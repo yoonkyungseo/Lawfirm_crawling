@@ -105,7 +105,7 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
                 
                 # 해당 pf가 기존에 저장된 사람인지 확인
                 if check_duplicates(name, job, call):
-                    pf.click()
+                    driver.execute_script("arguments[0].click();", pf)
                     time.sleep(4)
                     # 관련 분야
                     fields_lst = driver.find_elements(By.XPATH, '//*[@id="detailContents"]/div[5]/div/aside/div[1]/div/ul/li')
