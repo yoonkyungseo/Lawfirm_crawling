@@ -69,8 +69,8 @@ company = "화우"
 pf_lst = driver.find_elements(By.XPATH, '//*[@id="contentsList"]/div')
 pf_data = []
 for i in tqdm.tqdm(range(1, len(pf_lst)+1)):
-    pf = driver.find_elements(By.XPATH, f'//*[@id="contentsList"]/div[{i}]')
-    # driver.execute_script("arguments[0].scrollIntoView({block: 'nearest'});", pf) # 크롤링 pf로 화면 스크롤
+    pf = driver.find_element(By.XPATH, f'//*[@id="contentsList"]/div[{i}]')
+    driver.execute_script("arguments[0].scrollIntoView({block: 'nearest'});", pf) # 크롤링 pf로 화면 스크롤
     time.sleep(1)
     name = pf.find_element(By.CSS_SELECTOR, 'strong.name').text
     job = pf.find_element(By.CSS_SELECTOR, 'span.grade').text
