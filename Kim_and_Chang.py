@@ -50,7 +50,8 @@ driver.get("https://www.kimchang.com/ko/professionals/index.kc")
 driver.maximize_window()
 time.sleep(1)
 
-driver.find_element(By.XPATH, '//*[@id="form1"]/div[2]/ul/li[4]/a/span').click()
+all_button = driver.find_element(By.XPATH, '//*[@id="form1"]/div[2]/ul/li[4]/a/span')
+driver.execute_script("arguments[0].click();", all_button)
 time.sleep(1)
 
 company = "김앤장"
