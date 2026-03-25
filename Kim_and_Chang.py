@@ -1,0 +1,190 @@
+import os
+import gc
+import time
+import warnings
+warnings.filterwarnings('ignore')
+
+import pandas as pd
+import tqdm
+from selenium import webdriver
+from selenium.webdriver.common. by import By
+from datetime import datetime
+
+# --- Github 환경 추가 라이브러리 ---
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
+
+gc.collect()
+
+options = Options()
+options.add_argument("--headless")           # 브라우저 창을 띄우지 않음 (필수)
+options.add_argument("--no-sandbox")          # 보안 기능 해제 (리눅스 서버 필수)
+options.add_argument("--disable-dev-shm-usage") # 공유 메모리 부족 방지
+options.add_argument("--disable-gpu")         # GPU 가속 해제
+options.add_argument("--window-size=1920,1080") # 가상 모니터 크기 설정 (스크롤/클릭 오류 방지)
+
+# 데이터 프레임 정의
+col = ['company','name','job','call','related_fields','career','education','eligibility','awards','assessment']
+df = pd.DataFrame(columns=col)
+# 회사명, 이름, 직업, 전화번호, 업무분야, 경력, 학력, 자격, 수상, 외부평가(세종에만 있음)
+
+exist_data = set()
+
+# 중복 확인용 함수
+def check_duplicates(name, job, call):
+    global exist_data
+    new = (name, job, call)
+    if new in exist_data:
+        return False
+    else:
+        exist_data.add(new)
+        return True
+
+service = Service(ChromeDriverManager().install())
+driver = webdriver.Chrome(service=service, options=options)
+
+# 김앤장 크롤링 코드
+
+driver.get("https://www.kimchang.com/ko/professionals/index.kc")
+driver.maximize_window()
+time.sleep(1)
+
+driver.find_element(By.XPATH, '//*[@id="form1"]/div[2]/ul/li[4]/a/span').click()
+time.sleep(1)
+
+company = "김앤장"
+# 김앤장 구성원 페이지 ALL 항목들 = 구분 목록
+elements = driver.find_elements(By.XPATH, '//*[@id="keyWordTab4"]/li')
+for num in tqdm.tqdm(range(1, len(elements)+1)):
+    practice = driver.find_element(By.XPATH, f'//*[@id="keyWordTab4"]/li[{num}]/a') # 구분 목록 요소
+    driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", practice)
+    time.sleep(1)
+    # 현재 진행 중인 구분 목록 출력
+    print("-----", practice.text, "-----")
+    pf_data = []
+    practice.click() # 해당 구분 목록 클릭
+    time.sleep(3)
+
+    # 페이지 갯수 확인
+    pages = driver.find_elements(By.XPATH, '//*[@id="_pro"]/div/a')
+    if len(pages) == 9:
+        # 페이지가 5개 이상일 때
+        start = 3
+        end = len(pages)-1
+        page_flag = True
+    else:
+        # 페이지가 5개 이하일 때
+        start = 2
+        end = len(pages)
+        page_flag = False
+    
+    pf_flag = True
+    while pf_flag:
+        # 페이지별 탐색
+        for i in range(start, end):
+            # 페이지 이동
+            page = driver.find_element(By.XPATH, f'//*[@id="_pro"]/div/a[{i}]')
+            driver.execute_script("arguments[0].scrollIntoView({block: 'nearest'});", page)
+            time.sleep(1)
+            page_num = page.text
+            print(f"현재 {page_num} page 진행중")
+            page.click()
+            time.sleep(3)
+
+            pf_lst = driver.find_elements(By.XPATH, '//*[@id="_pro"]/ul[2]/li')
+            for j in range(1, len(pf_lst)+1):
+                pf = driver.find_element(By.XPATH, f'//*[@id="_pro"]/ul[2]/li[{j}]')
+                driver.execute_script("arguments[0].scrollIntoView({block: 'nearest'});", pf)
+                # 이름 # 직업
+                name, job = pf.find_element(By.XPATH, './/div/span[1]/a').text.splitlines()
+                # 전화번호
+                call = pf.find_element(By.XPATH, './/div/span[2]').text.replace('T.','')
+                
+                # 해당 pf가 기존에 저장된 사람인지 확인
+                if check_duplicates(name, job, call):
+                    pf.click()
+                    time.sleep(4)
+                    # 관련 분야
+                    fields_lst = driver.find_elements(By.XPATH, '//*[@id="detailContents"]/div[5]/div/aside/div[1]/div/ul/li')
+                    fields_total = []
+                    for field in fields_lst:
+                        fields_total.append(field.text)
+                    related_fields = ','.join(fields_total)
+                    # 경력
+                    career_lst = driver.find_elements(By.XPATH, '//*[@id="career"]/div[1]/p')
+                    career_total = []
+                    for careers in career_lst:
+                        career_total.append(careers.text)
+                    career = ','.join(career_total)
+                    # 학력
+                    edu_lst = driver.find_elements(By.XPATH, '//*[@id="career"]/ul[1]/p')
+                    edu_total = []
+                    for edus in edu_lst:
+                        edu_total.append(edus.text)
+                    education = ','.join(edu_total)
+                    # 자격
+                    eli_lst = driver.find_elements(By.XPATH, '//*[@id="career"]/ul[2]/p')
+                    eli_total = []
+                    for elis in eli_lst:
+                        eli_total.append(elis.text)
+                    eligibility = ','.join(eli_total)
+                    # 수상
+                    awards = ""
+                    extra_bullet = driver.find_elements(By.XPATH, '//*[@id="career"]/div[2]/div')
+                    for extra in extra_bullet:
+                        activity = extra.find_element(By.XPATH, './/h4/a')
+                        time.sleep(1)
+                        if activity.text == "주요 활동":
+                            activity.click()
+                            activity_bullet = extra.find_elements(By.XPATH, './/div/h5')
+                            for act in activity_bullet:
+                                if act.text == "수상":
+                                    awards_lst = extra.find_elements(By.XPATH, './/div/ul/li')
+                                    award_total = []
+                                    for award in awards_lst:
+                                        award_total.append(award.text)
+                                    awards = ','.join(award_total)
+                    add_pf = {
+                        'company':company,
+                        'name':name,
+                        'job':job,
+                        'call':call,
+                        'related_fields':related_fields,
+                        'career':career,
+                        'education':education,
+                        'eligibility':eligibility,
+                        'awards':awards,
+                        'assessment':""
+                    }
+                    pf_data.append(add_pf)
+                driver.back()
+                time.sleep(2)
+            if len(pf_lst) < 10:
+                pf_flag = False
+                break
+        # 다음 페이지로 넘기기
+        if page_flag and pf_flag:
+            driver.find_element(By.XPATH, f'//*[@id="_pro"]/div/a[{end}]').click()
+            time.sleep(3)
+            start_page = driver.find_element(By.XPATH, f'//*[@id="_pro"]/div/a[{start}]').text
+            time.sleep(2)
+            if int(start_page) == int(page_num)+1:
+                pages = driver.find_elements(By.XPATH, '//*[@id="_pro"]/div/a')
+                start = 3
+                end = len(pages)-1
+            else:
+                pf_flag = False
+                
+    # 구분목록 하나당 한번씩 df 갱신
+    df = pd.concat([df, pd.DataFrame(pf_data)], ignore_index=True)
+
+    time.sleep(2)
+
+today_folder = datetime.now().strftime("%Y-%m-%d")
+os.makedirs(f"data/{today_folder}", exist_ok=True)
+
+today = datetime.now().strftime("%y%m%d")
+df.to_csv(f"Kim_and_Chang_{today}.csv", index=False, encoding='utf-8-sig')
+
+driver.quit()
