@@ -89,6 +89,7 @@ for category in tqdm.tqdm(range(2, len(categories)+1)):
                 for field in fields_lst:
                     fields_total.append(field.text)
                 related_fields = ','.join(fields_total)
+                time.sleep(2)
 
                 # 경력
                 career_box = driver.find_element(By.XPATH, '//*[@id="professionalCareer"]')
@@ -108,6 +109,7 @@ for category in tqdm.tqdm(range(2, len(categories)+1)):
                     content = careers.find_element(By.CSS_SELECTOR, 'span.data-body').text
                     career_total.append(f'{content} ({period})')
                 career = ','.join(career_total)
+                time.sleep(2)
 
                 # 학력, 자격, 수상
                 detail_table = driver.find_elements(By.CSS_SELECTOR, 'div#keyExperience div.subsection')
