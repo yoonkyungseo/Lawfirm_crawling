@@ -101,6 +101,7 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
                 name, job = pf.find_element(By.XPATH, './/div/span[1]/a').text.splitlines()
                 # 전화번호
                 call = pf.find_element(By.XPATH, './/div/span[2]').text.replace('T.','')
+                print(name, job, call)
                 
                 # 해당 pf가 기존에 저장된 사람인지 확인
                 if check_duplicates(name, job, call):
