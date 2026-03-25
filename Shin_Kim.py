@@ -7,6 +7,8 @@ warnings.filterwarnings('ignore')
 import pandas as pd
 import tqdm
 from selenium import webdriver
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common. by import By
 from datetime import datetime
 
@@ -92,7 +94,8 @@ for category in tqdm.tqdm(range(2, len(categories)+1)):
                 time.sleep(2)
 
                 # 경력
-                career_box = driver.find_element(By.XPATH, '//*[@id="professionalCareer"]')
+                wait = WebDriverWait(driver, 10)
+                career_box = wait.until(EC.presence_of_element_located((By.ID, "professionalCareer")))
                 title = career_box.find_element(By.CSS_SELECTOR, 'h5.subsection-name').text
                 # 경력 더보기 버튼 존재 시 클릭
                 while True:
