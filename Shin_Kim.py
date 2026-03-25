@@ -101,7 +101,7 @@ for category in tqdm.tqdm(range(2, len(categories)+1)):
                 while True:
                     try:
                         career_button = career_box.find_element(By.CSS_SELECTOR, 'button span.open')
-                        career_button.click()
+                        driver.execute_script("arguments[0].click();", career_button)
                         time.sleep(1)
                     except:
                         break
@@ -128,7 +128,7 @@ for category in tqdm.tqdm(range(2, len(categories)+1)):
                         while True:
                             try:
                                 button = detail.find_element(By.CSS_SELECTOR, 'button span.open')
-                                button.click()
+                                driver.execute_script("arguments[0].click();", button)
                             except:
                                 break
                         detail_contents = detail.find_elements(By.CSS_SELECTOR, 'div.data-list-area li.data-item')
