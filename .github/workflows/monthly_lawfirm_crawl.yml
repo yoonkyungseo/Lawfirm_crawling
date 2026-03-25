@@ -38,7 +38,7 @@ jobs:
 
       # python 파일 실행
       - name: Run crawling script
-        continue-on-error: true # 여기서 오류가 나도 Commit and Push 단계 실행하도록 설정
+        continue-on-error: false # 여기서 오류가 나면 Commit and Push 단계 실행하지 않도록 설정
         run: python ${{ matrix.python-file }}
 
       # 결과 저장 및 푸시
