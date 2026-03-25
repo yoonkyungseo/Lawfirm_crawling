@@ -95,7 +95,7 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
 
             pf_lst = driver.find_elements(By.XPATH, '//*[@id="_pro"]/ul[2]/li')
             for j in range(1, len(pf_lst)+1):
-                pf = driver.find_element(By.XPATH, f'#_pro > ul.lawyer_profile > li:nth-child({j})')
+                pf = driver.find_element(By.CSS_SELECTOR, f'#_pro > ul.lawyer_profile > li:nth-child({j})')
                 driver.execute_script("arguments[0].scrollIntoView({block: 'nearest'});", pf)
                 # 이름 # 직업
                 name, job = pf.find_element(By.XPATH, './/div/span[1]/a').text.splitlines()
