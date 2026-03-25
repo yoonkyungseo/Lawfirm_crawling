@@ -165,8 +165,8 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
                         'assessment':""
                     }
                     pf_data.append(add_pf)
-                driver.close() # pf 클릭해서 연 창 닫기
-                driver.switch_to.window(main_window) # pf 리스트가 있는 main_window로 포커스 이동
+                    driver.close() # pf 클릭해서 연 창 닫기
+                    driver.switch_to.window(main_window) # pf 리스트가 있는 main_window로 포커스 이동
 
                 time.sleep(4)
             if len(pf_lst) < 10:
