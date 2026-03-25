@@ -22,11 +22,11 @@ jobs:
     steps:
       # 저장소 내 코드 가상 서버로 복사
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       # 가상 서버에 파이썬 설치
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.14.3'
 
