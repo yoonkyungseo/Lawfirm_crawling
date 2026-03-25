@@ -64,7 +64,7 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
     # 현재 진행 중인 구분 목록 출력
     print("-----", practice.text, "-----")
     pf_data = []
-    practice.click() # 해당 구분 목록 클릭
+    driver.execute_script("arguments[0].click();", practice) # 해당 구분 목록 클릭
     time.sleep(3)
 
     # 페이지 갯수 확인
@@ -90,7 +90,7 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
             time.sleep(1)
             page_num = page.text
             print(f"현재 {page_num} page 진행중")
-            page.click()
+            driver.execute_script("arguments[0].click();", page)
             time.sleep(3)
 
             pf_lst = driver.find_elements(By.XPATH, '//*[@id="_pro"]/ul[2]/li')
@@ -138,7 +138,7 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
                         activity = extra.find_element(By.XPATH, './/h4/a')
                         time.sleep(1)
                         if activity.text == "주요 활동":
-                            activity.click()
+                            driver.execute_script("arguments[0].click();", activity)
                             activity_bullet = extra.find_elements(By.XPATH, './/div/h5')
                             for act in activity_bullet:
                                 if act.text == "수상":
@@ -167,7 +167,8 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
                 break
         # 다음 페이지로 넘기기
         if page_flag and pf_flag:
-            driver.find_element(By.XPATH, f'//*[@id="_pro"]/div/a[{end}]').click()
+            next_page = driver.find_element(By.XPATH, f'//*[@id="_pro"]/div/a[{end}]')
+            driver.execute_script("arguments[0].click();", next_page)
             time.sleep(3)
             start_page = driver.find_element(By.XPATH, f'//*[@id="_pro"]/div/a[{start}]').text
             time.sleep(2)
