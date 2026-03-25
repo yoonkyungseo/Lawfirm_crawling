@@ -48,8 +48,9 @@ driver = webdriver.Chrome(service=service, options=options)
 
 driver.get("https://www.hwawoo.com/kor/professionals/members?lang=ko")
 driver.maximize_window()
-time.sleep(1)
-driver.find_element(By.XPATH, '//*[@id="container"]/div[1]/div/div[1]/div[2]/button[2]').click()
+time.sleep(3)
+search_button = driver.find_element(By.XPATH, '//*[@id="container"]/div[1]/div/div[1]/div[2]/button[2]')
+driver.execute_script("arguments[0].click();", search_button)
 time.sleep(1)
 
 # 더보기 버튼 모두 클릭
