@@ -161,7 +161,7 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
                     }
                     pf_data.append(add_pf)
                 driver.back()
-                time.sleep(2)
+                time.sleep(4)
             if len(pf_lst) < 10:
                 pf_flag = False
                 break
