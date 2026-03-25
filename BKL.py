@@ -106,7 +106,8 @@ def bkl_crawling(id, button_id):
                             eligibility = ','.join(box_total)
                     # 수상
                     elif "주요활동" in title:
-                        title_.find_element(By.XPATH, './/button').click()
+                        main_action_button = title_.find_element(By.XPATH, './/button')
+                        driver.execute_script("arguments[0].click();", main_action_button)
                         try:
                             awards_title = section.find_element(By.XPATH, ".//div[normalize-space()='수상']")
                             awards_lst = awards_title.find_elements(By.XPATH, './/following-sibling::div')
