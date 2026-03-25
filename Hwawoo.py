@@ -57,9 +57,10 @@ time.sleep(1)
 while True:
     button = driver.find_element(By.XPATH, '//*[@id="moreButton"]/button')
     driver.execute_script("arguments[0].scrollIntoView({block: 'nearest'});", button)
-    time.sleep(1)
+    time.sleep(2)
     if button.is_displayed():
-        button.click()
+        driver.execute_script("arguments[0].click();", button)
+        time.sleep(3)
     else:
         break
 
