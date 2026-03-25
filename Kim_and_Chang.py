@@ -47,6 +47,7 @@ driver = webdriver.Chrome(service=service, options=options)
 # 김앤장 크롤링 코드
 
 driver.get("https://www.kimchang.com/ko/professionals/index.kc")
+main_window = driver.current_window_handle # 현재 창 ID를 변수로 저장
 driver.maximize_window()
 time.sleep(3)
 
@@ -62,7 +63,7 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
     driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", practice)
     time.sleep(1)
     # 현재 진행 중인 구분 목록 출력
-    print("-----", practice.text, "-----")
+    print("-----", practice.get_attribute("textContent"), "-----")
     pf_data = []
     driver.execute_script("arguments[0].click();", practice) # 해당 구분 목록 클릭
     time.sleep(3)
@@ -105,8 +106,12 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
                 
                 # 해당 pf가 기존에 저장된 사람인지 확인
                 if check_duplicates(name, job, call):
-                    driver.execute_script("arguments[0].click();", pf)
+                    # pf 화면 새 창에서 열기
+                    pf_link = pf.find_element(By.TAG_NAME, "a").get_attribute("href")
+                    driver.execute_script(f"window.open('{pf_link}', '_blank');")
+                    driver.switch_to.window(driver.window_handles[-1]) # 새 창으로 포커스 이동
                     time.sleep(4)
+
                     # 관련 분야
                     fields_lst = driver.find_elements(By.XPATH, '//*[@id="detailContents"]/div[5]/div/aside/div[1]/div/ul/li')
                     fields_total = []
@@ -160,7 +165,9 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
                         'assessment':""
                     }
                     pf_data.append(add_pf)
-                driver.back()
+                driver.close() # pf 클릭해서 연 창 닫기
+                driver.switch_to.window(main_window) # pf 리스트가 있는 main_window로 포커스 이동
+
                 time.sleep(4)
             if len(pf_lst) < 10:
                 pf_flag = False
