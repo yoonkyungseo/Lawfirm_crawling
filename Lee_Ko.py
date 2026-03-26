@@ -53,8 +53,8 @@ time.sleep(1)
 company = "광장"
 
 categories = driver.find_elements(By.XPATH, '//*[@id="mCSB_2_container"]/li')
-pf_data = []
 for category in tqdm.tqdm(range(2, len(categories)+1)):
+    pf_data = []
     # 카테고리 선택
     category_box = driver.find_element(By.XPATH, "//div[@class='leeko-member-search__select']//div[@class='nice-select chosen-select']")
     driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", category_box) # 카테고리 박스로 스크롤
