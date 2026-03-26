@@ -62,19 +62,22 @@ for category in tqdm.tqdm(range(2, len(categories)+1)):
     # 카테고리 선택
     category_box = driver.find_element(By.XPATH, f'//*[@id="bizCode"]')
     driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", category_box) # 카테고리 박스로 스크롤
-    category_box.click() # 카테고리 박스 클릭
+    driver.execute_script("arguments[0].click();", category_box) # 카테고리 박스 클릭
+    time.sleep(0.5)
     cate = category_box.find_element(By.XPATH, f'.//option[{category}]')
     print("-----", cate.text, "-----")
-    cate.click() # 카테고리 선택
-    driver.find_element(By.CSS_SELECTOR, "button.btn.theme-b.type-a.rise-03").click() # 검색 버튼 클릭
+    driver.execute_script("arguments[0].click();", cate) # 카테고리 선택
+    time.sleep(0.5)
+    search_button = driver.find_element(By.CSS_SELECTOR, "button.btn.theme-b.type-a.rise-03")
+    driver.execute_script("arguments[0].click();", search_button) # 검색 버튼 클릭
     time.sleep(3)
 
     while True:
         # 주요구성원, 구성원 상관없이 화면에 뜨는 모든 pf 정보 가져옴
         pf_lst = driver.find_elements(By.CSS_SELECTOR, 'li.data-item') # 구성원 리스트
         for pf in pf_lst:
-            driver.execute_script("arguments[0].scrollIntoView({block: 'nearest'});", pf) # 크롤링 pf로 화면 스크롤
-            time.sleep(1)
+            driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", pf) # 크롤링 pf로 화면 스크롤
+            time.sleep(2)
             pf_name = pf.find_element(By.CSS_SELECTOR, 'a.text')
             name = pf_name.text
             job = pf.find_element(By.CSS_SELECTOR, 'span.sort').text
@@ -82,7 +85,7 @@ for category in tqdm.tqdm(range(2, len(categories)+1)):
 
             if check_duplicates(name, job, call):
                 print(name, job, call)
-                pf_name.click()
+                driver.execute_script("arguments[0].click();", pf_name)
                 time.sleep(3)
 
                 # 관련 분야
@@ -129,6 +132,7 @@ for category in tqdm.tqdm(range(2, len(categories)+1)):
                             try:
                                 button = detail.find_element(By.CSS_SELECTOR, 'button span.open')
                                 driver.execute_script("arguments[0].click();", button)
+                                time.sleep(2)
                             except:
                                 break
                         detail_contents = detail.find_elements(By.CSS_SELECTOR, 'div.data-list-area li.data-item')
@@ -176,9 +180,10 @@ for category in tqdm.tqdm(range(2, len(categories)+1)):
             if exist_next: # 다음으로 넘어갈 페이지가 있으면
                 page_num += 1
                 pagination = driver.find_element(By.CSS_SELECTOR, 'span.pagination')
-                driver.execute_script("arguments[0].scrollIntoView({block: 'nearest'});", pagination)
-                pagination.find_element(By.XPATH, f'.//a[{page_num}]').click()
-                time.sleep(1)
+                driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", pagination)
+                click_page = driver.find_element(By.XPATH, f'.//a[{page_num}]')
+                driver.execute_script("arguments[0].click();", click_page)
+                time.sleep(2)
             else:
                 break
         except:
