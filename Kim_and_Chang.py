@@ -7,6 +7,8 @@ warnings.filterwarnings('ignore')
 import pandas as pd
 import tqdm
 from selenium import webdriver
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common. by import By
 from datetime import datetime
 
@@ -55,6 +57,8 @@ all_button = driver.find_element(By.XPATH, '//*[@id="form1"]/div[2]/ul/li[4]/a/s
 driver.execute_script("arguments[0].click();", all_button)
 time.sleep(2)
 
+wait = WebDriverWait(driver, 10)
+
 company = "김앤장"
 # 김앤장 구성원 페이지 ALL 항목들 = 구분 목록
 elements = driver.find_elements(By.XPATH, '//*[@id="keyWordTab4"]/li')
@@ -86,7 +90,7 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
         # 페이지별 탐색
         for i in range(start, end):
             # 페이지 이동
-            page = driver.find_element(By.XPATH, f'//*[@id="_pro"]/div/a[{i}]')
+            page = wait.until(EC.visibility_of_element_located((By.XPATH, f'//*[@id="_pro"]/div/a[{i}]')))
             driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", page)
             time.sleep(2)
             page_num = page.text
