@@ -182,7 +182,7 @@ for category in tqdm.tqdm(range(2, len(categories)+1)):
                 page_num += 1
                 pagination = driver.find_element(By.CSS_SELECTOR, 'span.pagination')
                 driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", pagination)
-                click_page = driver.find_element(By.XPATH, f'.//a[{page_num}]')
+                click_page = pagination.find_element(By.XPATH, f'.//a[{page_num}]')
                 driver.execute_script("arguments[0].click();", click_page)
                 time.sleep(2)
             else:
