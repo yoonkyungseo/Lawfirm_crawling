@@ -79,7 +79,7 @@ for category in tqdm.tqdm(range(2, len(categories)+1)):
         pf_lst = driver.find_elements(By.CSS_SELECTOR, 'li.data-item') # 구성원 리스트
         for pf in pf_lst:
             driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", pf) # 크롤링 pf로 화면 스크롤
-            time.sleep(2)
+            time.sleep(0.5)
             pf_name = pf.find_element(By.CSS_SELECTOR, 'a.text')
             name = pf_name.text
             job = pf.find_element(By.CSS_SELECTOR, 'span.sort').text
@@ -95,7 +95,6 @@ for category in tqdm.tqdm(range(2, len(categories)+1)):
                 fields_total = []
                 for field in fields_lst:
                     driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", field)
-                    time.sleep(1)
                     fields_total.append(field.text)
                 related_fields = ','.join(fields_total)
                 time.sleep(2)
@@ -104,7 +103,6 @@ for category in tqdm.tqdm(range(2, len(categories)+1)):
                 wait = WebDriverWait(driver, 10)
                 career_box = wait.until(EC.presence_of_element_located((By.ID, "professionalCareer")))
                 driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", career_box)
-                time.sleep(1)
                 title = career_box.find_element(By.CSS_SELECTOR, 'h5.subsection-name').text
                 # 경력 더보기 버튼 존재 시 클릭
                 while True:
@@ -120,21 +118,24 @@ for category in tqdm.tqdm(range(2, len(categories)+1)):
                 career_total = []
                 for careers in career_lst:
                     driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", careers)
-                    period_element = wait.until(
-                        lambda x: careers.find_element(By.CSS_SELECTOR, 'span.data-head')
-                    )
-                    period = period_element.text
-                    content = careers.find_element(By.CSS_SELECTOR, 'span.data-body').text
-                    career_total.append(f'{content} ({period})')
+                    try:
+                        period = careers.find_element(By.CSS_SELECTOR, 'span.data-head').text
+                    except:
+                        period = ""
+                    content = careers.find_element(By.XPATH, 'span.data-body').text
+                    if not period:
+                        career_total.append(content)
+                    else:
+                        career_total.append(f'{content} ({period})')
                 career = ','.join(career_total)
-                time.sleep(2)
+                time.sleep(1)
 
                 # 학력, 자격, 수상
                 detail_table = driver.find_elements(By.CSS_SELECTOR, 'div#keyExperience div.subsection')
                 eligibility, awards = "", ""
                 for detail in detail_table:
                     driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", detail)
-                    time.sleep(1)
+                    time.sleep(0.5)
                     detail_title = detail.find_element(By.CSS_SELECTOR, 'h5.subsection-name').text
                     # 외부 평가
                     assessment_flag = False
@@ -146,7 +147,6 @@ for category in tqdm.tqdm(range(2, len(categories)+1)):
                             try:
                                 button = detail.find_element(By.CSS_SELECTOR, 'button span.open')
                                 driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", button)
-                                time.sleep(0.5)
                                 driver.execute_script("arguments[0].click();", button)
                                 time.sleep(2)
                             except:
@@ -155,7 +155,6 @@ for category in tqdm.tqdm(range(2, len(categories)+1)):
                         box_total = []
                         for detail_content in detail_contents:
                             driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", detail_content)
-                            time.sleep(1)
                             try:
                                 period = detail_content.find_element(By.CSS_SELECTOR, 'span.data-head').text
                             except:
