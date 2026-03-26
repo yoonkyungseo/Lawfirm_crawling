@@ -122,7 +122,7 @@ for category in tqdm.tqdm(range(2, len(categories)+1)):
                         period = careers.find_element(By.CSS_SELECTOR, 'span.data-head').text
                     except:
                         period = ""
-                    content = careers.find_element(By.XPATH, 'span.data-body').text
+                    content = careers.find_element(By.CSS_SELECTOR, 'span.data-body').text
                     if not period:
                         career_total.append(content)
                     else:
