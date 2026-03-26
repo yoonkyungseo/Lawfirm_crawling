@@ -65,6 +65,7 @@ for category in tqdm.tqdm(range(2, len(categories)+1)):
     driver.execute_script("arguments[0].click();", category_box) # 카테고리 박스 클릭
     time.sleep(0.5)
     cate = category_box.find_element(By.XPATH, f'.//option[{category}]')
+    driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", cate) # 카테고리 요소로 스크롤
     # driver.execute_script("arguments[0].click();", cate) # 카테고리 선택
     cate.click()
     print("-----", cate.text, "-----")
