@@ -53,7 +53,7 @@ time.sleep(3)
 
 all_button = driver.find_element(By.XPATH, '//*[@id="form1"]/div[2]/ul/li[4]/a/span')
 driver.execute_script("arguments[0].click();", all_button)
-time.sleep(1)
+time.sleep(2)
 
 company = "김앤장"
 # 김앤장 구성원 페이지 ALL 항목들 = 구분 목록
@@ -61,7 +61,7 @@ elements = driver.find_elements(By.XPATH, '//*[@id="keyWordTab4"]/li')
 for num in tqdm.tqdm(range(1, len(elements)+1)):
     practice = driver.find_element(By.XPATH, f'//*[@id="keyWordTab4"]/li[{num}]/a') # 구분 목록 요소
     driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", practice)
-    time.sleep(1)
+    time.sleep(2)
     # 현재 진행 중인 구분 목록 출력
     print("-----", practice.get_attribute("textContent"), "-----")
     pf_data = []
@@ -87,8 +87,8 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
         for i in range(start, end):
             # 페이지 이동
             page = driver.find_element(By.XPATH, f'//*[@id="_pro"]/div/a[{i}]')
-            driver.execute_script("arguments[0].scrollIntoView({block: 'nearest'});", page)
-            time.sleep(1)
+            driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", page)
+            time.sleep(2)
             page_num = page.text
             print(f"현재 {page_num} page 진행중")
             driver.execute_script("arguments[0].click();", page)
@@ -97,7 +97,8 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
             pf_lst = driver.find_elements(By.XPATH, '//*[@id="_pro"]/ul[2]/li')
             for j in range(1, len(pf_lst)+1):
                 pf = driver.find_element(By.CSS_SELECTOR, f'#_pro > ul.lawyer_profile > li:nth-child({j})')
-                driver.execute_script("arguments[0].scrollIntoView({block: 'nearest'});", pf)
+                driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", pf)
+                time.sleep(2)
                 # 이름 # 직업
                 name, job = pf.find_element(By.XPATH, './/div/span[1]/a').text.splitlines()
                 # 전화번호
@@ -144,6 +145,7 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
                         time.sleep(1)
                         if activity.text == "주요 활동":
                             driver.execute_script("arguments[0].click();", activity)
+                            time.sleep(1)
                             activity_bullet = extra.find_elements(By.XPATH, './/div/h5')
                             for act in activity_bullet:
                                 if act.text == "수상":
