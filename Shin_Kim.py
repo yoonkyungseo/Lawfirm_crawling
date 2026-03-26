@@ -65,8 +65,9 @@ for category in tqdm.tqdm(range(2, len(categories)+1)):
     driver.execute_script("arguments[0].click();", category_box) # 카테고리 박스 클릭
     time.sleep(0.5)
     cate = category_box.find_element(By.XPATH, f'.//option[{category}]')
+    # driver.execute_script("arguments[0].click();", cate) # 카테고리 선택
+    cate.click()
     print("-----", cate.text, "-----")
-    driver.execute_script("arguments[0].click();", cate) # 카테고리 선택
     time.sleep(0.5)
     search_button = driver.find_element(By.CSS_SELECTOR, "button.btn.theme-b.type-a.rise-03")
     driver.execute_script("arguments[0].click();", search_button) # 검색 버튼 클릭
