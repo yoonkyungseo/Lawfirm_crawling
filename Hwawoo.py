@@ -139,7 +139,7 @@ for i in tqdm.tqdm(range(1, len(pf_lst)+1)):
                     for tits, conts in zip(added_title, added_content):
                         conts_elements = conts.find_elements(By.CSS_SELECTOR, 'li')
                         cts = ','.join([el.get_attribute("textContent") for el in conts_elements])
-                        added_total.append(f'{tits.get_attribute("textContent")[1:-1]}]] {cts}')
+                        added_total.append(f'{tits.get_attribute("textContent")[1:-1]}]]{cts}')
                     added_result = '//'.join(added_total)
                 else:
                     for conts in added_content:
