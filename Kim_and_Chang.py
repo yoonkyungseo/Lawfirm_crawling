@@ -46,6 +46,15 @@ def check_duplicates(name, job, call):
 service = Service(ChromeDriverManager().install())
 driver = webdriver.Chrome(service=service, options=options)
 
+def wait_presence_element(driver, locator, timeout=10):
+    return WebDriverWait(driver, timeout).until(EC.presence_of_element_located(locator))
+def wait_presence_elements(driver, locator, timeout=10):
+    return WebDriverWait(driver, timeout).until(EC.presence_of_all_elements_located(locator))
+def wait_visibility_element(driver, locator, timeout=10):
+    return WebDriverWait(driver, timeout).until(EC.visibility_of_element_located(locator))
+def wait_clickable_element(driver, locator, timeout=10):
+    return WebDriverWait(driver, timeout).until(EC.element_to_be_clickable(locator))
+
 # 김앤장 크롤링 코드
 
 driver.get("https://www.kimchang.com/ko/professionals/index.kc")
@@ -53,32 +62,25 @@ main_window = driver.current_window_handle # 현재 창 ID를 변수로 저장
 driver.maximize_window()
 time.sleep(3)
 
-all_button = driver.find_element(By.XPATH, '//*[@id="form1"]/div[2]/ul/li[4]/a/span')
+all_button = wait_clickable_element(driver, (By.XPATH, '//*[@id="form1"]/div[2]/ul/li[4]/a/span'))
 driver.execute_script("arguments[0].click();", all_button)
 time.sleep(2)
 
-def wait_presence_element(driver, locator, timeout=10):
-    return WebDriverWait(driver, timeout).until(EC.presence_of_element_located(locator))
-def wait_presence_elements(driver, locator, timeout=10):
-    return WebDriverWait(driver, timeout).until(EC.presence_of_all_elements_located(locator))
-def wait_visibility_element(driver, locator, timeout=10):
-    return WebDriverWait(driver, timeout).until(EC.visibility_of_element_located(locator))
-
 company = "김앤장"
 # 김앤장 구성원 페이지 ALL 항목들 = 구분 목록
-elements = driver.find_elements(By.XPATH, '//*[@id="keyWordTab4"]/li')
+elements = wait_presence_elements(driver, (By.XPATH, '//*[@id="keyWordTab4"]/li'))
 for num in tqdm.tqdm(range(1, len(elements)+1)):
-    practice = driver.find_element(By.XPATH, f'//*[@id="keyWordTab4"]/li[{num}]/a') # 구분 목록 요소
+    practice = wait_clickable_element(driver, (By.XPATH, f'//*[@id="keyWordTab4"]/li[{num}]/a')) # 구분 목록 요소
     driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", practice)
     time.sleep(2)
     # 현재 진행 중인 구분 목록 출력
-    print("-----", practice.get_attribute("textContent"), "-----")
+    print("-----", practice.get_attribute("textContent").strip(), "-----")
     pf_data = []
     driver.execute_script("arguments[0].click();", practice) # 해당 구분 목록 클릭
     time.sleep(3)
 
     # 페이지 갯수 확인
-    pages = driver.find_elements(By.XPATH, '//*[@id="_pro"]/div/a')
+    pages = wait_presence_elements(driver, (By.XPATH, '//*[@id="_pro"]/div/a'))
     if len(pages) == 9:
         # 페이지가 5개 이상일 때
         start = 3
@@ -95,73 +97,73 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
         # 페이지별 탐색
         for i in range(start, end):
             # 페이지 이동
-            page = wait.until(EC.visibility_of_element_located((By.XPATH, f'//*[@id="_pro"]/div/a[{i}]')))
+            page = wait_clickable_element(driver, (By.XPATH, f'//*[@id="_pro"]/div/a[{i}]'))
             driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", page)
             time.sleep(2)
-            page_num = page.text
+            page_num = page.get_attribute("textContent")
             print(f"현재 {page_num} page 진행중")
             driver.execute_script("arguments[0].click();", page)
             time.sleep(3)
 
-            pf_lst = driver.find_elements(By.XPATH, '//*[@id="_pro"]/ul[2]/li')
+            pf_lst = wait_presence_elements(driver, (By.XPATH, '//*[@id="_pro"]/ul[2]/li'))
             for j in range(1, len(pf_lst)+1):
-                pf = driver.find_element(By.CSS_SELECTOR, f'#_pro > ul.lawyer_profile > li:nth-child({j})')
+                pf = wait_presence_element(driver, (By.CSS_SELECTOR, f'#_pro > ul.lawyer_profile > li:nth-child({j})'))
                 driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", pf)
                 time.sleep(2)
                 # 이름 # 직업
-                name, job = pf.find_element(By.XPATH, './/div/span[1]/a').text.splitlines()
+                name, job = wait_presence_element(pf, (By.XPATH, './/div/span[1]/a').get_attribute("textContent").splitlines())
                 # 전화번호
-                call = pf.find_element(By.XPATH, './/div/span[2]').text.replace('T.','')
+                call = wait_presence_element(pf, (By.XPATH, './/div/span[2]').get_attribute("textContent").replace('T.',''))
                 print(name, job, call)
                 
                 # 해당 pf가 기존에 저장된 사람인지 확인
                 if check_duplicates(name, job, call):
                     # pf 화면 새 창에서 열기
-                    pf_link = pf.find_element(By.TAG_NAME, "a").get_attribute("href")
+                    pf_link = wait_presence_element(pf, (By.TAG_NAME, "a").get_attribute("href"))
                     driver.execute_script(f"window.open('{pf_link}', '_blank');")
                     driver.switch_to.window(driver.window_handles[-1]) # 새 창으로 포커스 이동
                     time.sleep(4)
 
                     # 관련 분야
-                    fields_lst = driver.find_elements(By.XPATH, '//*[@id="detailContents"]/div[5]/div/aside/div[1]/div/ul/li')
+                    fields_lst = wait_presence_elements(driver, (By.XPATH, '//*[@id="detailContents"]/div[5]/div/aside/div[1]/div/ul/li'))
                     fields_total = []
                     for field in fields_lst:
-                        fields_total.append(field.text)
+                        fields_total.append(field.get_attribute("textContent"))
                     related_fields = ','.join(fields_total)
                     # 경력
-                    career_lst = driver.find_elements(By.XPATH, '//*[@id="career"]/div[1]/p')
+                    career_lst = wait_presence_elements(driver, (By.XPATH, '//*[@id="career"]/div[1]/p'))
                     career_total = []
                     for careers in career_lst:
-                        career_total.append(careers.text)
+                        career_total.append(careers.get_attribute("textContent"))
                     career = ','.join(career_total)
                     # 학력
-                    edu_lst = driver.find_elements(By.XPATH, '//*[@id="career"]/ul[1]/p')
+                    edu_lst = wait_presence_elements(driver, (By.XPATH, '//*[@id="career"]/ul[1]/p'))
                     edu_total = []
                     for edus in edu_lst:
-                        edu_total.append(edus.text)
+                        edu_total.append(edus.get_attribute("textContent"))
                     education = ','.join(edu_total)
                     # 자격
-                    eli_lst = driver.find_elements(By.XPATH, '//*[@id="career"]/ul[2]/p')
+                    eli_lst = wait_presence_elements(driver, (By.XPATH, '//*[@id="career"]/ul[2]/p'))
                     eli_total = []
                     for elis in eli_lst:
-                        eli_total.append(elis.text)
+                        eli_total.append(elis.get_attribute("textContent"))
                     eligibility = ','.join(eli_total)
                     # 수상
                     awards = ""
-                    extra_bullet = driver.find_elements(By.XPATH, '//*[@id="career"]/div[2]/div')
+                    extra_bullet = wait_presence_elements(driver, (By.XPATH, '//*[@id="career"]/div[2]/div'))
                     for extra in extra_bullet:
-                        activity = extra.find_element(By.XPATH, './/h4/a')
+                        activity = wait_clickable_element(extra, (By.XPATH, './/h4/a'))
                         time.sleep(1)
-                        if activity.text == "주요 활동":
+                        if activity.get_attribute("textContent") == "주요 활동":
                             driver.execute_script("arguments[0].click();", activity)
                             time.sleep(1)
-                            activity_bullet = extra.find_elements(By.XPATH, './/div/h5')
+                            activity_bullet = wait_presence_elements(extra, (By.XPATH, './/div/h5'))
                             for act in activity_bullet:
-                                if act.text == "수상":
-                                    awards_lst = extra.find_elements(By.XPATH, './/div/ul/li')
+                                if act.get_attribute("textContent") == "수상":
+                                    awards_lst = wait_presence_elements(extra, (By.XPATH, './/div/ul/li'))
                                     award_total = []
                                     for award in awards_lst:
-                                        award_total.append(award.text)
+                                        award_total.append(award.get_attribute("textContent"))
                                     awards = ','.join(award_total)
                     add_pf = {
                         'company':company,
@@ -185,13 +187,13 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
                 break
         # 다음 페이지로 넘기기
         if page_flag and pf_flag:
-            next_page = driver.find_element(By.XPATH, f'//*[@id="_pro"]/div/a[{end}]')
+            next_page = wait_clickable_element(driver, (By.XPATH, f'//*[@id="_pro"]/div/a[{end}]'))
             driver.execute_script("arguments[0].click();", next_page)
             time.sleep(3)
-            start_page = driver.find_element(By.XPATH, f'//*[@id="_pro"]/div/a[{start}]').text
+            start_page = wait_visibility_element(driver, (By.XPATH, f'//*[@id="_pro"]/div/a[{start}]')).get_attribute("textContent")
             time.sleep(2)
             if int(start_page) == int(page_num)+1:
-                pages = driver.find_elements(By.XPATH, '//*[@id="_pro"]/div/a')
+                pages = wait_presence_elements(driver, (By.XPATH, '//*[@id="_pro"]/div/a'))
                 start = 3
                 end = len(pages)-1
             else:
