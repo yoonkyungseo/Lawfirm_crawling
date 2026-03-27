@@ -83,7 +83,8 @@ def bkl_crawling(id, button_id):
                 fields_lst = driver.find_elements(By.XPATH, '//*[@id="content"]/div[3]/div[2]/div/div[1]/ul/li')
                 fields_total = []
                 for field in fields_lst:
-                    fields_total.append(field.text)
+                    field_text = field.find_element(By.XPATH, './/a').text
+                    fields_total.append(field_text)
                 related_fields = ','.join(fields_total)
                 
                 sections = driver.find_elements(By.CSS_SELECTOR, '.prof-section.ui-scroll-spy-section.ui-box')
