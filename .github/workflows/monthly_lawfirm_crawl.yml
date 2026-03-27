@@ -10,6 +10,8 @@ on:
 jobs:
   lawfirm_crawling:
     runs-on: ubuntu-latest # 실행할 OS 환경
+    env:
+      TZ: Asia/Seoul
     # 쓰기 권한 설정 (CSV 파일을 저장소에 다시 올리기 위해 필수)
     permissions:
       contents: write
