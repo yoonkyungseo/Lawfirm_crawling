@@ -143,7 +143,7 @@ def bkl_crawling(id, button_id):
                                     awards = contents_text
                                 # 외부활동
                                 else:
-                                    contents_total.append(f"{contents_title}]] {contents_text}")
+                                    contents_total.append(f"{contents_title}]]{contents_text}")
                             activity = '//'.join(contents_total)
                         except:
                             pass
@@ -165,7 +165,7 @@ def bkl_crawling(id, button_id):
                             perform_content_text = ','.join(perform_content_imsi)
 
                             if perform_title:
-                                performance_total.append(f'{perform_title}]] {perform_content_text}')
+                                performance_total.append(f'{perform_title}]]{perform_content_text}')
                             else:
                                 performance_total.append(perform_content_text)
                         performance = '//'.join(performance_total)
