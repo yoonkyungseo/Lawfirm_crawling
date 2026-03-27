@@ -192,6 +192,7 @@ def bkl_crawling(id, button_id):
         #     page += 1
         # except:
         #     break
+        break
 
 bkl_crawling("isMainY", 2)
 bkl_crawling("isMainN", 3)
