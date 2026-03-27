@@ -57,7 +57,12 @@ all_button = driver.find_element(By.XPATH, '//*[@id="form1"]/div[2]/ul/li[4]/a/s
 driver.execute_script("arguments[0].click();", all_button)
 time.sleep(2)
 
-wait = WebDriverWait(driver, 10)
+def wait_presence_element(driver, locator, timeout=10):
+    return WebDriverWait(driver, timeout).until(EC.presence_of_element_located(locator))
+def wait_presence_elements(driver, locator, timeout=10):
+    return WebDriverWait(driver, timeout).until(EC.presence_of_all_elements_located(locator))
+def wait_visibility_element(driver, locator, timeout=10):
+    return WebDriverWait(driver, timeout).until(EC.visibility_of_element_located(locator))
 
 company = "김앤장"
 # 김앤장 구성원 페이지 ALL 항목들 = 구분 목록
