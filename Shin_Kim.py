@@ -27,9 +27,9 @@ options.add_argument("--disable-gpu")         # GPU 가속 해제
 options.add_argument("--window-size=1920,1080") # 가상 모니터 크기 설정 (스크롤/클릭 오류 방지)
 
 # 데이터 프레임 정의
-col = ['company','name','job','call','related_fields','career','education','eligibility','awards','assessment']
+col = ['company','name','job','call', 'email', 'introduction','related_fields','career','education','eligibility','awards','assessment', 'performance', 'language', 'activity','url']
 df = pd.DataFrame(columns=col)
-# 회사명, 이름, 직업, 전화번호, 업무분야, 경력, 학력, 자격, 수상, 외부평가(세종에만 있음)
+# 회사명, 이름, 직업, 전화번호, 이메일, 상세 소개글, 업무분야, 경력, 학력, 자격, 수상, 외부평가(세종에만 있음), 주요업무실적, 사용언어, 외부활동, 프로필 url
 
 exist_data = set()
 
@@ -90,14 +90,24 @@ for category in tqdm.tqdm(range(2, len(categories)+1)):
                 driver.execute_script("arguments[0].click();", pf_name)
                 time.sleep(3)
 
-                # 관련 분야
-                fields_lst = driver.find_elements(By.CSS_SELECTOR, 'ul.related-work li')
-                fields_total = []
-                for field in fields_lst:
-                    driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", field)
-                    fields_total.append(field.text)
-                related_fields = ','.join(fields_total)
-                time.sleep(2)
+                # 이메일
+                email = driver.find_element(By.XPATH, '//*[@id="content"]/div[1]/div[2]/div[2]/div[2]/div[1]/span[3]/span/a').text
+
+                overviews = driver.find_elements(By.CSS_SELECTOR, 'div#overview div.subsection')
+                for overview in overviews:
+                    title = overview.find_element(By.CSS_SELECTOR, 'h5.subsection-name').get_attribute("textContent").strip()
+                    # 상세 소개글
+                    if title == "개요":
+                        introduction = overview.find_element(By.CSS_SELECTOR, ' p.para').text.replace('\n', ' ')
+                    elif title == "관련 업무분야":
+                        # 관련 분야
+                        fields_lst = overview.find_elements(By.CSS_SELECTOR, ' ul.related-work li')
+                        fields_total = []
+                        for field in fields_lst:
+                            driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", field)
+                            fields_total.append(field.get_attribute("textContent"))
+                        related_fields = ','.join(fields_total)
+                        time.sleep(2)
 
                 # 경력
                 wait = WebDriverWait(driver, 10)
@@ -132,17 +142,17 @@ for category in tqdm.tqdm(range(2, len(categories)+1)):
 
                 # 학력, 자격, 수상
                 detail_table = driver.find_elements(By.CSS_SELECTOR, 'div#keyExperience div.subsection')
-                eligibility, awards = "", ""
+                eligibility, awards, assessment, activity, performance = "", "", "", "", ""
                 for detail in detail_table:
                     driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", detail)
                     time.sleep(0.5)
                     detail_title = detail.find_element(By.CSS_SELECTOR, 'h5.subsection-name').text
                     # 외부 평가
                     assessment_flag = False
-                    if detail_title == "외부 평가":
+                    if detail_title == "외부 평가" or detail_title == "외부 활동":
                         assessment_flag = True
 
-                    if detail_title in ["학력", "자격", "수상 내역", "외부 평가"]:
+                    if detail_title in ["학력", "자격", "수상 내역", "외부 평가", "외부 활동"]:
                         while True:
                             try:
                                 button = detail.find_element(By.CSS_SELECTOR, 'button span.open')
@@ -171,21 +181,48 @@ for category in tqdm.tqdm(range(2, len(categories)+1)):
                             eligibility = ','.join(box_total)
                         elif detail_title == "수상 내역":
                             awards = ','.join(box_total)
-                        else:
+                        elif detail_title == "외부 평가":
                             assessment = ','.join(box_total)
-
+                        else:
+                            activity = ','.join(box_total)
+                    elif detail_title == "주요 업무 실적":
+                        cont_element = detail.find_element(By.CSS_SELECTOR, 'div.data-list-area > div.inner')
+                        children = cont_element.find_elements(By.XPATH, "./*")
+                        detail_results = ""
+                        for child in children:
+                            if child.tag_name == "h6":
+                                if detail_results:
+                                    detail_results += f'//{child.get_attribute("textContent")}]]'
+                                else:
+                                    detail_results += f"{child.get_attribute("textContent")}]]"
+                            elif child.tag_name == "ul":
+                                for ch in child:
+                                    ch_text = ch.get_attribute("textContent")
+                                    if detail_results:
+                                        detail_results += f',{ch_text}'
+                                    else:
+                                        detail_results += ch_text
+                        performance = detail_results
+                    elif detail_title == "언어":
+                        language = detail.find_element(By.CSS_SELECTOR, ' p.para').text
 
                 add_pf = {
                             'company':company,
                             'name':name,
                             'job':job,
                             'call':call,
+                            'email':email,
+                            'introduction':introduction,
                             'related_fields':related_fields,
                             'career':career,
                             'education':education,
                             'eligibility':eligibility,
                             'awards':awards,
-                            'assessment':assessment
+                            'assessment':assessment,
+                            'performance':performance,
+                            'language':language,
+                            'activity':activity,
+                            'url':driver.current_url
                         }
                 pf_data.append(add_pf)
                 driver.back()
