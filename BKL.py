@@ -25,9 +25,9 @@ options.add_argument("--disable-gpu")         # GPU 가속 해제
 options.add_argument("--window-size=1920,1080") # 가상 모니터 크기 설정 (스크롤/클릭 오류 방지)
 
 # 데이터 프레임 정의
-col = ['company','name','job','call','related_fields','career','education','eligibility','awards','assessment']
+col = ['company','name','job','call', 'email', 'introduction','related_fields','career','education','eligibility','awards','assessment', 'performance', 'language', 'activity','url']
 df = pd.DataFrame(columns=col)
-# 회사명, 이름, 직업, 전화번호, 업무분야, 경력, 학력, 자격, 수상, 외부평가(세종에만 있음)
+# 회사명, 이름, 직업, 전화번호, 이메일, 상세 소개글, 업무분야, 경력, 학력, 자격, 수상, 외부평가(세종에만 있음), 주요업무실적, 사용언어, 외부활동, 프로필 url
 
 exist_data = set()
 
@@ -78,12 +78,21 @@ def bkl_crawling(id, button_id):
             if check_duplicates(name, job, call):
                 pf.click()
                 time.sleep(3)
+                # 이메일
+                email = driver.find_element(By.XPATH, '//*[@id="content"]/div[1]/div[1]/div[3]/ul[2]/li[3]/span[2]').text
+
+                # 상세 소개글
+                pf_introduction = driver.find_elements(By.XPATH, '//*[@id="content"]/div[3]/div[1]/div[1]/div[2]/p')
+                intro_total = []
+                for intro in pf_introduction:
+                    intro_total.append(intro.text)
+                introduction = ','.join(intro_total)
 
                 # 관련 분야
-                fields_lst = driver.find_elements(By.XPATH, '//*[@id="content"]/div[3]/div[2]/div/div[1]/ul/li')
+                fields_lst = driver.find_elements(By.CSS_SELECTOR, ' ul.prof-business-list > li')
                 fields_total = []
                 for field in fields_lst:
-                    field_text = field.find_element(By.XPATH, './/a').text
+                    field_text = field.find_element(By.XPATH, './/a').get_attribute("textContent")
                     fields_total.append(field_text)
                 related_fields = ','.join(fields_total)
                 
@@ -100,36 +109,72 @@ def bkl_crawling(id, button_id):
                             period = box.find_element(By.XPATH, './/span[1]').text
                             box_total.append(f'{content} ({period})')
                         if title == "경력":
+                            # 기타 경력이 있다면 추가로 저장
+                            try:
+                                hidden_career = section.find_elements(By.CSS_SELECTOR, 'div.prof-list-container prof-list-txt02')
+                                for hidden in hidden_career:
+                                    hidden_content = hidden.find_element(By.XPATH, './/span[2]').get_attribute("textContent")
+                                    hidden_period = hidden.find_element(By.XPATH, './/span[1]').get_attribute("textContent")
+                                    box_total.append(f'{hidden_content} ({hidden_period})')
+                            except:
+                                pass
                             career = ','.join(box_total)
                         elif title == "학력":
                             education = ','.join(box_total)
                         else:
                             eligibility = ','.join(box_total)
-                    # 수상
                     elif "주요활동" in title:
                         main_action_button = title_.find_element(By.XPATH, './/button')
                         driver.execute_script("arguments[0].click();", main_action_button)
+                        time.sleep(0.3)
+                        # 수상, 외부 활동
                         try:
-                            awards_title = section.find_element(By.XPATH, ".//div[normalize-space()='수상']")
-                            awards_lst = awards_title.find_elements(By.XPATH, './/following-sibling::div')
-                            award_total = []
-                            for award in awards_lst:
-                                award_total.append(award.text)
-                            awards = ','.join(award_total)
+                            contents_total = ""
+                            find_contents = section.find_elements(By.CSS_SELECTOR, " div.prof-list-container")
+                            for what_contents in find_contents:
+                                len_contents = what_contents.find_elements(By.XPATH, './/div')
+                                contents_title = len_contents[0].text.strip()
+                                contents_imsi = []
+                                for cont in len_contents[1:]:
+                                    contents_imsi.append(cont.text)
+                                contents_text = ','.join(contents_imsi)
+                                # 수상
+                                if contents_title == "수상":
+                                    awards = contents_text
+                                # 외부활동
+                                else:
+                                    contents_total += f"{contents_title}]] {contents_text} //"
+                            if contents_total:
+                                activity = contents_total
                         except:
-                            awards = ""
+                            pass
+                    
+                    # 주요 업무 실적
+                    elif "주요 업무사례" in title:
+                        performance_lst = section.find_elements(By.CSS_SELECTOR, 'div.prof-contents-full div.prof-list-txt01')
+                        performance_total = []
+                        for perform in performance_lst:
+                            performance_total.append(perform.get_attribute("textContent"))
+                        performance = ','.join(performance_total)
+
 
                 add_pf = {
                             'company':company,
                             'name':name,
                             'job':job,
                             'call':call,
+                            'email':email,
+                            'introduction':introduction,
                             'related_fields':related_fields,
                             'career':career,
                             'education':education,
                             'eligibility':eligibility,
                             'awards':awards,
-                            'assessment':""
+                            'assessment':"",
+                            'performance':performance,
+                            'language':"", # 태평양은 사용언어 정보가 없음
+                            'activity':activity,
+                            'url':driver.current_url
                         }
                 pf_data.append(add_pf)
                 driver.back()
