@@ -55,10 +55,8 @@ time.sleep(1)
 company = "세종"
 
 categories = driver.find_elements(By.XPATH, '//*[@id="bizCode"]/option')
-for category in tqdm.tqdm(range(2, len(categories)+1)):
-    # 이거 실험하려고 만들어둔 categoty 변수
-    category = 2
-    # 이 변수 지워야 함
+# for category in tqdm.tqdm(range(2, len(categories)+1)):
+for category in tqdm.tqdm(range(2, 3)):
     pf_data = []
     # 뒤에서 page 넘길 때 사용하는 page_number
     page_num = 1
