@@ -71,8 +71,8 @@ def bkl_crawling(id, button_id):
             job = pf.find_element(By.XPATH, './/div[3]').text
             call = pf.find_element(By.XPATH, './/div[5]').text.replace('T.','')
             print(name, job, call)
-            # 자격, 수상 없는 경우를 대비하여 기본값 설정
-            eligibility, awards = "", ""
+            # 자격, 수상, 주요업무실적 없는 경우를 대비하여 기본값 설정
+            eligibility, awards, performance = "", "", ""
             
             # 해당 pf가 기존에 저장된 사람인지 확인
             if check_duplicates(name, job, call):
