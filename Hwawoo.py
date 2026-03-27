@@ -53,16 +53,16 @@ search_button = driver.find_element(By.CSS_SELECTOR, '#container > div.lawyer-se
 driver.execute_script("arguments[0].click();", search_button)
 time.sleep(1)
 
-# 더보기 버튼 모두 클릭
-while True:
-    button = driver.find_element(By.XPATH, '//*[@id="moreButton"]/button')
-    driver.execute_script("arguments[0].scrollIntoView({block: 'nearest'});", button)
-    time.sleep(2)
-    if button.is_displayed():
-        driver.execute_script("arguments[0].click();", button)
-        time.sleep(3)
-    else:
-        break
+# # 더보기 버튼 모두 클릭
+# while True:
+#     button = driver.find_element(By.XPATH, '//*[@id="moreButton"]/button')
+#     driver.execute_script("arguments[0].scrollIntoView({block: 'nearest'});", button)
+#     time.sleep(2)
+#     if button.is_displayed():
+#         driver.execute_script("arguments[0].click();", button)
+#         time.sleep(3)
+#     else:
+#         break
 
 company = "화우"
 
