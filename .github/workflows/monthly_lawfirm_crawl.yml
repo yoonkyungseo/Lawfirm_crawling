@@ -55,7 +55,7 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git pull --rebase origin master # 최신 상태로 업데이트
-          git add data/ 
+          git pull --rebase -X ours origin master # 최신 상태로 업데이트
+          git add -f data/ 
           git commit --allow-empty -m "Auto-update: Data for $(date +'%Y-%m-%d')"
           git push origin master
