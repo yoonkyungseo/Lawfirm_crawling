@@ -56,6 +56,9 @@ company = "세종"
 
 categories = driver.find_elements(By.XPATH, '//*[@id="bizCode"]/option')
 for category in tqdm.tqdm(range(2, len(categories)+1)):
+    # 이거 실험하려고 만들어둔 categoty 변수
+    category = 2
+    # 이 변수 지워야 함
     pf_data = []
     # 뒤에서 page 넘길 때 사용하는 page_number
     page_num = 1
@@ -228,20 +231,21 @@ for category in tqdm.tqdm(range(2, len(categories)+1)):
                 driver.back()
                 time.sleep(3)
         
-        # 페이지가 넘어갈 수 있으면 다음 페이지로 이동, 더이상 넘어갈 페이지가 없으면 while문 break
-        try:
-            exist_next = driver.find_element(By.CSS_SELECTOR, 'span.direction a.next')
-            if exist_next: # 다음으로 넘어갈 페이지가 있으면
-                page_num += 1
-                pagination = driver.find_element(By.CSS_SELECTOR, 'span.pagination')
-                driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", pagination)
-                click_page = pagination.find_element(By.XPATH, f'.//a[{page_num}]')
-                driver.execute_script("arguments[0].click();", click_page)
-                time.sleep(2)
-            else:
-                break
-        except:
-            break
+        # # 페이지가 넘어갈 수 있으면 다음 페이지로 이동, 더이상 넘어갈 페이지가 없으면 while문 break
+        # try:
+        #     exist_next = driver.find_element(By.CSS_SELECTOR, 'span.direction a.next')
+        #     if exist_next: # 다음으로 넘어갈 페이지가 있으면
+        #         page_num += 1
+        #         pagination = driver.find_element(By.CSS_SELECTOR, 'span.pagination')
+        #         driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", pagination)
+        #         click_page = pagination.find_element(By.XPATH, f'.//a[{page_num}]')
+        #         driver.execute_script("arguments[0].click();", click_page)
+        #         time.sleep(2)
+        #     else:
+        #         break
+        # except:
+        #     break
+        break
     # 카테고리 하나당 한번씩 df 갱신
     df = pd.concat([df, pd.DataFrame(pf_data)], ignore_index=True)
 
