@@ -25,9 +25,9 @@ options.add_argument("--disable-gpu")         # GPU 가속 해제
 options.add_argument("--window-size=1920,1080") # 가상 모니터 크기 설정 (스크롤/클릭 오류 방지)
 
 # 데이터 프레임 정의
-col = ['company','name','job','call','related_fields','career','education','eligibility','awards','assessment']
+col = ['company','name','job','call', 'email', 'introduction','related_fields','career','education','eligibility','awards','assessment', 'performance', 'language', 'activity','url']
 df = pd.DataFrame(columns=col)
-# 회사명, 이름, 직업, 전화번호, 업무분야, 경력, 학력, 자격, 수상, 외부평가(세종에만 있음)
+# 회사명, 이름, 직업, 전화번호, 이메일, 상세 소개글, 업무분야, 경력, 학력, 자격, 수상, 외부평가(세종에만 있음), 주요업무실적, 사용언어, 외부활동, 프로필 url
 
 exist_data = set()
 
@@ -90,6 +90,10 @@ for category in tqdm.tqdm(range(2, len(categories)+1)):
             if check_duplicates(name, job, call):
                 pf.click()
                 time.sleep(3)
+                # 이메일
+                email = driver.find_element(By.XPATH, '//*[@id="printDiv"]/div/div/div[1]/div[1]/div[2]/p[1]/a').text
+                # 상세 소개글
+                introduction = driver.find_element(By.CSS_SELECTOR, '.leeko-member-detail__text').text
 
                 # 관련 분야
                 fields_lst = driver.find_elements(By.CSS_SELECTOR, '.leeko-tag.leeko-tag--dark a')
@@ -98,28 +102,29 @@ for category in tqdm.tqdm(range(2, len(categories)+1)):
                     fields_total.append(field.text)
                 related_fields = ','.join(fields_total)
 
-                # 경력, 학력, 자격, 수상
+                # 경력, 학력, 자격, 수상, 언어
                 detail_table = driver.find_elements(By.CSS_SELECTOR, '.leeko-member-detail__table')
                 eligibility, awards = "", ""
                 for detail in detail_table:
                     detail_title = detail.find_element(By.XPATH, './/div[1]').text
 
                     if detail_title in ["경력", "학력", "자격/회원", "수상실적"]:
-                        try:
-                            button = detail.find_element(By.XPATH, './/a')
-                            while True:
-                                if button.text == "더보기":
-                                    driver.execute_script("arguments[0].scrollIntoView({block: 'nearest'});", button)
-                                    button.click()
-                                else:
-                                    break
-                        except:
-                            pass
+                        # # 버튼 클릭 지우고 돌려볼건데 돌아가면 그냥 지워버리기
+                        # try:
+                        #     button = detail.find_element(By.XPATH, './/a')
+                        #     while True:
+                        #         if button.text == "더보기":
+                        #             driver.execute_script("arguments[0].scrollIntoView({block: 'nearest'});", button)
+                        #             button.click()
+                        #         else:
+                        #             break
+                        # except:
+                        #     pass
                         detail_contents = detail.find_elements(By.XPATH, './/div[2]//tr')
                         box_total = []
                         for detail_content in detail_contents:
-                            period = detail_content.find_element(By.XPATH, './/th').text
-                            content = detail_content.find_element(By.XPATH, './/td').text
+                            period = detail_content.find_element(By.XPATH, './/th').get_attribute("textContent")
+                            content = detail_content.find_element(By.XPATH, './/td').get_attribute("textContent")
                             box_total.append(f'{content} ({period})')
 
                         if detail_title == "경력":
@@ -130,18 +135,53 @@ for category in tqdm.tqdm(range(2, len(categories)+1)):
                             eligibility = ','.join(box_total)
                         else:
                             awards = ','.join(box_total)
+                    elif detail_title == "언어":
+                        language = detail.find_element(By.CSS_SELECTOR, ' td').text
+
+                # 주요업무실적, 외부활동
+                detail_table = driver.find_elements(By.CSS_SELECTOR, '.leeko-member-detail__list')
+                performace, activity = "", ""
+                for detail in detail_table:
+                    detail_title = detail.find_element(By.XPATH, './/div[1]').text
+
+                    if detail_title in ["주요처리사례", "저서/활동/기타"]:
+                        dl_element = detail.find_element(By.CSS_SELECTOR, 'dl.leeko-more-contents')
+                        children = dl_element.find_elements(By.XPATH, "./*")
+                        detail_results = ""
+                        for child in children:
+                            child_text = child.get_attribute("textContent")
+                            if child.tag_name == "dt":
+                                if detail_results:
+                                    detail_results += f'//{child_text}]]'
+                                else:
+                                    detail_results += f"{child}]]"
+                            elif child.tag_name == "dd":
+                                if detail_results:
+                                    detail_results += f",{child_text}"
+                                else:
+                                    detail_results += child_text
+                        if detail_title == "주요처리사례":
+                            performance = detail_results
+                        else:
+                            activity = detail_results
 
                 add_pf = {
                             'company':company,
                             'name':name,
                             'job':job,
                             'call':call,
+                            'email':email,
+                            'introduction':introduction,
                             'related_fields':related_fields,
                             'career':career,
                             'education':education,
                             'eligibility':eligibility,
                             'awards':awards,
-                            'assessment':""
+                            'assessment':"",
+                            'performance':performance,
+                            'language':language,
+                            'activity':activity,
+                            'url':driver.current_url
                         }
                 pf_data.append(add_pf)
                 driver.back()
