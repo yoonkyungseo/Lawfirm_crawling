@@ -87,14 +87,13 @@ for category in tqdm.tqdm(range(2, len(categories)+1)):
             name = pf_name.text
             job = pf.find_element(By.CSS_SELECTOR, 'span.sort').text
             call = pf.find_element(By.CSS_SELECTOR, 'span.info-item.telephone').text
+            email = pf.find_element(By.CSS_SELECTOR, 'span.info-item.email').text
 
             if check_duplicates(name, job, call):
                 print(name, job, call)
                 driver.execute_script("arguments[0].click();", pf_name)
                 time.sleep(3)
 
-                # 이메일
-                email = driver.find_element(By.XPATH, '//*[@id="content"]/div[1]/div[2]/div[2]/div[2]/div[1]/span[3]/span/a').text
 
                 overviews = driver.find_elements(By.CSS_SELECTOR, 'div#overview div.subsection')
                 for overview in overviews:
