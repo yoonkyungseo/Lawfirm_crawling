@@ -199,7 +199,7 @@ for category in tqdm.tqdm(range(2, len(categories)+1)):
                                 else:
                                     detail_results += f"{child.get_attribute("textContent")}]]"
                             elif child.tag_name == "ul":
-                                for ch in child:
+                                for ch in child.find_elements(By.CSS_SELECTOR, 'li'):
                                     ch_text = ch.get_attribute("textContent")
                                     if detail_results:
                                         detail_results += f',{ch_text}'
