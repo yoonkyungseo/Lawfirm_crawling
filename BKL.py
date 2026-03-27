@@ -143,7 +143,7 @@ def bkl_crawling(id, button_id):
                                     awards = contents_text
                                 # 외부활동
                                 else:
-                                    contents_total += f"{contents_title}]] {contents_text} //"
+                                    contents_total += f"{contents_title}]] {contents_text}//"
                             if contents_total:
                                 activity = contents_total
                         except:
