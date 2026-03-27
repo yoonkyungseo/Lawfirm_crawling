@@ -20,7 +20,7 @@ jobs:
       matrix:
         # 병렬 실행 파일
         # python-file: ["Kim_and_Chang.py", "BKL.py", "Lee_Ko.py", "Shin_Kim.py", "Hwawoo.py"]
-        python-file: ["BKL.py", "Hwawoo.py", "Lee_Ko.py"]
+        python-file: ["BKL.py", "Hwawoo.py", "Lee_Ko.py", "Shin_Kim.py"]
     
     steps:
       # 저장소 내 코드 가상 서버로 복사
