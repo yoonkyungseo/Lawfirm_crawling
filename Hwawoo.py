@@ -25,9 +25,9 @@ options.add_argument("--disable-gpu")         # GPU 가속 해제
 options.add_argument("--window-size=1920,1080") # 가상 모니터 크기 설정 (스크롤/클릭 오류 방지)
 
 # 데이터 프레임 정의
-col = ['company','name','job','call','related_fields','career','education','eligibility','awards','assessment']
+col = ['company','name','job','call', 'email', 'introduction','related_fields','career','education','eligibility','awards','assessment', 'performance', 'language', 'activity','url']
 df = pd.DataFrame(columns=col)
-# 회사명, 이름, 직업, 전화번호, 업무분야, 경력, 학력, 자격, 수상, 외부평가(세종에만 있음)
+# 회사명, 이름, 직업, 전화번호, 이메일, 상세 소개글, 업무분야, 경력, 학력, 자격, 수상, 외부평가(세종에만 있음), 주요업무실적, 사용언어, 외부활동, 프로필 url
 
 exist_data = set()
 
@@ -80,14 +80,19 @@ for i in tqdm.tqdm(range(1, len(pf_lst)+1)):
         print(name, job, call)
         pf.click()
         time.sleep(3)
+
+        # 이메일
+        email = driver.find_element(By.XPATH, '//*[@id="container"]/div/div/div[2]/ul[1]/li[3]/span').text
         
-        # 관련분야, 경력, 학력, 자격, 수상
-        detail_table = driver.find_elements(By.CSS_SELECTOR, 'div.tab-wrap.box-detail-contents.tab-ctrl article[id^="anchor_cont_"]')
-        eligibility, awards = "", ""
+        # 관련분야, 경력, 학력, 자격, 수상, 주요업무실적
+        detail_table = driver.find_elements(By.CSS_SELECTOR, 'div.tab-wrap.box-detail-contents.tab-ctrl article[class^="dtail"]')
+        eligibility, awards, performance, activity = "", "", "", ""
         for detail in detail_table:
-            detail_title = detail.find_element(By.XPATH, './/div[1]/h3').text
+            detail_title = detail.find_element(By.XPATH, './/div[1]/h3').get_attribute("textContent").strip()
             
-            if detail_title in ["업무분야", "경력", "학력", "자격", "수상"]:
+            if detail_title == "소개":
+                introduction = detail.find_element(By.CSS_SELECTOR, 'div.intro-wrap').text
+            elif detail_title in ["업무분야", "경력", "학력", "자격", "수상"]:
                 while True:
                     try:
                         button = detail.find_element(By.XPATH, './/div[2]/button')
@@ -122,18 +127,49 @@ for i in tqdm.tqdm(range(1, len(pf_lst)+1)):
                     eligibility = ','.join(box_total)
                 else:
                     awards = ','.join(box_total)
+            elif detail_title in ["주요업무사례", "기고"]:
+                added_total = []
+                perf = detail.find_element(By.CSS_SELECTOR, 'div.box-fold-wrap.short > div')
+                added_content = perf.find_elements(By.CSS_SELECTOR, 'ul')
+                try:
+                    added_title = perf.find_elements(By.CSS_SELECTOR, 'p')
+                except:
+                    added_title = []
+                if added_title:
+                    for tits, conts in zip(added_title, added_content):
+                        conts_elements = conts.find_elements(By.CSS_SELECTOR, 'li')
+                        cts = ','.join([el.get_attribute("textContent") for el in conts_elements])
+                        added_total.append(f'{tits.get_attribute("textContent")[1:-1]}]] {cts}')
+                    added_result = '//'.join(added_total)
+                else:
+                    for conts in added_content:
+                        conts_elements = conts.find_elements(By.CSS_SELECTOR, 'li')
+                        added_result = ','.join([el.get_attribute("textContent") for el in conts_elements])
+                if detail_title == "주요업무사례":
+                    performance = added_result
+                else:
+                    activity = added_result
+            elif detail_title == "언어":
+                language = detail.find_element(By.XPATH, './/div[2]/div').text
+
 
         add_pf = {
                     'company':company,
                     'name':name,
                     'job':job,
                     'call':call,
+                    'email':email,
+                    'introduction':introduction,
                     'related_fields':related_fields,
                     'career':career,
                     'education':education,
                     'eligibility':eligibility,
                     'awards':awards,
-                    'assessment':""
+                    'assessment':"",
+                    'performance':performance,
+                    'language':language,
+                    'activity':activity,
+                    'url':driver.current_url
                 }
         pf_data.append(add_pf)
 
