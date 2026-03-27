@@ -89,7 +89,7 @@ def bkl_crawling(id, button_id):
                 introduction = ','.join(intro_total)
 
                 # 관련 분야
-                fields_lst = driver.find_elements(By.CSS_SELECTOR, ' ul.prof-business-list > li')
+                fields_lst = driver.find_elements(By.CSS_SELECTOR, ' div.prof-business-container ul.prof-business-list > li')
                 fields_total = []
                 for field in fields_lst:
                     field_text = field.find_element(By.XPATH, './/a').get_attribute("textContent")
@@ -111,7 +111,7 @@ def bkl_crawling(id, button_id):
                         if title == "경력":
                             # 기타 경력이 있다면 추가로 저장
                             try:
-                                hidden_career = section.find_elements(By.CSS_SELECTOR, 'div.prof-list-container prof-list-txt02')
+                                hidden_career = section.find_elements(By.CSS_SELECTOR, 'div.prof-list-container > div.prof-contents-hidden div')
                                 for hidden in hidden_career:
                                     hidden_content = hidden.find_element(By.XPATH, './/span[2]').get_attribute("textContent")
                                     hidden_period = hidden.find_element(By.XPATH, './/span[1]').get_attribute("textContent")
@@ -129,7 +129,7 @@ def bkl_crawling(id, button_id):
                         time.sleep(0.3)
                         # 수상, 외부 활동
                         try:
-                            contents_total = ""
+                            contents_total = []
                             find_contents = section.find_elements(By.CSS_SELECTOR, " div.prof-list-container")
                             for what_contents in find_contents:
                                 len_contents = what_contents.find_elements(By.XPATH, './/div')
@@ -143,19 +143,32 @@ def bkl_crawling(id, button_id):
                                     awards = contents_text
                                 # 외부활동
                                 else:
-                                    contents_total += f"{contents_title}]] {contents_text}//"
-                            if contents_total:
-                                activity = contents_total
+                                    contents_total.append(f"{contents_title}]] {contents_text}")
+                            activity = '//'.join(contents_total)
                         except:
                             pass
                     
                     # 주요 업무 실적
                     elif "주요 업무사례" in title:
-                        performance_lst = section.find_elements(By.CSS_SELECTOR, 'div.prof-contents-full div.prof-list-txt01')
+                        performance_lst = section.find_elements(By.CSS_SELECTOR, 'div.prof-contents-full > div.prof-list-container')
                         performance_total = []
                         for perform in performance_lst:
-                            performance_total.append(perform.get_attribute("textContent"))
-                        performance = ','.join(performance_total)
+                            # 주요 업무 사례에 세부제목이 있는 경우
+                            try:
+                                perform_title = perform.find_element(By.CSS_SELECTOR, 'div.prof-list-tit01').get_attribute("textContent")
+                            except:
+                                perform_title = ""
+                            perform_contents = perform.find_elements(By.CSS_SELECTOR, 'div.prof-list-txt01')
+                            perform_content_imsi = []
+                            for perf_con in perform_contents:
+                                perform_content_imsi.append(perf_con.get_attribute("textContent"))
+                            perform_content_text = ','.join(perform_content_imsi)
+
+                            if perform_title:
+                                performance_total.append(f'{perform_title}]] {perform_content_text}')
+                            else:
+                                performance_total.append(perform_content_text)
+                        performance = '//'.join(performance_total)
 
 
                 add_pf = {
