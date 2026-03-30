@@ -66,6 +66,8 @@ def wait_visibility_element(driver, locator, timeout=15):
     return WebDriverWait(driver, timeout).until(EC.visibility_of_element_located(locator))
 def wait_clickable_element(driver, locator, timeout=15):
     return WebDriverWait(driver, timeout).until(EC.element_to_be_clickable(locator))
+def get_text_by_js(selector):
+    return driver.execute_script(f"return document.querySelector('{selector}') ? document.querySelector('{selector}').textContent : '';").strip()
 
 # 김앤장 크롤링 코드
 
@@ -134,7 +136,8 @@ for num in tqdm.tqdm(range(1, 2)):
                     email = wait_presence_element(driver, (By.XPATH, "//a[contains(@href, 'mailto:')]")).get_attribute("textContent")
 
                     # 상세 소개글
-                    introduction = wait_presence_element(driver, (By.CSS_SELECTOR, ".top_text.hidden_area")).get_attribute("textContent").replace('\n', ' ').strip()
+                    # introduction = wait_presence_element(driver, (By.CSS_SELECTOR, ".top_text.hidden_area")).get_attribute("textContent").replace('\n', ' ').strip()
+                    introduction = get_text_by_js('.top_text.hidden_area').replace('\n', ' ').strip()
                     print('introduction', introduction)
 
                     # 관련 분야
