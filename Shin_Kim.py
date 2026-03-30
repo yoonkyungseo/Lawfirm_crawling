@@ -223,6 +223,8 @@ for category in tqdm.tqdm(range(2, 4)):
                         new = "-"
                     else:
                         new = "Y"
+                else:
+                    new = '-'
 
                 add_pf = {
                             'company':company,

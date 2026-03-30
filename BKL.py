@@ -187,6 +187,8 @@ def bkl_crawling(id, button_id):
                         new = "-"
                     else:
                         new = "Y"
+                else:
+                    new = '-'
 
                 add_pf = {
                             'company':company,

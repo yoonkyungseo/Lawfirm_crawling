@@ -238,6 +238,8 @@ for num in tqdm.tqdm(range(1, 2)):
                             new = "-"
                         else:
                             new = "Y"
+                    else:
+                        new = '-'
 
                     add_pf = {
                         'company':company,

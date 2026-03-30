@@ -164,10 +164,12 @@ for i in tqdm.tqdm(range(1, len(pf_lst)+1)):
                 language = detail.find_element(By.XPATH, './/div[2]/div').text
 
         if old_exist_data:
-                    if (name, email) in old_exist_data:
-                        new = "-"
-                    else:
-                        new = "Y"
+            if (name, email) in old_exist_data:
+                new = "-"
+            else:
+                new = "Y"
+        else:
+            new = '-'
 
         add_pf = {
                     'company':company,
