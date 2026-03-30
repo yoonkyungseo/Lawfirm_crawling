@@ -68,6 +68,20 @@ def wait_clickable_element(driver, locator, timeout=15):
     return WebDriverWait(driver, timeout).until(EC.element_to_be_clickable(locator))
 def get_text_by_js(selector):
     return driver.execute_script(f"return document.querySelector('{selector}') ? document.querySelector('{selector}').textContent : '';").strip()
+def scroll_until_found(driver, css_selector, max_attempts=5):
+    for _ in range(max_attempts):
+        try:
+            # 요소를 찾아봅니다.
+            element = driver.find_element(By.CSS_SELECTOR, css_selector)
+            if element.is_displayed():
+                return True # 찾았으면 종료!
+        except:
+            pass
+        
+        # 못 찾았으면 600px 내리고 1초 대기
+        driver.execute_script("window.scrollBy(0, 600);")
+        time.sleep(1)
+    return False
 
 # 김앤장 크롤링 코드
 
@@ -132,14 +146,12 @@ for num in tqdm.tqdm(range(1, 2)):
                     driver.execute_script(f"window.open('{pf_link}', '_blank');")
                     driver.switch_to.window(driver.window_handles[-1]) # 새 창으로 포커스 이동
 
-                    driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-                    time.sleep(2)
-
                     # 이메일
                     email = wait_presence_element(driver, (By.XPATH, "//a[contains(@href, 'mailto:')]")).get_attribute("textContent")
 
                     # 상세 소개글
                     # introduction = wait_presence_element(driver, (By.CSS_SELECTOR, ".top_text.hidden_area")).get_attribute("textContent").replace('\n', ' ').strip()
+                    scroll_until_found(driver, '.top_text')
                     introductions = wait_presence_elements(driver, (By.CSS_SELECTOR, '.top_text.hidden_area p'))
                     introduction = ""
                     for intro in introductions:
