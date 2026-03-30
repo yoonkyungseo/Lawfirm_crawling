@@ -195,11 +195,14 @@ for num in tqdm.tqdm(range(1, 2)):
                     eligibility = ','.join(eli_total)
 
                     # 언어
-                    lan_lst = wait_presence_elements(driver, (By.CSS_SELECTOR, '#career > p.lang'))
-                    lan_total = []
-                    for lan in lan_lst:
-                        lan_total.append(lan.get_attribute("textContent").replace('\n', ' ').strip())
-                    language = ','.join(lan_total)
+                    try:
+                        lan_lst = wait_presence_elements(driver, (By.CSS_SELECTOR, '#career > p.lang'))
+                        lan_total = []
+                        for lan in lan_lst:
+                            lan_total.append(lan.get_attribute("textContent").replace('\n', ' ').strip())
+                        language = ','.join(lan_total)
+                    except:
+                        language = ""
                     
                     # 수상, 외부 활동, 주요 업무 실적
                     awards, activity, performance = "", "", ""
