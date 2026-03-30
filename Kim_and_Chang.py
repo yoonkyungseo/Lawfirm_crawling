@@ -138,7 +138,7 @@ for num in tqdm.tqdm(range(1, 2)):
                     time.sleep(4)
 
                     # 이메일
-                    email = wait_presence_element(driver, (By.XPATH, '//*[@id="detailContents"]/div[1]/div/div[2]/div/div/span[3]/a')).get_attribute("textContent")
+                    email = wait_presence_element(driver, (By.CSS_SELECTOR, ' span.email > a')).get_attribute("textContent")
 
                     # 상세 소개글
                     introduction = wait_presence_element(driver, (By.XPATH, '//*[@id="profile"]/div/div/div[1]/p')).get_attribute("textContent").text.replace('\n', ' ').strip()
