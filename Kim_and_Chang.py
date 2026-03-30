@@ -143,6 +143,7 @@ for num in tqdm.tqdm(range(1, 2)):
                 if check_duplicates(name, job, call):
                     # pf 화면 새 창에서 열기
                     pf_link = wait_presence_element(pf, (By.TAG_NAME, "a")).get_attribute("href")
+                    print(pf_link)
                     driver.execute_script(f"window.open('{pf_link}', '_blank');")
                     driver.switch_to.window(driver.window_handles[-1]) # 새 창으로 포커스 이동
                     time.sleep(10)
