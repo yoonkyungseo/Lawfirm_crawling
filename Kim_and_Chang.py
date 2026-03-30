@@ -134,7 +134,7 @@ for num in tqdm.tqdm(range(1, 2)):
                     email = wait_presence_element(driver, (By.XPATH, "//a[contains(@href, 'mailto:')]")).get_attribute("textContent")
 
                     # 상세 소개글
-                    introduction = driver.find_element(By.XPATH, "//h3[contains(text(), '소개')]/following-sibling::div//div[contains(@class, 'top_text')]").get_attribute("textContent").text.replace('\n', ' ').strip()
+                    introduction = driver.find_element(By.XPATH, ".//div[contains(@class, 'top_text')]").get_attribute("textContent").text.replace('\n', ' ').strip()
 
                     # 관련 분야
                     fields_lst = wait_presence_elements(driver, (By.XPATH, '//*[@id="detailContents"]/div[5]/div/aside/div[1]/div/ul/li'))
