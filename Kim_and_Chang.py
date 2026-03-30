@@ -137,8 +137,10 @@ for num in tqdm.tqdm(range(1, 2)):
 
                     # 상세 소개글
                     # introduction = wait_presence_element(driver, (By.CSS_SELECTOR, ".top_text.hidden_area")).get_attribute("textContent").replace('\n', ' ').strip()
-                    time.sleep(10)
-                    introduction = get_text_by_js('.top_text.hidden_area').replace('\n', ' ').strip()
+                    introductions = wait_presence_elements(driver, (By.CSS_SELECTOR, '.top_text.hidden_area p'))
+                    introduction = ""
+                    for intro in introductions:
+                        introduction += intro.get_attribute("textContent").replace('\n', ' ').strip()
                     print('introduction', introduction)
 
                     # 관련 분야
