@@ -58,13 +58,13 @@ def check_duplicates(name, job, call):
 service = Service(ChromeDriverManager().install())
 driver = webdriver.Chrome(service=service, options=options)
 
-def wait_presence_element(driver, locator, timeout=10):
+def wait_presence_element(driver, locator, timeout=15):
     return WebDriverWait(driver, timeout).until(EC.presence_of_element_located(locator))
-def wait_presence_elements(driver, locator, timeout=10):
+def wait_presence_elements(driver, locator, timeout=15):
     return WebDriverWait(driver, timeout).until(EC.presence_of_all_elements_located(locator))
-def wait_visibility_element(driver, locator, timeout=10):
+def wait_visibility_element(driver, locator, timeout=15):
     return WebDriverWait(driver, timeout).until(EC.visibility_of_element_located(locator))
-def wait_clickable_element(driver, locator, timeout=10):
+def wait_clickable_element(driver, locator, timeout=15):
     return WebDriverWait(driver, timeout).until(EC.element_to_be_clickable(locator))
 
 # 김앤장 크롤링 코드
@@ -134,7 +134,7 @@ for num in tqdm.tqdm(range(1, 2)):
                     email = wait_presence_element(driver, (By.XPATH, "//a[contains(@href, 'mailto:')]")).get_attribute("textContent")
 
                     # 상세 소개글
-                    introduction = driver.find_element(By.CLASS_NAME, "top_text").get_attribute("textContent").text.replace('\n', ' ').strip()
+                    introduction = wait_presence_element(driver, (By.CLASS_NAME, "top_text")).get_attribute("textContent").text.replace('\n', ' ').strip()
 
                     # 관련 분야
                     fields_lst = wait_presence_elements(driver, (By.XPATH, '//*[@id="detailContents"]/div[5]/div/aside/div[1]/div/ul/li'))
