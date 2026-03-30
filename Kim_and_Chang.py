@@ -130,6 +130,7 @@ for num in tqdm.tqdm(range(1, 2)):
             page_num = page.get_attribute("textContent")
             print(f"현재 {page_num} page 진행중")
             driver.execute_script("arguments[0].click();", page)
+            time.sleep(3)
 
             pf_lst = wait_presence_elements(driver, (By.XPATH, '//*[@id="_pro"]/ul[2]/li'))
             for j in range(1, len(pf_lst)+1):
@@ -280,8 +281,7 @@ for num in tqdm.tqdm(range(1, 2)):
                 end = len(pages)-1
             else:
                 pf_flag = False
-        # 디버깅용
-        break        
+                
     # 구분목록 하나당 한번씩 df 갱신
     df = pd.concat([df, pd.DataFrame(pf_data)], ignore_index=True)
 
