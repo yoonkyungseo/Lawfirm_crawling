@@ -145,6 +145,7 @@ for num in tqdm.tqdm(range(1, 2)):
                     pf_link = wait_presence_element(pf, (By.TAG_NAME, "a")).get_attribute("href")
                     driver.execute_script(f"window.open('{pf_link}', '_blank');")
                     driver.switch_to.window(driver.window_handles[-1]) # 새 창으로 포커스 이동
+                    time.sleep(10)
 
                     # 이메일
                     email = wait_presence_element(driver, (By.XPATH, "//a[contains(@href, 'mailto:')]")).get_attribute("textContent")
