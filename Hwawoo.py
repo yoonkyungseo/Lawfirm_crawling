@@ -99,7 +99,7 @@ for i in tqdm.tqdm(range(1, len(pf_lst)+1)):
         time.sleep(3)
 
         # 이메일
-        email = driver.find_element(By.XPATH, '//*[@id="container"]/div/div/div[2]/ul[1]/li[3]/span').text
+        email = driver.find_element(By.CSS_SELECTOR, ' span.email').text
         
         # 관련분야, 경력, 학력, 자격, 수상, 주요업무실적
         detail_table = driver.find_elements(By.CSS_SELECTOR, ' div.tab-wrap.box-detail-contents.tab-ctrl > article[class^="dtail"]')
