@@ -74,7 +74,7 @@ main_window = driver.current_window_handle # 현재 창 ID를 변수로 저장
 driver.maximize_window()
 time.sleep(3)
 
-all_button = wait_visibility_element(driver, (By.XPATH, '//*[@id="form1"]/div[2]/ul/li[4]/a/span'))
+all_button = wait_presence_element(driver, (By.XPATH, '//*[@id="form1"]/div[2]/ul/li[4]/a/span'))
 driver.execute_script("arguments[0].click();", all_button)
 time.sleep(2)
 
