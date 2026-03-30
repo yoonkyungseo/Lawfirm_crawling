@@ -132,13 +132,13 @@ for num in tqdm.tqdm(range(1, 2)):
 
                     # 이메일
                     email = wait_presence_element(driver, (By.XPATH, "//a[contains(@href, 'mailto:')]")).get_attribute("textContent")
+                    print('email', email)
 
                     # 상세 소개글
-                    # introduction = wait_presence_element(driver, (By.CLASS_NAME, "top_text")).get_attribute("textContent").text.replace('\n', ' ').strip()
+                    introduction = wait_presence_element(driver, (By.CLASS_NAME, "member_info")).get_attribute("textContent").text.replace('\n', ' ').strip()
+                    print('introduction', introduction)
 
                     # 관련 분야
-                    fields_lst = driver.find_elements(By.XPATH, '//*[@id="detailContents"]/div[5]/div/aside/div[1]/div/ul/li')
-                    print('fields_lst', len(fields_lst))
                     fields_lst = wait_presence_elements(driver, (By.XPATH, '//*[@id="detailContents"]/div[5]/div/aside/div[1]/div/ul/li'))
                     fields_total = []
                     for field in fields_lst:
