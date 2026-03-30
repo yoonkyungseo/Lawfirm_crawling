@@ -66,7 +66,7 @@ company = "광장"
 
 categories = driver.find_elements(By.XPATH, '//*[@id="mCSB_2_container"]/li')
 # for category in tqdm.tqdm(range(2, len(categories)+1)):
-for category in tqdm.tqdm(range(2, 3)):
+for category in tqdm.tqdm(range(2, 4)):
     pf_data = []
     # 카테고리 선택
     category_box = driver.find_element(By.XPATH, "//div[@class='leeko-member-search__select']//div[@class='nice-select chosen-select']")
