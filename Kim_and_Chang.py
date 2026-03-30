@@ -171,11 +171,14 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
                     education = ','.join(edu_total)
 
                     # 자격
-                    eli_lst = wait_presence_elements(driver, (By.XPATH, '//*[@id="career"]/ul[2]//*'))
-                    eli_total = []
-                    for elis in eli_lst:
-                        eli_total.append(elis.get_attribute("textContent").replace('\n', ' ').strip())
-                    eligibility = ','.join(eli_total)
+                    try:
+                        eli_lst = wait_presence_elements(driver, (By.XPATH, '//*[@id="career"]/ul[2]//*'))
+                        eli_total = []
+                        for elis in eli_lst:
+                            eli_total.append(elis.get_attribute("textContent").replace('\n', ' ').strip())
+                        eligibility = ','.join(eli_total)
+                    except:
+                        eligibility = ""
 
                     # 언어
                     try:
