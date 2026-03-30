@@ -141,27 +141,23 @@ for num in tqdm.tqdm(range(1, 2)):
                 call = wait_presence_element(pf, (By.XPATH, './/div/span[2]')).get_attribute("textContent").replace('T.','')
                 print(name, job, call)
                 
-                # 이메일
-                email = wait_presence_element(driver, (By.XPATH, "//a[contains(@href, 'mailto:')]")).get_attribute("textContent")
-                print(email)
 
                 # 해당 pf가 기존에 저장된 사람인지 확인
                 if check_duplicates(name, job, call):
                     # pf 화면 새 창에서 열기
-                    pf_link = wait_presence_element(pf, (By.CSS_SELECTOR, "p"))
-                    ActionChains(driver) \
-                        .key_down(Keys.CONTROL) \
-                        .click(pf_link) \
-                        .key_up(Keys.CONTROL) \
-                        .perform()
-                    driver.execute_script(f"window.open('{pf_link}', '_blank');")
-                    driver.switch_to.window(driver.window_handles[-1]) # 새 창으로 포커스 이동
+                    pf_link = wait_presence_element(pf, (By.CSS_SELECTOR, "img"))
+                    driver.execute_script("arguments[0].click();", pf_link)
                     time.sleep(5)
+
+                    all_content = grab_all_visible_text(driver)
+                    print(f"추출 결과: {all_content}")
+
+                    # 이메일
+                    email = wait_presence_element(driver, (By.XPATH, "//a[contains(@href, 'mailto:')]")).get_attribute("textContent")
+                    print(email)
 
                     # 상세 소개글
                     # introduction = wait_presence_element(driver, (By.CSS_SELECTOR, ".top_text.hidden_area")).get_attribute("textContent").replace('\n', ' ').strip()
-                    all_content = grab_all_visible_text(driver)
-                    print(f"추출 결과: {all_content}")
                     introductions = wait_presence_elements(driver, (By.CSS_SELECTOR, '.top_text.hidden_area p'))
                     introduction = ""
                     for intro in introductions:
@@ -259,8 +255,8 @@ for num in tqdm.tqdm(range(1, 2)):
                         'new':new
                     }
                     pf_data.append(add_pf)
-                    driver.close() # pf 클릭해서 연 창 닫기
-                    driver.switch_to.window(main_window) # pf 리스트가 있는 main_window로 포커스 이동
+                    driver.back()
+                    time.sleep(5)
 
             if len(pf_lst) < 10:
                 pf_flag = False
