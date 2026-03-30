@@ -167,7 +167,7 @@ for category in tqdm.tqdm(range(2, 4)):
                                 if detail_results:
                                     detail_results += f'//{child_text}]]'
                                 else:
-                                    detail_results += f"{child}]]"
+                                    detail_results += f"{child_text}]]"
                             elif child.tag_name == "dd":
                                 if detail_results:
                                     detail_results += f",{child_text}"
