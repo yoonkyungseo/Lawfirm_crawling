@@ -124,7 +124,8 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
                 pf = wait_presence_element(driver, (By.CSS_SELECTOR, f'#_pro > ul.lawyer_profile > li:nth-child({j})'))
                 driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", pf)
                 # 이름 # 직업
-                name, job = wait_presence_element(pf, (By.XPATH, './/div/span[1]/a')).get_attribute("textContent").split()
+                job = wait_presence_element(pf, (By.XPATH, './/div/span[1]/a/span')).get_attribute("textContent").strip()
+                name = wait_presence_element(pf, (By.XPATH, './/div/span[1]/a')).get_attribute("textContent").replace(job, "").strip()
                 # 전화번호
                 call = wait_presence_element(pf, (By.XPATH, './/div/span[2]')).get_attribute("textContent").replace('T.','')
                 print(name, job, call)
