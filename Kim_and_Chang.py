@@ -141,6 +141,10 @@ for num in tqdm.tqdm(range(1, 2)):
                 call = wait_presence_element(pf, (By.XPATH, './/div/span[2]')).get_attribute("textContent").replace('T.','')
                 print(name, job, call)
                 
+                # 이메일
+                email = wait_presence_element(driver, (By.XPATH, "//a[contains(@href, 'mailto:')]")).get_attribute("textContent")
+                print(email)
+
                 # 해당 pf가 기존에 저장된 사람인지 확인
                 if check_duplicates(name, job, call):
                     # pf 화면 새 창에서 열기
@@ -153,9 +157,6 @@ for num in tqdm.tqdm(range(1, 2)):
                     driver.execute_script(f"window.open('{pf_link}', '_blank');")
                     driver.switch_to.window(driver.window_handles[-1]) # 새 창으로 포커스 이동
                     time.sleep(5)
-
-                    # 이메일
-                    email = wait_presence_element(driver, (By.XPATH, "//a[contains(@href, 'mailto:')]")).get_attribute("textContent")
 
                     # 상세 소개글
                     # introduction = wait_presence_element(driver, (By.CSS_SELECTOR, ".top_text.hidden_area")).get_attribute("textContent").replace('\n', ' ').strip()
