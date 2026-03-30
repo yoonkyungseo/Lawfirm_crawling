@@ -26,6 +26,7 @@ options.add_argument("--no-sandbox")          # 보안 기능 해제 (리눅스 
 options.add_argument("--disable-dev-shm-usage") # 공유 메모리 부족 방지
 options.add_argument("--disable-gpu")         # GPU 가속 해제
 options.add_argument("--window-size=1920,1080") # 가상 모니터 크기 설정 (스크롤/클릭 오류 방지)
+options.add_argument("--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36") # 최신 크롬 브라우저의 User-Agent로 설정 (봇 탐지 회피)
 
 base_path = 'data'
 folders = [f for f in os.listdir(base_path) if os.path.isdir(os.path.join(base_path, f))]
@@ -68,34 +69,19 @@ def wait_clickable_element(driver, locator, timeout=15):
     return WebDriverWait(driver, timeout).until(EC.element_to_be_clickable(locator))
 def get_text_by_js(selector):
     return driver.execute_script(f"return document.querySelector('{selector}') ? document.querySelector('{selector}').textContent : '';").strip()
-def final_attempt_get_intro(driver):
-    # 1. 넉넉하게 기다립니다. (김앤장은 이게 보수적이어야 합니다)
-    time.sleep(5)
+def grab_all_visible_text(driver):
+    # 1. 페이지 로딩 및 동적 요소 생성을 위해 강제 대기
+    # 김앤장 사이트는 스크롤이 트리거가 되므로 바닥까지 내렸다가 위로 올립니다.
+    driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+    time.sleep(2)
+    driver.execute_script("window.scrollTo(0, 0);")
+    time.sleep(1)
+
+    # 2. 자바스크립트로 화면에 보이는 모든 텍스트 추출
+    # innerText는 불필요한 태그 정보를 제외한 '순수 글자'만 반환합니다.
+    all_text = driver.execute_script("return document.body.innerText;")
     
-    # 2. 자바스크립트로 "소개"라는 단어를 포함한 제목을 찾고, 그 형제 요소를 가져옵니다.
-    script = """
-    // 모든 h3 태그 중 '소개'라는 글자가 있는 것을 찾습니다.
-    var headers = Array.from(document.querySelectorAll('h3'));
-    var introHeader = headers.find(h => h.textContent.includes('소개'));
-    
-    if (!introHeader) return "제목(소개)을 찾지 못함";
-    
-    // 그 제목의 바로 다음 형제(div) 혹은 그 안의 텍스트 영역을 찾습니다.
-    var contentDiv = introHeader.nextElementSibling;
-    if (!contentDiv) return "내용 영역이 없음";
-    
-    // 내용 영역 안에 있는 모든 텍스트를 가져옵니다.
-    return contentDiv.textContent.trim();
-    """
-    
-    result = driver.execute_script(script)
-    
-    # 3. 데이터가 나왔는지 확인하고 정리
-    if result and "찾지 못함" not in result:
-        # 연속된 공백과 줄바꿈을 하나로 합침
-        return " ".join(result.split())
-    
-    return "실패: " + result
+    return all_text
 
 # 김앤장 크롤링 코드
 
@@ -165,8 +151,8 @@ for num in tqdm.tqdm(range(1, 2)):
 
                     # 상세 소개글
                     # introduction = wait_presence_element(driver, (By.CSS_SELECTOR, ".top_text.hidden_area")).get_attribute("textContent").replace('\n', ' ').strip()
-                    intro = final_attempt_get_intro(driver)
-                    print(f"추출 결과: {intro}")
+                    all_content = grab_all_visible_text(driver)
+                    print(f"추출 결과: {all_content}")
                     introductions = wait_presence_elements(driver, (By.CSS_SELECTOR, '.top_text.hidden_area p'))
                     introduction = ""
                     for intro in introductions:
