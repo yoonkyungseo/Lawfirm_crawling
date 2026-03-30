@@ -11,6 +11,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common. by import By
 from datetime import datetime
+import glob
 
 # --- Github 환경 추가 라이브러리 ---
 from selenium.webdriver.chrome.options import Options
@@ -26,10 +27,21 @@ options.add_argument("--disable-dev-shm-usage") # 공유 메모리 부족 방지
 options.add_argument("--disable-gpu")         # GPU 가속 해제
 options.add_argument("--window-size=1920,1080") # 가상 모니터 크기 설정 (스크롤/클릭 오류 방지)
 
+base_path = 'data'
+folders = [f for f in os.listdir(base_path) if os.path.isdir(os.path.join(base_path, f))]
+folders.sort()
+latest_folder = folders[-1] # 가장 최근 폴더 선택
+old_csv_files = glob.glob(os.path.join(f'data/{latest_folder}', "Kim_and_Chang*.csv"))
+if old_csv_files:
+    df_old = pd.read_csv(old_csv_files[0])
+    old_exist_data = set(zip(df_old['name'].fillna(''), df_old['email'].fillna('')))
+else:
+    old_exist_data = set()
+
 # 데이터 프레임 정의
-col = ['company','name','job','call','related_fields','career','education','eligibility','awards','assessment']
+col = ['company','name','job','call','email','introduction','related_fields','career','education','eligibility','awards','assessment','performance','language','activity','url','new']
 df = pd.DataFrame(columns=col)
-# 회사명, 이름, 직업, 전화번호, 업무분야, 경력, 학력, 자격, 수상, 외부평가(세종에만 있음)
+# 회사명, 이름, 직업, 전화번호, 이메일, 상세 소개글, 업무분야, 경력, 학력, 자격, 수상, 외부평가(세종에만 있음), 주요업무실적, 사용언어, 외부활동, 프로필 url, 신규 여부
 
 exist_data = set()
 
@@ -165,6 +177,13 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
                                     for award in awards_lst:
                                         award_total.append(award.get_attribute("textContent"))
                                     awards = ','.join(award_total)
+                    
+                    if old_exist_data:
+                        if (name, email) in old_exist_data:
+                            new = "-"
+                        else:
+                            new = "Y"
+
                     add_pf = {
                         'company':company,
                         'name':name,
@@ -203,6 +222,19 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
     df = pd.concat([df, pd.DataFrame(pf_data)], ignore_index=True)
 
     time.sleep(2)
+
+# 퇴사자 확인
+if df_old:
+    df_old['temp_id'] = df_old['name'].astype(str) + df_old['email'].astype(str)
+    df['temp_id'] = df['name'].astype(str) + df['email'].astype(str)
+    # 퇴사자 정보 추출
+    retired_info = df_old[~df_old['temp_id'].isin(df['temp_id'])].copy()
+    df.drop(columns=['temp_id'], inplace=True)
+
+    if not retired_info.empty:
+        retired_info['new'] = "Out"
+        retired_info.drop(columns=['temp_id'], inplace=True)
+        df = pd.concat([df, retired_info], ignore_index=True)
 
 today_folder = datetime.now().strftime("%Y-%m-%d")
 os.makedirs(f"data/{today_folder}", exist_ok=True)
