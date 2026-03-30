@@ -81,7 +81,8 @@ time.sleep(2)
 company = "김앤장"
 # 김앤장 구성원 페이지 ALL 항목들 = 구분 목록
 elements = wait_presence_elements(driver, (By.XPATH, '//*[@id="keyWordTab4"]/li'))
-for num in tqdm.tqdm(range(1, len(elements)+1)):
+# for num in tqdm.tqdm(range(1, len(elements)+1)):
+for num in tqdm.tqdm(range(1, 2)):
     practice = wait_clickable_element(driver, (By.XPATH, f'//*[@id="keyWordTab4"]/li[{num}]/a')) # 구분 목록 요소
     driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", practice)
     time.sleep(2)
