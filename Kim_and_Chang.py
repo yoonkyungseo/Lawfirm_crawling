@@ -149,23 +149,24 @@ for num in tqdm.tqdm(range(1, 2)):
                     driver.execute_script("arguments[0].click();", pf_link)
                     time.sleep(5)
 
-                    all_content = grab_all_visible_text(driver)
-                    print(f"추출 결과: {all_content}")
+                    # all_content = grab_all_visible_text(driver)
+                    # print(f"추출 결과: {all_content}")
 
                     # 이메일
                     email = wait_presence_element(driver, (By.XPATH, "//a[contains(@href, 'mailto:')]")).get_attribute("textContent")
-                    print(email)
 
                     # 상세 소개글
                     # introduction = wait_presence_element(driver, (By.CSS_SELECTOR, ".top_text.hidden_area")).get_attribute("textContent").replace('\n', ' ').strip()
-                    introductions = wait_presence_elements(driver, (By.CSS_SELECTOR, '.top_text.hidden_area p'))
                     introduction = ""
-                    for intro in introductions:
-                        introduction += intro.get_attribute("textContent").replace('\n', ' ').strip()
-                    print('introduction', introduction)
+                    try:
+                        introductions = wait_presence_elements(driver, (By.CSS_SELECTOR, '.top_text.hidden_area p'))
+                        for intro in introductions:
+                            introduction += intro.get_attribute("textContent").replace('\n', ' ').strip()
+                    except:
+                        pass
 
                     # 관련 분야
-                    fields_lst = wait_presence_elements(driver, (By.XPATH, '//*[@id="detailContents"]/div[5]/div/aside/div[1]/div/ul/li'))
+                    fields_lst = wait_presence_elements(driver, (By.CSS_SELECTOR, 'div.left_tag li'))
                     fields_total = []
                     for field in fields_lst:
                         fields_total.append(field.get_attribute("textContent"))
@@ -201,7 +202,10 @@ for num in tqdm.tqdm(range(1, 2)):
                     
                     # 수상, 외부 활동, 주요 업무 실적
                     awards, activity, performance = "", "", ""
-                    extra_bullet = wait_presence_elements(driver, (By.XPATH, '//*[@id="career"]/div[2]/div'))
+                    try:
+                        extra_bullet = wait_presence_elements(driver, (By.XPATH, '//*[@id="career"]/div[2]/div'))
+                    except:
+                        extra_bullet = []
                     for extra in extra_bullet:
                         main_activity = wait_presence_element(extra, (By.XPATH, './/h4/a'))
                         # 수상, 외부 활동
@@ -254,6 +258,8 @@ for num in tqdm.tqdm(range(1, 2)):
                         'url':driver.current_url,
                         'new':new
                     }
+                    ## 디버깅용
+                    print(add_pf)
                     pf_data.append(add_pf)
                     driver.back()
                     time.sleep(5)
