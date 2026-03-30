@@ -106,7 +106,7 @@ for category in tqdm.tqdm(range(2, 4)):
                 # 이메일
                 email = driver.find_element(By.XPATH, '//*[@id="printDiv"]/div/div/div[1]/div[1]/div[2]/p[1]/a').text
                 # 상세 소개글
-                introduction = driver.find_element(By.CSS_SELECTOR, '.leeko-member-detail__text').text
+                introduction = driver.find_element(By.CSS_SELECTOR, '.leeko-member-detail__text').text.replace('\n', ' ').strip()
 
                 # 관련 분야
                 fields_lst = driver.find_elements(By.CSS_SELECTOR, '.leeko-tag.leeko-tag--dark a')
