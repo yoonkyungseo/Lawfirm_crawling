@@ -151,7 +151,8 @@ for num in tqdm.tqdm(range(1, 2)):
 
                     # 상세 소개글
                     # introduction = wait_presence_element(driver, (By.CSS_SELECTOR, ".top_text.hidden_area")).get_attribute("textContent").replace('\n', ' ').strip()
-                    scroll_until_found(driver, '.top_text')
+                    check_scroll = scroll_until_found(driver, '.top_text')
+                    print('check_scroll', check_scroll)
                     introductions = wait_presence_elements(driver, (By.CSS_SELECTOR, '.top_text.hidden_area p'))
                     introduction = ""
                     for intro in introductions:
