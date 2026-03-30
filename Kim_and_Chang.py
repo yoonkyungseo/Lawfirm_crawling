@@ -10,6 +10,8 @@ from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common. by import By
+from selenium.webdriver import ActionChains
+from selenium.webdriver.common.keys import Keys
 from datetime import datetime
 import glob
 
@@ -142,11 +144,15 @@ for num in tqdm.tqdm(range(1, 2)):
                 # 해당 pf가 기존에 저장된 사람인지 확인
                 if check_duplicates(name, job, call):
                     # pf 화면 새 창에서 열기
-                    pf_link = wait_presence_element(pf, (By.TAG_NAME, "a")).get_attribute("href")
-                    print(pf_link)
+                    pf_link = wait_presence_element(pf, (By.CSS_SELECTOR, "p"))
+                    ActionChains(driver) \
+                        .key_down(Keys.CONTROL) \
+                        .click(pf_link) \
+                        .key_up(Keys.CONTROL) \
+                        .perform()
                     driver.execute_script(f"window.open('{pf_link}', '_blank');")
                     driver.switch_to.window(driver.window_handles[-1]) # 새 창으로 포커스 이동
-                    time.sleep(10)
+                    time.sleep(5)
 
                     # 이메일
                     email = wait_presence_element(driver, (By.XPATH, "//a[contains(@href, 'mailto:')]")).get_attribute("textContent")
