@@ -26,14 +26,19 @@ options.add_argument("--disable-gpu")         # GPU 가속 해제
 options.add_argument("--window-size=1920,1080") # 가상 모니터 크기 설정 (스크롤/클릭 오류 방지)
 
 base_path = 'data'
-folders = [f for f in os.listdir(base_path) if os.path.isdir(os.path.join(base_path, f))]
-folders.sort()
-latest_folder = folders[-1] # 가장 최근 폴더 선택
-old_csv_files = glob.glob(os.path.join(f'data/{latest_folder}', "BKL*.csv"))
-if old_csv_files:
-    df_old = pd.read_csv(old_csv_files[0])
-    old_exist_data = set(zip(df_old['name'].fillna(''), df_old['email'].fillna('')))
-else:
+try:
+    folders = [f for f in os.listdir(base_path) if os.path.isdir(os.path.join(base_path, f))]
+    folders.sort()
+    latest_folder = folders[-1] # 가장 최근 폴더 선택
+    old_csv_files = glob.glob(os.path.join(f'data/{latest_folder}', "BKL*.csv"))
+    if old_csv_files:
+        df_old = pd.read_csv(old_csv_files[0])
+        old_exist_data = set(zip(df_old['name'].fillna(''), df_old['email'].fillna('')))
+    else:
+        df_old = pd.DataFrame()
+        old_exist_data = set()
+except FileNotFoundError:
+    df_old = pd.DataFrame()
     old_exist_data = set()
 
 # 데이터 프레임 정의
