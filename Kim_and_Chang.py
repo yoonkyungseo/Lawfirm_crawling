@@ -83,7 +83,7 @@ company = "김앤장"
 elements = wait_presence_elements(driver, (By.XPATH, '//*[@id="keyWordTab4"]/li'))
 # for num in tqdm.tqdm(range(1, len(elements)+1)):
 for num in tqdm.tqdm(range(1, 2)):
-    practice = wait_clickable_element(driver, (By.XPATH, f'//*[@id="keyWordTab4"]/li[{num}]/a')) # 구분 목록 요소
+    practice = wait_presence_element(driver, (By.XPATH, f'//*[@id="keyWordTab4"]/li[{num}]/a')) # 구분 목록 요소
     driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", practice)
     time.sleep(2)
     # 현재 진행 중인 구분 목록 출력
@@ -182,7 +182,7 @@ for num in tqdm.tqdm(range(1, 2)):
                     awards, activity, performance = "", "", ""
                     extra_bullet = wait_presence_elements(driver, (By.XPATH, '//*[@id="career"]/div[2]/div'))
                     for extra in extra_bullet:
-                        main_activity = wait_clickable_element(extra, (By.XPATH, './/h4/a'))
+                        main_activity = wait_presence_element(extra, (By.XPATH, './/h4/a'))
                         time.sleep(1)
                         # 수상, 외부 활동
                         if main_activity.get_attribute("textContent") == "주요 활동":
