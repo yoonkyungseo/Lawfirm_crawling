@@ -124,15 +124,15 @@ for num in tqdm.tqdm(range(1, 2)):
                 driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", pf)
                 time.sleep(2)
                 # 이름 # 직업
-                name, job = pf.find_element(By.XPATH, './/div/span[1]/a').get_attribute("textContent").splitlines()
+                name, job = wait_presence_element(pf, (By.XPATH, './/div/span[1]/a')).get_attribute("textContent").splitlines()
                 # 전화번호
-                call = wait_presence_element(pf, (By.XPATH, './/div/span[2]').get_attribute("textContent").replace('T.',''))
+                call = wait_presence_element(pf, (By.XPATH, './/div/span[2]')).get_attribute("textContent").replace('T.','')
                 print(name, job, call)
                 
                 # 해당 pf가 기존에 저장된 사람인지 확인
                 if check_duplicates(name, job, call):
                     # pf 화면 새 창에서 열기
-                    pf_link = wait_presence_element(pf, (By.TAG_NAME, "a").get_attribute("href"))
+                    pf_link = wait_presence_element(pf, (By.TAG_NAME, "a")).get_attribute("href")
                     driver.execute_script(f"window.open('{pf_link}', '_blank');")
                     driver.switch_to.window(driver.window_handles[-1]) # 새 창으로 포커스 이동
                     time.sleep(4)
