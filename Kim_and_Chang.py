@@ -68,36 +68,34 @@ def wait_clickable_element(driver, locator, timeout=15):
     return WebDriverWait(driver, timeout).until(EC.element_to_be_clickable(locator))
 def get_text_by_js(selector):
     return driver.execute_script(f"return document.querySelector('{selector}') ? document.querySelector('{selector}').textContent : '';").strip()
-def get_kimchang_introduction(driver):
-    # 1. 페이지 로딩 후 안정화 대기 (김앤장은 넉넉히 주는 게 좋습니다)
-    time.sleep(3)
+def final_attempt_get_intro(driver):
+    # 1. 넉넉하게 기다립니다. (김앤장은 이게 보수적이어야 합니다)
+    time.sleep(5)
     
-    # 2. '소개' 영역이 보일 때까지 살짝 스크롤 (트리거용)
-    driver.execute_script("window.scrollTo(0, 800);")
-    time.sleep(1)
-
-    # 3. 자바스크립트로 '소개' 텍스트 강제 추출
-    # 상세페이지 내 '소개' 섹션의 특정 ID(#profile)와 클래스(.top_text)를 정밀 타격합니다.
+    # 2. 자바스크립트로 "소개"라는 단어를 포함한 제목을 찾고, 그 형제 요소를 가져옵니다.
     script = """
-        var container = document.querySelector('#profile .top_text') || 
-                        document.querySelector('.field_infobox .top_text');
-        if (!container) return "";
-        
-        // 내부의 모든 p 태그나 텍스트 노드를 합칩니다.
-        var paragraphs = container.querySelectorAll('p');
-        if (paragraphs.length > 0) {
-            return Array.from(paragraphs).map(p => p.textContent.trim()).join(' ');
-        }
-        return container.textContent.trim();
+    // 모든 h3 태그 중 '소개'라는 글자가 있는 것을 찾습니다.
+    var headers = Array.from(document.querySelectorAll('h3'));
+    var introHeader = headers.find(h => h.textContent.includes('소개'));
+    
+    if (!introHeader) return "제목(소개)을 찾지 못함";
+    
+    // 그 제목의 바로 다음 형제(div) 혹은 그 안의 텍스트 영역을 찾습니다.
+    var contentDiv = introHeader.nextElementSibling;
+    if (!contentDiv) return "내용 영역이 없음";
+    
+    // 내용 영역 안에 있는 모든 텍스트를 가져옵니다.
+    return contentDiv.textContent.trim();
     """
     
     result = driver.execute_script(script)
     
-    # 4. 파이썬에서 최종 클렌징 (줄바꿈 제거 및 공백 정리)
-    if result:
-        clean_text = " ".join(result.split())
-        return clean_text
-    return "텍스트를 찾지 못했습니다."
+    # 3. 데이터가 나왔는지 확인하고 정리
+    if result and "찾지 못함" not in result:
+        # 연속된 공백과 줄바꿈을 하나로 합침
+        return " ".join(result.split())
+    
+    return "실패: " + result
 
 # 김앤장 크롤링 코드
 
@@ -167,7 +165,7 @@ for num in tqdm.tqdm(range(1, 2)):
 
                     # 상세 소개글
                     # introduction = wait_presence_element(driver, (By.CSS_SELECTOR, ".top_text.hidden_area")).get_attribute("textContent").replace('\n', ' ').strip()
-                    intro = get_kimchang_introduction(driver)
+                    intro = final_attempt_get_intro(driver)
                     print(f"추출 결과: {intro}")
                     introductions = wait_presence_elements(driver, (By.CSS_SELECTOR, '.top_text.hidden_area p'))
                     introduction = ""
