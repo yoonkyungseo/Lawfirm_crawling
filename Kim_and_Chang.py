@@ -137,7 +137,7 @@ for num in tqdm.tqdm(range(1, 2)):
                     # introduction = wait_presence_element(driver, (By.CLASS_NAME, "top_text")).get_attribute("textContent").text.replace('\n', ' ').strip()
 
                     # 관련 분야
-                    fields_lst = wait_presence_elements(driver, (By.XPATH, '//*[@id="detailContents"]/div[5]/div/aside/div[1]/div/ul/li'))
+                    fields_lst = driver.find_elements(By.XPATH, '//*[@id="detailContents"]/div[5]/div/aside/div[1]/div/ul/li')
                     fields_total = []
                     for field in fields_lst:
                         fields_total.append(field.get_attribute("textContent"))
