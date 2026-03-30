@@ -136,48 +136,79 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
                     driver.switch_to.window(driver.window_handles[-1]) # 새 창으로 포커스 이동
                     time.sleep(4)
 
+                    # 이메일
+                    email = wait_presence_element(driver, (By.XPATH, '//*[@id="detailContents"]/div[1]/div/div[2]/div/div/span[3]/a')).get_attribute("textContent")
+
+                    # 상세 소개글
+                    introduction = wait_presence_element(driver, (By.XPATH, '//*[@id="profile"]/div/div/div[1]/p')).get_attribute("textContent").text.replace('\n', ' ').strip()
+
                     # 관련 분야
                     fields_lst = wait_presence_elements(driver, (By.XPATH, '//*[@id="detailContents"]/div[5]/div/aside/div[1]/div/ul/li'))
                     fields_total = []
                     for field in fields_lst:
                         fields_total.append(field.get_attribute("textContent"))
                     related_fields = ','.join(fields_total)
+
                     # 경력
                     career_lst = wait_presence_elements(driver, (By.XPATH, '//*[@id="career"]/div[1]/p'))
                     career_total = []
                     for careers in career_lst:
                         career_total.append(careers.get_attribute("textContent"))
                     career = ','.join(career_total)
+
                     # 학력
                     edu_lst = wait_presence_elements(driver, (By.XPATH, '//*[@id="career"]/ul[1]/p'))
                     edu_total = []
                     for edus in edu_lst:
                         edu_total.append(edus.get_attribute("textContent"))
                     education = ','.join(edu_total)
+
                     # 자격
                     eli_lst = wait_presence_elements(driver, (By.XPATH, '//*[@id="career"]/ul[2]/p'))
                     eli_total = []
                     for elis in eli_lst:
                         eli_total.append(elis.get_attribute("textContent"))
                     eligibility = ','.join(eli_total)
-                    # 수상
-                    awards = ""
+
+                    # 언어
+                    lan_lst = wait_presence_elements(driver, (By.CSS_SELECTOR, '#career > p.lang'))
+                    lan_total = []
+                    for lan in lan_lst:
+                        lan_total.append(lan.get_attribute("textContent"))
+                    language = ','.join(lan_total)
+                    
+                    # 수상, 외부 활동, 주요 업무 실적
+                    awards, activity, performance = "", "", ""
                     extra_bullet = wait_presence_elements(driver, (By.XPATH, '//*[@id="career"]/div[2]/div'))
                     for extra in extra_bullet:
-                        activity = wait_clickable_element(extra, (By.XPATH, './/h4/a'))
+                        main_activity = wait_clickable_element(extra, (By.XPATH, './/h4/a'))
                         time.sleep(1)
-                        if activity.get_attribute("textContent") == "주요 활동":
-                            driver.execute_script("arguments[0].click();", activity)
+                        # 수상, 외부 활동
+                        if main_activity.get_attribute("textContent") == "주요 활동":
+                            driver.execute_script("arguments[0].click();", main_activity)
                             time.sleep(1)
-                            activity_bullet = wait_presence_elements(extra, (By.XPATH, './/div/h5'))
-                            for act in activity_bullet:
+                            main_activity_bullet = wait_presence_elements(extra, (By.XPATH, './/div/h5'))
+                            for act in main_activity_bullet:
                                 if act.get_attribute("textContent") == "수상":
-                                    awards_lst = wait_presence_elements(extra, (By.XPATH, './/div/ul/li'))
+                                    awards_lst = wait_presence_elements(extra, (By.XPATH, './/div/ul[1]/li'))
                                     award_total = []
                                     for award in awards_lst:
                                         award_total.append(award.get_attribute("textContent"))
                                     awards = ','.join(award_total)
-                    
+                                elif act.get_attribute("textContent") == "저서 및 외부활동":
+                                    activity_lst = wait_presence_elements(extra, (By.CSS_SELECTOR, ' ul.field_history li'))
+                                    activity_total = []
+                                    for plus_act in activity_lst:
+                                        activity_total.append(plus_act.get_attribute("textContent"))
+                                    activity = ','.join(activity_total)
+                        # 주요 업무 실적
+                        elif main_activity.get_attribute("textContent") == "주요 실적":
+                            perf_lst = wait_presence_elements(extra, (By.CSS_SELECTOR, 'div.boxopen li'))
+                            perf_total = []
+                            for perf in perf_lst:
+                                perf_total.append(perf.get_attribute("textContent"))
+                            performance = ','.join(perf_total)
+
                     if old_exist_data:
                         if (name, email) in old_exist_data:
                             new = "-"
@@ -189,12 +220,19 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
                         'name':name,
                         'job':job,
                         'call':call,
+                        'email':email,
+                        'introduction':introduction,
                         'related_fields':related_fields,
                         'career':career,
                         'education':education,
                         'eligibility':eligibility,
                         'awards':awards,
-                        'assessment':""
+                        'assessment':"",
+                        'performance':performance,
+                        'language':language,
+                        'activity':activity,
+                        'url':driver.current_url,
+                        'new':new
                     }
                     pf_data.append(add_pf)
                     driver.close() # pf 클릭해서 연 창 닫기
