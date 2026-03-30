@@ -68,20 +68,36 @@ def wait_clickable_element(driver, locator, timeout=15):
     return WebDriverWait(driver, timeout).until(EC.element_to_be_clickable(locator))
 def get_text_by_js(selector):
     return driver.execute_script(f"return document.querySelector('{selector}') ? document.querySelector('{selector}').textContent : '';").strip()
-def scroll_until_found(driver, css_selector, max_attempts=5):
-    for _ in range(max_attempts):
-        try:
-            # 요소를 찾아봅니다.
-            element = driver.find_element(By.CSS_SELECTOR, css_selector)
-            if element.is_displayed():
-                return True # 찾았으면 종료!
-        except:
-            pass
+def get_kimchang_introduction(driver):
+    # 1. 페이지 로딩 후 안정화 대기 (김앤장은 넉넉히 주는 게 좋습니다)
+    time.sleep(3)
+    
+    # 2. '소개' 영역이 보일 때까지 살짝 스크롤 (트리거용)
+    driver.execute_script("window.scrollTo(0, 800);")
+    time.sleep(1)
+
+    # 3. 자바스크립트로 '소개' 텍스트 강제 추출
+    # 상세페이지 내 '소개' 섹션의 특정 ID(#profile)와 클래스(.top_text)를 정밀 타격합니다.
+    script = """
+        var container = document.querySelector('#profile .top_text') || 
+                        document.querySelector('.field_infobox .top_text');
+        if (!container) return "";
         
-        # 못 찾았으면 600px 내리고 1초 대기
-        driver.execute_script("window.scrollBy(0, 600);")
-        time.sleep(1)
-    return False
+        // 내부의 모든 p 태그나 텍스트 노드를 합칩니다.
+        var paragraphs = container.querySelectorAll('p');
+        if (paragraphs.length > 0) {
+            return Array.from(paragraphs).map(p => p.textContent.trim()).join(' ');
+        }
+        return container.textContent.trim();
+    """
+    
+    result = driver.execute_script(script)
+    
+    # 4. 파이썬에서 최종 클렌징 (줄바꿈 제거 및 공백 정리)
+    if result:
+        clean_text = " ".join(result.split())
+        return clean_text
+    return "텍스트를 찾지 못했습니다."
 
 # 김앤장 크롤링 코드
 
@@ -151,8 +167,8 @@ for num in tqdm.tqdm(range(1, 2)):
 
                     # 상세 소개글
                     # introduction = wait_presence_element(driver, (By.CSS_SELECTOR, ".top_text.hidden_area")).get_attribute("textContent").replace('\n', ' ').strip()
-                    check_scroll = scroll_until_found(driver, '.top_text')
-                    print('check_scroll', check_scroll)
+                    intro = get_kimchang_introduction(driver)
+                    print(f"추출 결과: {intro}")
                     introductions = wait_presence_elements(driver, (By.CSS_SELECTOR, '.top_text.hidden_area p'))
                     introduction = ""
                     for intro in introductions:
