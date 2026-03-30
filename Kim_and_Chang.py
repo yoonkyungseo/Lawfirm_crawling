@@ -174,24 +174,24 @@ for num in tqdm.tqdm(range(1, 2)):
                     related_fields = ','.join(fields_total)
 
                     # 경력
-                    career_lst = wait_presence_elements(driver, (By.XPATH, '//*[@id="career"]/div[1]/p'))
+                    career_lst = wait_presence_elements(driver, (By.XPATH, '//*[@id="career"]/div[1]//*'))
                     career_total = []
                     for careers in career_lst:
-                        career_total.append(careers.get_attribute("textContent"))
+                        career_total.append(careers.get_attribute("textContent").replace('\n', ' ').strip())
                     career = ','.join(career_total)
 
                     # 학력
-                    edu_lst = wait_presence_elements(driver, (By.XPATH, '//*[@id="career"]/ul[1]/p'))
+                    edu_lst = wait_presence_elements(driver, (By.XPATH, '//*[@id="career"]/ul[1]//*'))
                     edu_total = []
                     for edus in edu_lst:
-                        edu_total.append(edus.get_attribute("textContent"))
+                        edu_total.append(edus.get_attribute("textContent").replace('\n', ' ').strip())
                     education = ','.join(edu_total)
 
                     # 자격
-                    eli_lst = wait_presence_elements(driver, (By.XPATH, '//*[@id="career"]/ul[2]/p'))
+                    eli_lst = wait_presence_elements(driver, (By.XPATH, '//*[@id="career"]/ul[2]//*'))
                     eli_total = []
                     for elis in eli_lst:
-                        eli_total.append(elis.get_attribute("textContent"))
+                        eli_total.append(elis.get_attribute("textContent").replace('\n', ' ').strip())
                     eligibility = ','.join(eli_total)
 
                     # 언어
