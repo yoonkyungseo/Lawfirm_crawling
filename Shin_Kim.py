@@ -117,7 +117,7 @@ for category in tqdm.tqdm(range(2, 4)):
                         fields_total = []
                         for field in fields_lst:
                             driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", field)
-                            fields_total.append(field.get_attribute("textContent"))
+                            fields_total.append(field.get_attribute("textContent").replace('\n', ' ').strip())
                         related_fields = ','.join(fields_total)
                         time.sleep(2)
 
