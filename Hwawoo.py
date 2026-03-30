@@ -102,7 +102,7 @@ for i in tqdm.tqdm(range(1, len(pf_lst)+1)):
             detail_title = detail.find_element(By.CSS_SELECTOR, 'h3').get_attribute("textContent").strip()
             
             if detail_title == "소개":
-                introduction = detail.find_element(By.CSS_SELECTOR, 'div.intro-wrap').text
+                introduction = detail.find_element(By.CSS_SELECTOR, 'div.intro-wrap').text.replace('\n', ' ').strip()
             elif detail_title in ["업무분야", "경력", "학력", "자격", "수상"]:
                 while True:
                     try:
