@@ -76,7 +76,6 @@ time.sleep(3)
 
 all_button = wait_presence_element(driver, (By.XPATH, '//*[@id="form1"]/div[2]/ul/li[4]/a/span'))
 driver.execute_script("arguments[0].click();", all_button)
-time.sleep(2)
 
 company = "김앤장"
 # 김앤장 구성원 페이지 ALL 항목들 = 구분 목록
@@ -85,12 +84,10 @@ elements = wait_presence_elements(driver, (By.XPATH, '//*[@id="keyWordTab4"]/li'
 for num in tqdm.tqdm(range(1, 2)):
     practice = wait_presence_element(driver, (By.XPATH, f'//*[@id="keyWordTab4"]/li[{num}]/a')) # 구분 목록 요소
     driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", practice)
-    time.sleep(2)
     # 현재 진행 중인 구분 목록 출력
     print("-----", practice.get_attribute("textContent").strip(), "-----")
     pf_data = []
     driver.execute_script("arguments[0].click();", practice) # 해당 구분 목록 클릭
-    time.sleep(3)
 
     # 페이지 갯수 확인
     pages = wait_presence_elements(driver, (By.XPATH, '//*[@id="_pro"]/div/a'))
@@ -112,17 +109,14 @@ for num in tqdm.tqdm(range(1, 2)):
             # 페이지 이동
             page = wait_clickable_element(driver, (By.XPATH, f'//*[@id="_pro"]/div/a[{i}]'))
             driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", page)
-            time.sleep(2)
             page_num = page.get_attribute("textContent")
             print(f"현재 {page_num} page 진행중")
             driver.execute_script("arguments[0].click();", page)
-            time.sleep(3)
 
             pf_lst = wait_presence_elements(driver, (By.XPATH, '//*[@id="_pro"]/ul[2]/li'))
             for j in range(1, len(pf_lst)+1):
                 pf = wait_presence_element(driver, (By.CSS_SELECTOR, f'#_pro > ul.lawyer_profile > li:nth-child({j})'))
                 driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", pf)
-                time.sleep(2)
                 # 이름 # 직업
                 name, job = wait_presence_element(pf, (By.XPATH, './/div/span[1]/a')).get_attribute("textContent").split()
                 # 전화번호
@@ -135,13 +129,12 @@ for num in tqdm.tqdm(range(1, 2)):
                     pf_link = wait_presence_element(pf, (By.TAG_NAME, "a")).get_attribute("href")
                     driver.execute_script(f"window.open('{pf_link}', '_blank');")
                     driver.switch_to.window(driver.window_handles[-1]) # 새 창으로 포커스 이동
-                    time.sleep(4)
 
                     # 이메일
                     email = wait_presence_element(driver, (By.XPATH, "//a[contains(@href, 'mailto:')]")).get_attribute("textContent")
 
                     # 상세 소개글
-                    introduction = wait_presence_element(driver, (By.CSS_SELECTOR, 'section#profile div.member_info div.view_more_area div.top_text.hidden_area')).get_attribute("textContent").text.replace('\n', ' ').strip()
+                    introduction = wait_presence_element(driver, (By.CSS_SELECTOR, '#profile div.top_text')).get_attribute("textContent").text.replace('\n', ' ').strip()
 
                     # 관련 분야
                     fields_lst = wait_presence_elements(driver, (By.XPATH, '//*[@id="detailContents"]/div[5]/div/aside/div[1]/div/ul/li'))
@@ -183,11 +176,9 @@ for num in tqdm.tqdm(range(1, 2)):
                     extra_bullet = wait_presence_elements(driver, (By.XPATH, '//*[@id="career"]/div[2]/div'))
                     for extra in extra_bullet:
                         main_activity = wait_presence_element(extra, (By.XPATH, './/h4/a'))
-                        time.sleep(1)
                         # 수상, 외부 활동
                         if main_activity.get_attribute("textContent") == "주요 활동":
                             driver.execute_script("arguments[0].click();", main_activity)
-                            time.sleep(1)
                             main_activity_bullet = wait_presence_elements(extra, (By.XPATH, './/div/h5'))
                             for act in main_activity_bullet:
                                 if act.get_attribute("textContent") == "수상":
@@ -238,7 +229,6 @@ for num in tqdm.tqdm(range(1, 2)):
                     pf_data.append(add_pf)
                     driver.close() # pf 클릭해서 연 창 닫기
                     driver.switch_to.window(main_window) # pf 리스트가 있는 main_window로 포커스 이동
-                    time.sleep(4)
 
             if len(pf_lst) < 10:
                 pf_flag = False
@@ -247,9 +237,7 @@ for num in tqdm.tqdm(range(1, 2)):
         if page_flag and pf_flag:
             next_page = wait_clickable_element(driver, (By.XPATH, f'//*[@id="_pro"]/div/a[{end}]'))
             driver.execute_script("arguments[0].click();", next_page)
-            time.sleep(3)
             start_page = wait_visibility_element(driver, (By.XPATH, f'//*[@id="_pro"]/div/a[{start}]')).get_attribute("textContent")
-            time.sleep(2)
             if int(start_page) == int(page_num)+1:
                 pages = wait_presence_elements(driver, (By.XPATH, '//*[@id="_pro"]/div/a'))
                 start = 3
