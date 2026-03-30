@@ -65,8 +65,7 @@ time.sleep(1)
 company = "광장"
 
 categories = driver.find_elements(By.XPATH, '//*[@id="mCSB_2_container"]/li')
-# for category in tqdm.tqdm(range(2, len(categories)+1)):
-for category in tqdm.tqdm(range(2, 4)):
+for category in tqdm.tqdm(range(2, len(categories)+1)):
     pf_data = []
     # 카테고리 선택
     category_box = driver.find_element(By.XPATH, "//div[@class='leeko-member-search__select']//div[@class='nice-select chosen-select']")
@@ -78,15 +77,15 @@ for category in tqdm.tqdm(range(2, 4)):
     driver.find_element(By.XPATH, "//div[@class='leeko-member-search__form']/button").click() # 검색 버튼 클릭
     time.sleep(3)
 
-    # # 모든 더보기 버튼 클릭해서 화면에 pf 정보가 다 뜨도록 설정
-    # while True:
-    #     try:
-    #         button = driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[6]/a/strong')
-    #         driver.execute_script("arguments[0].scrollIntoView({block: 'nearest'});", button)
-    #         time.sleep(1)
-    #         button.click()
-    #     except:
-    #         break
+    # 모든 더보기 버튼 클릭해서 화면에 pf 정보가 다 뜨도록 설정
+    while True:
+        try:
+            button = driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[6]/a/strong')
+            driver.execute_script("arguments[0].scrollIntoView({block: 'nearest'});", button)
+            time.sleep(1)
+            button.click()
+        except:
+            break
 
     category_member_lst = driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[5]/div') # 구성원 리스트
     pf_lines = category_member_lst.find_elements(By.CSS_SELECTOR, "div.leeko-member__list") # 구성원 리스트에서 한 줄씩 뽑기
@@ -122,17 +121,6 @@ for category in tqdm.tqdm(range(2, 4)):
                     detail_title = detail.find_element(By.XPATH, './/div[1]').text
 
                     if detail_title in ["경력", "학력", "자격/회원", "수상실적"]:
-                        # # 버튼 클릭 지우고 돌려볼건데 돌아가면 그냥 지워버리기
-                        # try:
-                        #     button = detail.find_element(By.XPATH, './/a')
-                        #     while True:
-                        #         if button.text == "더보기":
-                        #             driver.execute_script("arguments[0].scrollIntoView({block: 'nearest'});", button)
-                        #             button.click()
-                        #         else:
-                        #             break
-                        # except:
-                        #     pass
                         detail_contents = detail.find_elements(By.XPATH, './/div[2]//tr')
                         box_total = []
                         for detail_content in detail_contents:

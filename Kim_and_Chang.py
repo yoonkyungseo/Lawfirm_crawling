@@ -10,8 +10,6 @@ from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common. by import By
-from selenium.webdriver import ActionChains
-from selenium.webdriver.common.keys import Keys
 from datetime import datetime
 import glob
 
@@ -69,21 +67,6 @@ def wait_visibility_element(driver, locator, timeout=15):
     return WebDriverWait(driver, timeout).until(EC.visibility_of_element_located(locator))
 def wait_clickable_element(driver, locator, timeout=15):
     return WebDriverWait(driver, timeout).until(EC.element_to_be_clickable(locator))
-def get_text_by_js(selector):
-    return driver.execute_script(f"return document.querySelector('{selector}') ? document.querySelector('{selector}').textContent : '';").strip()
-def grab_all_visible_text(driver):
-    # 1. 페이지 로딩 및 동적 요소 생성을 위해 강제 대기
-    # 김앤장 사이트는 스크롤이 트리거가 되므로 바닥까지 내렸다가 위로 올립니다.
-    driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-    time.sleep(2)
-    driver.execute_script("window.scrollTo(0, 0);")
-    time.sleep(1)
-
-    # 2. 자바스크립트로 화면에 보이는 모든 텍스트 추출
-    # innerText는 불필요한 태그 정보를 제외한 '순수 글자'만 반환합니다.
-    all_text = driver.execute_script("return document.body.innerText;")
-    
-    return all_text
 
 # 김앤장 크롤링 코드
 
@@ -98,8 +81,7 @@ driver.execute_script("arguments[0].click();", all_button)
 company = "김앤장"
 # 김앤장 구성원 페이지 ALL 항목들 = 구분 목록
 elements = wait_presence_elements(driver, (By.XPATH, '//*[@id="keyWordTab4"]/li'))
-# for num in tqdm.tqdm(range(1, len(elements)+1)):
-for num in tqdm.tqdm(range(1, 2)):
+for num in tqdm.tqdm(range(1, len(elements)+1)):
     practice = wait_presence_element(driver, (By.XPATH, f'//*[@id="keyWordTab4"]/li[{num}]/a')) # 구분 목록 요소
     driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", practice)
     # 현재 진행 중인 구분 목록 출력
@@ -150,14 +132,10 @@ for num in tqdm.tqdm(range(1, 2)):
                     driver.execute_script("arguments[0].click();", pf_link)
                     time.sleep(5)
 
-                    # all_content = grab_all_visible_text(driver)
-                    # print(f"추출 결과: {all_content}")
-
                     # 이메일
                     email = wait_presence_element(driver, (By.XPATH, "//a[contains(@href, 'mailto:')]")).get_attribute("textContent")
 
                     # 상세 소개글
-                    # introduction = wait_presence_element(driver, (By.CSS_SELECTOR, ".top_text.hidden_area")).get_attribute("textContent").replace('\n', ' ').strip()
                     introduction = ""
                     try:
                         introductions = wait_presence_elements(driver, (By.CSS_SELECTOR, '.top_text.hidden_area p'))
@@ -264,8 +242,7 @@ for num in tqdm.tqdm(range(1, 2)):
                         'url':driver.current_url,
                         'new':new
                     }
-                    ## 디버깅용
-                    print(add_pf)
+                    
                     pf_data.append(add_pf)
                     driver.back()
                     time.sleep(5)

@@ -215,17 +215,16 @@ def bkl_crawling(id, button_id):
         # 더보기 버튼 클릭 전마다 df 갱신
         df = pd.concat([df, pd.DataFrame(pf_data)], ignore_index=True)
 
-        # try:
-        #     button = driver.find_element(By.XPATH, f'//*[@id="{id}"]/div[{button_id}]/button')
-        #     driver.execute_script("arguments[0].scrollIntoView({block: 'nearest'});", button)
-        #     button.click()
-        #     time.sleep(2)
-        #     driver.refresh()
-        #     time.sleep(4)
-        #     page += 1
-        # except:
-        #     break
-        break
+        try:
+            button = driver.find_element(By.XPATH, f'//*[@id="{id}"]/div[{button_id}]/button')
+            driver.execute_script("arguments[0].scrollIntoView({block: 'nearest'});", button)
+            button.click()
+            time.sleep(2)
+            driver.refresh()
+            time.sleep(4)
+            page += 1
+        except:
+            break
 
 bkl_crawling("isMainY", 2)
 bkl_crawling("isMainN", 3)
