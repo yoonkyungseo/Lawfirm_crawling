@@ -169,7 +169,7 @@ for num in tqdm.tqdm(range(1, 2)):
                     fields_lst = wait_presence_elements(driver, (By.CSS_SELECTOR, 'div.left_tag li'))
                     fields_total = []
                     for field in fields_lst:
-                        fields_total.append(field.get_attribute("textContent"))
+                        fields_total.append(field.get_attribute("textContent").replace('\n', ' ').strip())
                     related_fields = ','.join(fields_total)
 
                     # 경력
@@ -197,7 +197,7 @@ for num in tqdm.tqdm(range(1, 2)):
                     lan_lst = wait_presence_elements(driver, (By.CSS_SELECTOR, '#career > p.lang'))
                     lan_total = []
                     for lan in lan_lst:
-                        lan_total.append(lan.get_attribute("textContent"))
+                        lan_total.append(lan.get_attribute("textContent").replace('\n', ' ').strip())
                     language = ','.join(lan_total)
                     
                     # 수상, 외부 활동, 주요 업무 실적
@@ -280,7 +280,8 @@ for num in tqdm.tqdm(range(1, 2)):
                 end = len(pages)-1
             else:
                 pf_flag = False
-                
+        # 디버깅용
+        break        
     # 구분목록 하나당 한번씩 df 갱신
     df = pd.concat([df, pd.DataFrame(pf_data)], ignore_index=True)
 
