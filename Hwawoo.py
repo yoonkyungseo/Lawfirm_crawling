@@ -197,7 +197,7 @@ for i in tqdm.tqdm(range(1, len(pf_lst)+1)):
 df = pd.concat([df, pd.DataFrame(pf_data)], ignore_index=True)
 
 # 퇴사자 확인
-if df_old:
+if not df_old.empty:
     df_old['temp_id'] = df_old['name'].astype(str) + df_old['email'].astype(str)
     df['temp_id'] = df['name'].astype(str) + df['email'].astype(str)
     # 퇴사자 정보 추출
