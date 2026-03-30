@@ -165,9 +165,9 @@ for category in tqdm.tqdm(range(2, 4)):
                             child_text = child.get_attribute("textContent")
                             if child.tag_name == "dt":
                                 if detail_results:
-                                    detail_results += f'//{child_text}]]'
+                                    detail_results += f'//{child_text.replace("[","").replace("]","")}]]'
                                 else:
-                                    detail_results += f"{child_text}]]"
+                                    detail_results += f"{child_text.replace("[","").replace("]","")}]]"
                             elif child.tag_name == "dd":
                                 if detail_results:
                                     detail_results += f",{child_text}"
