@@ -94,7 +94,7 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
     print("-----", practice.get_attribute("textContent").strip(), "-----")
     pf_data = []
     driver.execute_script("arguments[0].click();", practice) # 해당 구분 목록 클릭
-    time.sleep(5) # 구분 목록 클릭 후 로딩 시간 부여
+    time.sleep(3) # 구분 목록 클릭 후 로딩 시간 부여
 
     # 페이지 갯수 확인
     current_page_idx = 1
@@ -120,10 +120,10 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
 
                 # 해당 pf가 기존에 저장된 사람인지 확인
                 if check_duplicates(name, job, call):
-                    # pf 화면 새 창에서 열기
+                    # pf 화면 클릭
                     pf_link = wait_presence_element(pf, (By.CSS_SELECTOR, "img"))
                     driver.execute_script("arguments[0].click();", pf_link)
-                    time.sleep(5)
+                    time.sleep(3)
 
                     # 이메일
                     email = wait_presence_element(driver, (By.XPATH, "//a[contains(@href, 'mailto:')]")).get_attribute("textContent")
@@ -241,7 +241,7 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
                     
                     pf_data.append(add_pf)
                     driver.back()
-                    time.sleep(5)
+                    time.sleep(3)
 
             # 다음 페이지로 넘기기
             try:
@@ -249,18 +249,18 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
                 target_page_btn = wait_clickable_element(driver, (By.XPATH, f'//div[@class="paging"]//a[text()="{next_page_idx}"]'))
                 driver.execute_script("arguments[0].click();", target_page_btn)
                 current_page_idx += 1
-                time.sleep(5)
+                time.sleep(3)
             except:
                 try:
                     next_step_page_btn = wait_clickable_element(driver, (By.XPATH, '//div[@class="paging"]//a[@class="next hidden_text"]'))
                     driver.execute_script("arguments[0].click();", next_step_page_btn)
-                    time.sleep(5)
+                    time.sleep(3)
 
                     next_page_idx = current_page_idx + 1
                     target_page_btn = wait_clickable_element(driver, (By.XPATH, f'//div[@class="paging"]//a[text()="{next_page_idx}"]'))
                     driver.execute_script("arguments[0].click();", target_page_btn)
                     current_page_idx += 1
-                    time.sleep(5)
+                    time.sleep(3)
                 except:
                     break
         except:
