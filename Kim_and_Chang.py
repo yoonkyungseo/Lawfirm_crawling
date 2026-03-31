@@ -94,14 +94,10 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
     print("-----", practice.get_attribute("textContent").strip(), "-----")
     pf_data = []
     driver.execute_script("arguments[0].click();", practice) # 해당 구분 목록 클릭
+    time.sleep(5) # 구분 목록 클릭 후 로딩 시간 부여
 
     # 페이지 갯수 확인
     current_page_idx = 1
-
-    # 1페이지가 제대로 로딩이 안되는 것 같아서 새로고침 추가
-    if num != 1:
-        driver.refresh()
-        time.sleep(2)
 
     try_again = 0
     while True:
