@@ -95,181 +95,174 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
     driver.execute_script("arguments[0].click();", practice) # 해당 구분 목록 클릭
 
     # 페이지 갯수 확인
-    pages = wait_presence_elements(driver, (By.XPATH, '//*[@id="_pro"]/div/a'))
-    if len(pages) == 9:
-        # 페이지가 5개 이상일 때
-        start = 3
-        end = len(pages)-1
-        page_flag = True
-    else:
-        # 페이지가 5개 이하일 때
-        start = 2
-        end = len(pages)
-        page_flag = False
-    
-    pf_flag = True
-    while pf_flag:
-        # 페이지별 탐색
-        for i in range(start, end):
-            # 페이지 이동
-            page = wait_clickable_element(driver, (By.XPATH, f'//*[@id="_pro"]/div/a[{i}]'))
-            driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", page)
-            page_num = page.get_attribute("textContent")
-            print(f"현재 {page_num} page 진행중")
-            driver.execute_script("arguments[0].click();", page)
-            time.sleep(3)
+    current_page_idx = 1
 
-            pf_lst = wait_presence_elements(driver, (By.XPATH, '//*[@id="_pro"]/ul[2]/li'))
-            for j in range(1, len(pf_lst)+1):
-                pf = wait_presence_element(driver, (By.CSS_SELECTOR, f'#_pro > ul.lawyer_profile > li:nth-child({j})'))
-                driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", pf)
-                # 이름 # 직업
-                job = wait_presence_element(pf, (By.XPATH, './/div/span[1]/a/span')).get_attribute("textContent").strip()
-                name = wait_presence_element(pf, (By.XPATH, './/div/span[1]/a')).get_attribute("textContent").replace(job, "").strip()
-                # 전화번호
-                call = wait_presence_element(pf, (By.XPATH, './/div/span[2]')).get_attribute("textContent").replace('T.','')
-                print(name, job, call)
+    while True:
+        # 페이지별 탐색
+        print(f"현재 {current_page_idx} page 진행중")
+
+        pf_lst = wait_presence_elements(driver, (By.XPATH, '//*[@id="_pro"]/ul[2]/li'))
+        current_pf_num = len(pf_lst)
+
+        for j in range(1, len(pf_lst)+1):
+            pf = wait_presence_element(driver, (By.CSS_SELECTOR, f'#_pro > ul.lawyer_profile > li:nth-child({j})'))
+            driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", pf)
+            # 이름 # 직업
+            job = wait_presence_element(pf, (By.XPATH, './/div/span[1]/a/span')).get_attribute("textContent").strip()
+            name = wait_presence_element(pf, (By.XPATH, './/div/span[1]/a')).get_attribute("textContent").replace(job, "").strip()
+            # 전화번호
+            call = wait_presence_element(pf, (By.XPATH, './/div/span[2]')).get_attribute("textContent").replace('T.','')
+            print(name, job, call)
                 
 
-                # 해당 pf가 기존에 저장된 사람인지 확인
-                if check_duplicates(name, job, call):
-                    # pf 화면 새 창에서 열기
-                    pf_link = wait_presence_element(pf, (By.CSS_SELECTOR, "img"))
-                    driver.execute_script("arguments[0].click();", pf_link)
-                    time.sleep(5)
+            # 해당 pf가 기존에 저장된 사람인지 확인
+            if check_duplicates(name, job, call):
+                # pf 화면 새 창에서 열기
+                pf_link = wait_presence_element(pf, (By.CSS_SELECTOR, "img"))
+                driver.execute_script("arguments[0].click();", pf_link)
+                time.sleep(5)
 
-                    # 이메일
-                    email = wait_presence_element(driver, (By.XPATH, "//a[contains(@href, 'mailto:')]")).get_attribute("textContent")
+                # 이메일
+                email = wait_presence_element(driver, (By.XPATH, "//a[contains(@href, 'mailto:')]")).get_attribute("textContent")
 
-                    # 상세 소개글
-                    introduction = ""
-                    try:
-                        introductions = wait_presence_elements(driver, (By.CSS_SELECTOR, '.top_text.hidden_area p'))
-                        for intro in introductions:
-                            introduction += intro.get_attribute("textContent").replace('\n', ' ').strip()
-                    except:
-                        pass
+                # 상세 소개글
+                introduction = ""
+                try:
+                    introductions = wait_presence_elements(driver, (By.CSS_SELECTOR, '.top_text.hidden_area p'))
+                    for intro in introductions:
+                        introduction += intro.get_attribute("textContent").replace('\n', ' ').strip()
+                except:
+                    pass
 
-                    # 관련 분야
-                    fields_lst = wait_presence_elements(driver, (By.CSS_SELECTOR, 'div.left_tag li'))
-                    fields_total = []
-                    for field in fields_lst:
-                        fields_total.append(field.get_attribute("textContent").replace('\n', ' ').strip())
-                    related_fields = ','.join(fields_total)
+                # 관련 분야
+                fields_lst = wait_presence_elements(driver, (By.CSS_SELECTOR, 'div.left_tag li'))
+                fields_total = []
+                for field in fields_lst:
+                    fields_total.append(field.get_attribute("textContent").replace('\n', ' ').strip())
+                related_fields = ','.join(fields_total)
 
-                    # 경력
-                    career_lst = wait_presence_elements(driver, (By.XPATH, '//*[@id="career"]/div[1]//*'))
-                    career_total = []
-                    for careers in career_lst:
-                        career_total.append(careers.get_attribute("textContent").replace('\n', ' ').strip())
-                    career = ','.join(career_total)
+                # 경력
+                career_lst = wait_presence_elements(driver, (By.XPATH, '//*[@id="career"]/div[1]//*'))
+                career_total = []
+                for careers in career_lst:
+                    career_total.append(careers.get_attribute("textContent").replace('\n', ' ').strip())
+                career = ','.join(career_total)
 
-                    # 학력
-                    edu_lst = wait_presence_elements(driver, (By.XPATH, '//*[@id="career"]/ul[1]//*'))
-                    edu_total = []
-                    for edus in edu_lst:
-                        edu_total.append(edus.get_attribute("textContent").replace('\n', ' ').strip())
-                    education = ','.join(edu_total)
+                # 학력
+                edu_lst = wait_presence_elements(driver, (By.XPATH, '//*[@id="career"]/ul[1]//*'))
+                edu_total = []
+                for edus in edu_lst:
+                    edu_total.append(edus.get_attribute("textContent").replace('\n', ' ').strip())
+                education = ','.join(edu_total)
 
-                    # 자격
-                    try:
-                        eli_lst = wait_presence_elements(driver, (By.XPATH, '//*[@id="career"]/ul[2]//*'))
-                        eli_total = []
-                        for elis in eli_lst:
-                            eli_total.append(elis.get_attribute("textContent").replace('\n', ' ').strip())
-                        eligibility = ','.join(eli_total)
-                    except:
-                        eligibility = ""
+                # 자격
+                try:
+                    eli_lst = wait_presence_elements(driver, (By.XPATH, '//*[@id="career"]/ul[2]//*'))
+                    eli_total = []
+                    for elis in eli_lst:
+                        eli_total.append(elis.get_attribute("textContent").replace('\n', ' ').strip())
+                    eligibility = ','.join(eli_total)
+                except:
+                    eligibility = ""
 
-                    # 언어
-                    try:
-                        lan_lst = wait_presence_elements(driver, (By.CSS_SELECTOR, '#career > p.lang'))
-                        lan_total = []
-                        for lan in lan_lst:
-                            lan_total.append(lan.get_attribute("textContent").replace('\n', ' ').strip())
-                        language = ','.join(lan_total)
-                    except:
-                        language = ""
-                    
-                    # 수상, 외부 활동, 주요 업무 실적
-                    awards, activity, performance = "", "", ""
-                    try:
-                        extra_bullet = wait_presence_elements(driver, (By.XPATH, '//*[@id="career"]/div[2]/div'))
-                    except:
-                        extra_bullet = []
-                    for extra in extra_bullet:
-                        main_activity = wait_presence_element(extra, (By.XPATH, './/h4/a'))
-                        # 수상, 외부 활동
-                        if main_activity.get_attribute("textContent") == "주요 활동":
-                            driver.execute_script("arguments[0].click();", main_activity)
-                            main_activity_bullet = wait_presence_elements(extra, (By.XPATH, './/div/h5'))
-                            for act in main_activity_bullet:
-                                if act.get_attribute("textContent") == "수상":
-                                    awards_lst = wait_presence_elements(extra, (By.XPATH, './/div/ul[1]/li'))
-                                    award_total = []
-                                    for award in awards_lst:
-                                        award_total.append(award.get_attribute("textContent"))
-                                    awards = ','.join(award_total)
-                                elif act.get_attribute("textContent") == "저서 및 외부활동":
-                                    activity_lst = wait_presence_elements(extra, (By.CSS_SELECTOR, ' ul.field_history li'))
-                                    activity_total = []
-                                    for plus_act in activity_lst:
-                                        activity_total.append(plus_act.get_attribute("textContent"))
-                                    activity = ','.join(activity_total)
-                        # 주요 업무 실적
-                        elif main_activity.get_attribute("textContent") == "주요 실적":
-                            perf_lst = wait_presence_elements(extra, (By.CSS_SELECTOR, 'div.boxopen li'))
-                            perf_total = []
-                            for perf in perf_lst:
-                                perf_total.append(perf.get_attribute("textContent"))
-                            performance = ','.join(perf_total)
+                # 언어
+                try:
+                    lan_lst = wait_presence_elements(driver, (By.CSS_SELECTOR, '#career > p.lang'))
+                    lan_total = []
+                    for lan in lan_lst:
+                        lan_total.append(lan.get_attribute("textContent").replace('\n', ' ').strip())
+                    language = ','.join(lan_total)
+                except:
+                    language = ""
+                
+                # 수상, 외부 활동, 주요 업무 실적
+                awards, activity, performance = "", "", ""
+                try:
+                    extra_bullet = wait_presence_elements(driver, (By.XPATH, '//*[@id="career"]/div[2]/div'))
+                except:
+                    extra_bullet = []
+                for extra in extra_bullet:
+                    main_activity = wait_presence_element(extra, (By.XPATH, './/h4/a'))
+                    # 수상, 외부 활동
+                    if main_activity.get_attribute("textContent") == "주요 활동":
+                        driver.execute_script("arguments[0].click();", main_activity)
+                        main_activity_bullet = wait_presence_elements(extra, (By.XPATH, './/div/h5'))
+                        for act in main_activity_bullet:
+                            if act.get_attribute("textContent") == "수상":
+                                awards_lst = wait_presence_elements(extra, (By.XPATH, './/div/ul[1]/li'))
+                                award_total = []
+                                for award in awards_lst:
+                                    award_total.append(award.get_attribute("textContent"))
+                                awards = ','.join(award_total)
+                            elif act.get_attribute("textContent") == "저서 및 외부활동":
+                                activity_lst = wait_presence_elements(extra, (By.CSS_SELECTOR, ' ul.field_history li'))
+                                activity_total = []
+                                for plus_act in activity_lst:
+                                    activity_total.append(plus_act.get_attribute("textContent"))
+                                activity = ','.join(activity_total)
+                    # 주요 업무 실적
+                    elif main_activity.get_attribute("textContent") == "주요 실적":
+                        perf_lst = wait_presence_elements(extra, (By.CSS_SELECTOR, 'div.boxopen li'))
+                        perf_total = []
+                        for perf in perf_lst:
+                            perf_total.append(perf.get_attribute("textContent"))
+                        performance = ','.join(perf_total)
 
-                    if old_exist_data:
-                        if (name, email) in old_exist_data:
-                            new = "-"
-                        else:
-                            new = "Y"
+                if old_exist_data:
+                    if (name, email) in old_exist_data:
+                        new = "-"
                     else:
-                        new = '-'
+                        new = "Y"
+                else:
+                    new = '-'
 
-                    add_pf = {
-                        'company':company,
-                        'name':name,
-                        'job':job,
-                        'call':call,
-                        'email':email,
-                        'introduction':introduction,
-                        'related_fields':related_fields,
-                        'career':career,
-                        'education':education,
-                        'eligibility':eligibility,
-                        'awards':awards,
-                        'assessment':"",
-                        'performance':performance,
-                        'language':language,
-                        'activity':activity,
-                        'url':driver.current_url,
-                        'new':new
-                    }
-                    
-                    pf_data.append(add_pf)
-                    driver.back()
-                    time.sleep(5)
-
-            if len(pf_lst) < 10:
-                pf_flag = False
-                break
-        # 다음 페이지로 넘기기
-        if page_flag and pf_flag:
-            next_page = wait_clickable_element(driver, (By.XPATH, f'//*[@id="_pro"]/div/a[{end}]'))
-            driver.execute_script("arguments[0].click();", next_page)
-            start_page = wait_visibility_element(driver, (By.XPATH, f'//*[@id="_pro"]/div/a[{start}]')).get_attribute("textContent")
-            if int(start_page) == int(page_num)+1:
-                pages = wait_presence_elements(driver, (By.XPATH, '//*[@id="_pro"]/div/a'))
-                start = 3
-                end = len(pages)-1
+                add_pf = {
+                    'company':company,
+                    'name':name,
+                    'job':job,
+                    'call':call,
+                    'email':email,
+                    'introduction':introduction,
+                    'related_fields':related_fields,
+                    'career':career,
+                    'education':education,
+                    'eligibility':eligibility,
+                    'awards':awards,
+                    'assessment':"",
+                    'performance':performance,
+                    'language':language,
+                    'activity':activity,
+                    'url':driver.current_url,
+                    'new':new
+                }
+                
+                pf_data.append(add_pf)
+                driver.back()
+                time.sleep(5)
+            
             else:
-                pf_flag = False
+                check_duplicates_pf += 1
+
+        # 다음 페이지로 넘기기
+        try:
+            next_page_idx = current_page_idx + 1
+            target_page_btn = wait_clickable_element(driver, (By.XPATH, f'//div[@class="paging"]//a[text()="{next_page_idx}"]'))
+            driver.execute_script("arguments[0].click();", target_page_btn)
+            current_page_idx += 1
+            time.sleep(5)
+        except:
+            try:
+                next_step_page_btn = wait_clickable_element(driver, (By.XPATH, '//div[@class="paging"]//a[@class="next hidden_text"]'))
+                driver.execute_script("arguments[0].click();", next_step_page_btn)
+                time.sleep(5)
+
+                next_page_idx = current_page_idx + 1
+                target_page_btn = wait_clickable_element(driver, (By.XPATH, f'//div[@class="paging"]//a[text()="{next_page_idx}"]'))
+                driver.execute_script("arguments[0].click();", target_page_btn)
+                current_page_idx += 1
+                time.sleep(5)
+            except:
+                break
                 
     # 구분목록 하나당 한번씩 df 갱신
     df = pd.concat([df, pd.DataFrame(pf_data)], ignore_index=True)
