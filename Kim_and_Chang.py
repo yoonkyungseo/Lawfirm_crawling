@@ -239,9 +239,6 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
                 pf_data.append(add_pf)
                 driver.back()
                 time.sleep(5)
-            
-            else:
-                check_duplicates_pf += 1
 
         # 다음 페이지로 넘기기
         try:
