@@ -73,6 +73,20 @@ def wait_visibility_element(driver, locator, timeout=15):
 def wait_clickable_element(driver, locator, timeout=15):
     return WebDriverWait(driver, timeout).until(EC.element_to_be_clickable(locator))
 
+def grab_all_visible_text(driver):
+    # 1. 페이지 로딩 및 동적 요소 생성을 위해 강제 대기
+    # 김앤장 사이트는 스크롤이 트리거가 되므로 바닥까지 내렸다가 위로 올립니다.
+    driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+    time.sleep(2)
+    driver.execute_script("window.scrollTo(0, 0);")
+    time.sleep(1)
+
+    # 2. 자바스크립트로 화면에 보이는 모든 텍스트 추출
+    # innerText는 불필요한 태그 정보를 제외한 '순수 글자'만 반환합니다.
+    all_text = driver.execute_script("return document.body.innerText;")
+    
+    return all_text
+
 # 김앤장 크롤링 코드
 
 driver.get("https://www.kimchang.com/ko/professionals/index.kc")
@@ -96,6 +110,8 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
 
     driver.refresh()
     time.sleep(2)
+    all_content = grab_all_visible_text(driver)
+    print(all_content)
 
     # 페이지 갯수 확인
     current_page_idx = 1
