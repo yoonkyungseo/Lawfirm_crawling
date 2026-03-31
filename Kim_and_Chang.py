@@ -94,6 +94,9 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
     pf_data = []
     driver.execute_script("arguments[0].click();", practice) # 해당 구분 목록 클릭
 
+    driver.refresh()
+    time.sleep(2)
+
     # 페이지 갯수 확인
     current_page_idx = 1
 
