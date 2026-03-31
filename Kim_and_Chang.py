@@ -97,6 +97,7 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
     # 페이지 갯수 확인
     current_page_idx = 1
 
+    try_again = 0
     while True:
         # 페이지별 탐색
         print(f"현재 {current_page_idx} page 진행중")
@@ -261,8 +262,13 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
                 except:
                     break
         except:
-            driver.refresh()
-            time.sleep(5)
+            if try_again <= 5:
+                driver.refresh()
+                try_again += 1
+                time.sleep(5)
+            else:
+                print(f"{practice.get_attribute("textContent").strip()} 부분 페이지 로딩 문제로 중단")
+                break
 
     # 구분목록 하나당 한번씩 df 갱신
     df = pd.concat([df, pd.DataFrame(pf_data)], ignore_index=True)
