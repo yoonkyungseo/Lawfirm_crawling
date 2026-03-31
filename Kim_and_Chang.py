@@ -98,6 +98,11 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
     # 페이지 갯수 확인
     current_page_idx = 1
 
+    # 1페이지가 제대로 로딩이 안되는 것 같아서 새로고침 추가
+    if num != 1:
+        driver.refresh()
+        time.sleep(2)
+
     try_again = 0
     while True:
         # 페이지별 탐색
@@ -273,9 +278,6 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
 
     # 구분목록 하나당 한번씩 df 갱신
     df = pd.concat([df, pd.DataFrame(pf_data)], ignore_index=True)
-    # 1페이지가 제대로 로딩이 안되는 것 같아서 새로고침 추가
-    driver.refresh()
-    time.sleep(5)
 
 # 퇴사자 확인
 if not df_old.empty:
