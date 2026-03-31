@@ -73,19 +73,6 @@ def wait_visibility_element(driver, locator, timeout=15):
 def wait_clickable_element(driver, locator, timeout=15):
     return WebDriverWait(driver, timeout).until(EC.element_to_be_clickable(locator))
 
-def grab_all_visible_text(driver):
-    # 1. 페이지 로딩 및 동적 요소 생성을 위해 강제 대기
-    # 김앤장 사이트는 스크롤이 트리거가 되므로 바닥까지 내렸다가 위로 올립니다.
-    driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-    time.sleep(2)
-    driver.execute_script("window.scrollTo(0, 0);")
-    time.sleep(1)
-
-    # 2. 자바스크립트로 화면에 보이는 모든 텍스트 추출
-    # innerText는 불필요한 태그 정보를 제외한 '순수 글자'만 반환합니다.
-    all_text = driver.execute_script("return document.body.innerText;")
-    
-    return all_text
 
 # 김앤장 크롤링 코드
 
@@ -107,11 +94,6 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
     print("-----", practice.get_attribute("textContent").strip(), "-----")
     pf_data = []
     driver.execute_script("arguments[0].click();", practice) # 해당 구분 목록 클릭
-
-    driver.refresh()
-    time.sleep(2)
-    all_content = grab_all_visible_text(driver)
-    print(all_content)
 
     # 페이지 갯수 확인
     current_page_idx = 1
@@ -286,13 +268,14 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
                 try_again += 1
                 time.sleep(5)
             else:
-                print(f"{practice.get_attribute("textContent").strip()} 부분 페이지 로딩 문제로 중단")
+                print("페이지 로딩 문제로 중단")
                 break
 
     # 구분목록 하나당 한번씩 df 갱신
     df = pd.concat([df, pd.DataFrame(pf_data)], ignore_index=True)
-
-    time.sleep(2)
+    # 1페이지가 제대로 로딩이 안되는 것 같아서 새로고침 추가
+    driver.refresh()
+    time.sleep(5)
 
 # 퇴사자 확인
 if not df_old.empty:
