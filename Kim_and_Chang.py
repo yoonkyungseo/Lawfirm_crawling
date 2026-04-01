@@ -214,6 +214,7 @@ for num in tqdm.tqdm(range(2, len(elements)+1)):
                                     imsi_cont = ""
                                     imsi_cont_lst = []
                                     for plus_act in activity_lst:
+                                        print(plus_act.tag_name)
                                         if plus_act.tag_name == "div":
                                             txt_tit = plus_act.get_attribute("textContent").replace("[","").replace("]","").strip()
                                             if txt_tit:
