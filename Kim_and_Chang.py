@@ -245,6 +245,7 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
                                         imsi_cont += f',{perf.get_attribute("textContent").strip()}'
                                     else:
                                         imsi_cont = perf.get_attribute("textContent").strip()
+                                print("다음 perf")
                             if imsi_tit:
                                 perf_total = []
                                 for t, c in zip(imsi_tit, imsi_cont_lst):
