@@ -143,7 +143,7 @@ for num in tqdm.tqdm(range(2, len(elements)+1)):
                     print('introduction',introduction)
 
                     # 관련 분야
-                    fields_lst = wait_presence_elements(driver, (By.CSS_SELECTOR, 'div.left_tag li'))
+                    fields_lst = wait_presence_elements(driver, (By.CSS_SELECTOR, 'div.tag_area.pc > div.left_tag li'))
                     fields_total = []
                     for field in fields_lst:
                         fields_total.append(field.get_attribute("textContent").replace('\n', ' ').strip())
