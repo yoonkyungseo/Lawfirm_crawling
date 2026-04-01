@@ -226,6 +226,7 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
                         elif "주요 실적" in main_activity.get_attribute("textContent"):
                             print("주요 실적")
                             perf_lst = wait_presence_elements(extra, (By.CSS_SELECTOR, 'div.boxopen *'))
+                            print(len(perf_lst))
                             imsi_tit = []
                             imsi_cont = ""
                             imsi_cont_lst = []
