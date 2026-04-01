@@ -97,8 +97,7 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
     time.sleep(5) # 구분 목록 클릭 후 로딩 시간 부여
 
     # 페이지 갯수 확인
-    # current_page_idx = 1
-    current_page_idx = 4
+    current_page_idx = 1
 
     try_again = 0
     while True:
@@ -108,8 +107,7 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
             pf_lst = wait_presence_elements(driver, (By.XPATH, '//*[@id="_pro"]/ul[2]/li'))
             current_pf_num = len(pf_lst)
 
-            # for j in range(1, len(pf_lst)+1):
-            for j in range(5, 6):
+            for j in range(1, len(pf_lst)+1):
                 pf = wait_presence_element(driver, (By.CSS_SELECTOR, f'#_pro > ul.lawyer_profile > li:nth-child({j})'))
                 driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", pf)
                 # 이름 # 직업
@@ -215,7 +213,7 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
                                             if imsi_cont:
                                                 imsi_cont_lst.append(imsi_cont)
                                                 imsi_cont = ""
-                                        elif plus_act.tag_name == "li":
+                                        elif plus_act.tag_name in ["li", "p"]:
                                             if imsi_cont:
                                                 imsi_cont += f',{plus_act.get_attribute("textContent").strip()}'
                                             else:
@@ -231,14 +229,11 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
                                         activity = imsi_cont
                         # 주요 업무 실적
                         elif "주요 실적" in main_activity.get_attribute("textContent"):
-                            print('주요 실적')
                             perf_lst = wait_presence_elements(extra, (By.XPATH, './/div[@class="box_open"]//*'))
-                            print(len(perf_lst))
                             imsi_tit = []
                             imsi_cont = ""
                             imsi_cont_lst = []
                             for perf in perf_lst:
-                                print(perf.tag_name)
                                 if perf.tag_name == 'strong':
                                     txt_tit = perf.get_attribute("textContent").replace("[","").replace("]","").strip()
                                     if txt_tit:
@@ -253,7 +248,6 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
                                         imsi_cont = perf.get_attribute("textContent").strip()
                                 elif perf.tag_name == 'p':
                                     imsi_cont = perf.get_attribute("textContent").replace('\n[', '//').replace(']\n', ']]').replace('\n', '').replace('[','').strip()
-                                    print(imsi_cont)
                             if imsi_tit and imsi_cont:
                                 imsi_cont_lst.append(imsi_cont)
                             if imsi_tit:
@@ -292,6 +286,8 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
                         'new':new
                     }
                     print(add_pf)
+                    print('performance', add_pf['performance'])
+                    print('activity',add_pf['activity'])
                     
                     pf_data.append(add_pf)
                     driver.back()
