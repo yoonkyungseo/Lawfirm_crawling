@@ -187,7 +187,7 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
                     for extra in extra_bullet:
                         main_activity = wait_presence_element(extra, (By.XPATH, './/h4/a'))
                         # 수상, 외부 활동
-                        if main_activity.get_attribute("textContent") == "주요 활동":
+                        if "주요 활동" in main_activity.get_attribute("textContent"):
                             driver.execute_script("arguments[0].click();", main_activity)
                             main_activity_bullet = wait_presence_elements(extra, (By.XPATH, './/div/h5'))
                             for act in main_activity_bullet:
@@ -198,18 +198,50 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
                                         award_total.append(award.get_attribute("textContent"))
                                     awards = ','.join(award_total)
                                 elif act.get_attribute("textContent") == "저서 및 외부활동":
-                                    activity_lst = wait_presence_elements(extra, (By.CSS_SELECTOR, ' ul.field_history li'))
-                                    activity_total = []
+                                    activity_lst = wait_presence_elements(extra, (By.CSS_SELECTOR, ' ul.field_history > *'))
+                                    imsi_tit = []
+                                    imsi_cont = ""
+                                    imsi_cont_lst = []
                                     for plus_act in activity_lst:
-                                        activity_total.append(plus_act.get_attribute("textContent"))
-                                    activity = ','.join(activity_total)
+                                        if plus_act.tag_name == "div":
+                                            txt_tit = plus_act.get_attribute("textContent").replace("[","").replace("]","").strip()
+                                            if txt_tit:
+                                                imsi_tit.append(txt_tit)
+                                            if imsi_cont:
+                                                imsi_cont_lst.append(imsi_cont)
+                                                imsi_cont = ""
+                                        elif plus_act.tag_name == "li":
+                                            if imsi_cont:
+                                                imsi_cont += f',{plus_act.get_attribute("textContent").strip()}'
+                                            else:
+                                                imsi_cont = plus_act.get_attribute("textContent").strip()
+                                    activity_total = []
+                                    for t, c in zip(imsi_tit, imsi_cont_lst):
+                                        activity_total.append(f'{t}]]{c}')
+                                    activity = '//'.join(activity_total)
                         # 주요 업무 실적
-                        elif main_activity.get_attribute("textContent") == "주요 실적":
-                            perf_lst = wait_presence_elements(extra, (By.CSS_SELECTOR, 'div.boxopen li'))
-                            perf_total = []
+                        elif "주요 실적" in main_activity.get_attribute("textContent"):
+                            perf_lst = wait_presence_elements(extra, (By.CSS_SELECTOR, 'div.boxopen *'))
+                            imsi_tit = []
+                            imsi_cont = ""
+                            imsi_cont_lst = []
                             for perf in perf_lst:
-                                perf_total.append(perf.get_attribute("textContent"))
-                            performance = ','.join(perf_total)
+                                if perf.tag_name == 'div':
+                                    txt_tit = perf.get_attribute("textContent").replace("[","").replace("]","").strip()
+                                    if txt_tit:
+                                        imsi_tit.append()
+                                    if imsi_cont:
+                                        imsi_cont_lst.append(imsi_cont)
+                                        imsi_cont = ""
+                                elif perf.tag_name == "li":
+                                    if imsi_cont:
+                                        imsi_cont += f',{perf.get_attribute("textContent").strip()}'
+                                    else:
+                                        imsi_cont = perf.get_attribute("textContent").strip()
+                            perf_total = []
+                            for t, c in zip(imsi_tit, imsi_cont_lst):
+                                perf_total.append(f'{t}]]{c}')
+                            performance = '//'.join(perf_total)
 
                     if old_exist_data:
                         if (name, email) in old_exist_data:
