@@ -238,6 +238,7 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
                         'url':driver.current_url,
                         'new':new
                     }
+                    print(add_pf)
                     
                     pf_data.append(add_pf)
                     driver.back()
@@ -249,19 +250,18 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
                 target_page_btn = wait_clickable_element(driver, (By.XPATH, f'//div[@class="paging"]//a[text()="{next_page_idx}"]'))
                 driver.execute_script("arguments[0].click();", target_page_btn)
                 current_page_idx += 1
-                time.sleep(2)
             except:
                 try:
                     next_step_page_btn = wait_clickable_element(driver, (By.XPATH, '//div[@class="paging"]//a[@class="next hidden_text"]'))
                     driver.execute_script("arguments[0].click();", next_step_page_btn)
-                    time.sleep(2)
+                    time.sleep(3)
 
                     next_page_idx = current_page_idx + 1
                     target_page_btn = wait_clickable_element(driver, (By.XPATH, f'//div[@class="paging"]//a[text()="{next_page_idx}"]'))
                     driver.execute_script("arguments[0].click();", target_page_btn)
                     current_page_idx += 1
-                    time.sleep(2)
                 except:
+                    print("마지막 페이지입니다.")
                     break
         except:
             if try_again <= 5:
