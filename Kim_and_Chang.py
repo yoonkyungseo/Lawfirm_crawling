@@ -232,7 +232,7 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
                             imsi_cont = ""
                             imsi_cont_lst = []
                             for perf in perf_lst:
-                                if perf.tag_name in ['div', 'h5']:
+                                if perf.tag_name == 'strong':
                                     txt_tit = perf.get_attribute("textContent").replace("[","").replace("]","").strip()
                                     if txt_tit:
                                         imsi_tit.append(txt_tit)
