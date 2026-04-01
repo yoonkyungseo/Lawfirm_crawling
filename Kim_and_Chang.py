@@ -81,20 +81,20 @@ main_window = driver.current_window_handle # 현재 창 ID를 변수로 저장
 driver.maximize_window()
 time.sleep(3)
 
-all_button = wait_presence_element(driver, (By.XPATH, '//*[@id="form1"]/div[2]/ul/li[4]/a/span'))
+all_button = wait_presence_element(driver, (By.XPATH, '//*[@id="form1"]/div[2]/ul/li[2]/a/span'))
 driver.execute_script("arguments[0].click();", all_button)
 
 company = "김앤장"
-# 김앤장 구성원 페이지 ALL 항목들 = 구분 목록
-elements = wait_presence_elements(driver, (By.XPATH, '//*[@id="keyWordTab4"]/li'))
+# 김앤장 구성원 페이지 산업별(Industry) 구분 클릭
+elements = wait_presence_elements(driver, (By.XPATH, '//*[@id="keyWordTab2"]/li'))
 for num in tqdm.tqdm(range(1, len(elements)+1)):
-    practice = wait_presence_element(driver, (By.XPATH, f'//*[@id="keyWordTab4"]/li[{num}]/a')) # 구분 목록 요소
+    practice = wait_presence_element(driver, (By.XPATH, f'//*[@id="keyWordTab2"]/li[{num}]/a')) # 구분 목록 요소
     driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", practice)
     # 현재 진행 중인 구분 목록 출력
     print("-----", practice.get_attribute("textContent").strip(), "-----")
     pf_data = []
     driver.execute_script("arguments[0].click();", practice) # 해당 구분 목록 클릭
-    time.sleep(3) # 구분 목록 클릭 후 로딩 시간 부여
+    time.sleep(5) # 구분 목록 클릭 후 로딩 시간 부여
 
     # 페이지 갯수 확인
     current_page_idx = 1
@@ -123,7 +123,7 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
                     # pf 화면 클릭
                     pf_link = wait_presence_element(pf, (By.CSS_SELECTOR, "img"))
                     driver.execute_script("arguments[0].click();", pf_link)
-                    time.sleep(3)
+                    time.sleep(2)
 
                     # 이메일
                     email = wait_presence_element(driver, (By.XPATH, "//a[contains(@href, 'mailto:')]")).get_attribute("textContent")
@@ -241,7 +241,7 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
                     
                     pf_data.append(add_pf)
                     driver.back()
-                    time.sleep(3)
+                    time.sleep(2)
 
             # 다음 페이지로 넘기기
             try:
@@ -249,25 +249,25 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
                 target_page_btn = wait_clickable_element(driver, (By.XPATH, f'//div[@class="paging"]//a[text()="{next_page_idx}"]'))
                 driver.execute_script("arguments[0].click();", target_page_btn)
                 current_page_idx += 1
-                time.sleep(3)
+                time.sleep(2)
             except:
                 try:
                     next_step_page_btn = wait_clickable_element(driver, (By.XPATH, '//div[@class="paging"]//a[@class="next hidden_text"]'))
                     driver.execute_script("arguments[0].click();", next_step_page_btn)
-                    time.sleep(3)
+                    time.sleep(2)
 
                     next_page_idx = current_page_idx + 1
                     target_page_btn = wait_clickable_element(driver, (By.XPATH, f'//div[@class="paging"]//a[text()="{next_page_idx}"]'))
                     driver.execute_script("arguments[0].click();", target_page_btn)
                     current_page_idx += 1
-                    time.sleep(3)
+                    time.sleep(2)
                 except:
                     break
         except:
             if try_again <= 5:
                 driver.refresh()
                 try_again += 1
-                time.sleep(5)
+                time.sleep(2)
             else:
                 print("페이지 로딩 문제로 중단")
                 break
