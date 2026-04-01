@@ -232,11 +232,10 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
                             imsi_cont = ""
                             imsi_cont_lst = []
                             for perf in perf_lst:
-                                print(perf.tag_name)
                                 if perf.tag_name in ['div', 'h5']:
                                     txt_tit = perf.get_attribute("textContent").replace("[","").replace("]","").strip()
                                     if txt_tit:
-                                        imsi_tit.append()
+                                        imsi_tit.append(txt_tit)
                                     if imsi_cont:
                                         imsi_cont_lst.append(imsi_cont)
                                         imsi_cont = ""
@@ -245,7 +244,6 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
                                         imsi_cont += f',{perf.get_attribute("textContent").strip()}'
                                     else:
                                         imsi_cont = perf.get_attribute("textContent").strip()
-                                print("다음 perf")
                             if imsi_tit:
                                 perf_total = []
                                 for t, c in zip(imsi_tit, imsi_cont_lst):
