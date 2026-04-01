@@ -109,7 +109,7 @@ for num in tqdm.tqdm(range(2, len(elements)+1)):
             current_pf_num = len(pf_lst)
 
             # for j in range(1, len(pf_lst)+1):
-            for j in range(3, len(pf_lst)+1):
+            for j in range(3, 4):
                 pf = wait_presence_element(driver, (By.CSS_SELECTOR, f'#_pro > ul.lawyer_profile > li:nth-child({j})'))
                 driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", pf)
                 # 이름 # 직업
@@ -225,7 +225,9 @@ for num in tqdm.tqdm(range(2, len(elements)+1)):
                                             if imsi_cont:
                                                 imsi_cont += f',{plus_act.get_attribute("textContent").strip()}'
                                             else:
+                                                print("김은정 외국변호사 p태그 확인")
                                                 imsi_cont = plus_act.get_attribute("textContent").replace('\n[', '//').replace(']\n', ']]').replace('\n', '').replace('[','').strip()
+                                                print(imsi_cont)
                                     if imsi_tit and imsi_cont:
                                         imsi_cont_lst.append(imsi_cont)
                                     if imsi_tit:
