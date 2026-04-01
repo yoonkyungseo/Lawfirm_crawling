@@ -194,6 +194,7 @@ for num in tqdm.tqdm(range(2, len(elements)+1)):
                             main_activity_bullet = wait_presence_elements(extra, (By.XPATH, './/div/h5'))
                             for act in main_activity_bullet:
                                 if act.get_attribute("textContent") == "수상":
+                                    print("수상!!!!!!!!!!!!!!")
                                     try:
                                         awards_lst = wait_presence_elements(extra, (By.XPATH, './/div/ul[1]/li'))
                                         award_total = []
@@ -208,6 +209,7 @@ for num in tqdm.tqdm(range(2, len(elements)+1)):
                                             if award_txt:
                                                 award_total.append(award_txt)
                                         awards = ','.join(award_total)
+                                    print("수상:", awards)
                                 elif act.get_attribute("textContent") == "저서 및 외부활동":
                                     print("김은정 외국 변호사 외부활동")
                                     activity_lst = wait_presence_elements(extra, (By.CSS_SELECTOR, ' ul.field_history *'))
