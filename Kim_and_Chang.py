@@ -108,7 +108,7 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
             current_pf_num = len(pf_lst)
 
             # for j in range(1, len(pf_lst)+1):
-            for j in range(2, len(pf_lst)+1):
+            for j in range(3, len(pf_lst)+1):
                 pf = wait_presence_element(driver, (By.CSS_SELECTOR, f'#_pro > ul.lawyer_profile > li:nth-child({j})'))
                 driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", pf)
                 # 이름 # 직업
