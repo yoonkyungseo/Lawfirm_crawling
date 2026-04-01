@@ -202,7 +202,7 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
                                     awards = ','.join(award_total)
                                 elif act.get_attribute("textContent") == "저서 및 외부활동":
                                     print("외부 활동")
-                                    activity_lst = wait_presence_elements(extra, (By.CSS_SELECTOR, ' ul.field_history > *'))
+                                    activity_lst = wait_presence_elements(extra, (By.CSS_SELECTOR, ' ul.field_history *'))
                                     imsi_tit = []
                                     imsi_cont = ""
                                     imsi_cont_lst = []
