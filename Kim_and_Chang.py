@@ -124,6 +124,7 @@ for num in tqdm.tqdm(range(2, len(elements)+1)):
                 if check_duplicates(name, job, call):
                     # pf 화면 클릭
                     pf_link = wait_presence_element(pf, (By.CSS_SELECTOR, "img"))
+                    driver.execute_script("arguments[0].setAttribute('target', '_self');", pf_link)
                     driver.execute_script("arguments[0].click();", pf_link)
                     time.sleep(2)
 
