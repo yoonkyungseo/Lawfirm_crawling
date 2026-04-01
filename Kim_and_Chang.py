@@ -194,11 +194,20 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
                             for act in main_activity_bullet:
                                 if act.get_attribute("textContent") == "수상":
                                     print("수상")
-                                    awards_lst = wait_presence_elements(extra, (By.XPATH, './/div/ul[1]/li'))
-                                    award_total = []
-                                    for award in awards_lst:
-                                        award_total.append(award.get_attribute("textContent"))
-                                    awards = ','.join(award_total)
+                                    try:
+                                        awards_lst = wait_presence_elements(extra, (By.XPATH, './/div/ul[1]/li'))
+                                        award_total = []
+                                        for award in awards_lst:
+                                            award_total.append(award.get_attribute("textContent"))
+                                        awards = ','.join(award_total)
+                                    except:
+                                        awards_lst = wait_presence_elements(extra, (By.XPATH, './/div/p'))
+                                        award_total = []
+                                        for award in awards_lst:
+                                            award_txt = award.get_attribute("textContent").strip()
+                                            if award_txt:
+                                                award_total.append(award_txt)
+                                        awards = ','.join(award_total)
                                 elif act.get_attribute("textContent") == "저서 및 외부활동":
                                     print("외부 활동")
                                     activity_lst = wait_presence_elements(extra, (By.CSS_SELECTOR, ' ul.field_history *'))
@@ -246,7 +255,7 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
                                         imsi_cont += f',{perf.get_attribute("textContent").strip()}'
                                     else:
                                         imsi_cont = perf.get_attribute("textContent").strip()
-                                elif perf.tag_name == 'p':
+                                elif (perf.tag_name == 'p') and perf.get_attribute("textContent").strip() != "":
                                     imsi_cont = perf.get_attribute("textContent").replace('\n[', '//').replace(']\n', ']]').replace('\n', '').replace('[','').strip()
                             if imsi_tit and imsi_cont:
                                 imsi_cont_lst.append(imsi_cont)
