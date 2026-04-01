@@ -188,16 +188,19 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
                         main_activity = wait_presence_element(extra, (By.XPATH, './/h4/a'))
                         # 수상, 외부 활동
                         if "주요 활동" in main_activity.get_attribute("textContent"):
+                            print("주요 활동")
                             driver.execute_script("arguments[0].click();", main_activity)
                             main_activity_bullet = wait_presence_elements(extra, (By.XPATH, './/div/h5'))
                             for act in main_activity_bullet:
                                 if act.get_attribute("textContent") == "수상":
+                                    print("수상")
                                     awards_lst = wait_presence_elements(extra, (By.XPATH, './/div/ul[1]/li'))
                                     award_total = []
                                     for award in awards_lst:
                                         award_total.append(award.get_attribute("textContent"))
                                     awards = ','.join(award_total)
                                 elif act.get_attribute("textContent") == "저서 및 외부활동":
+                                    print("외부 활동")
                                     activity_lst = wait_presence_elements(extra, (By.CSS_SELECTOR, ' ul.field_history > *'))
                                     imsi_tit = []
                                     imsi_cont = ""
@@ -221,6 +224,7 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
                                     activity = '//'.join(activity_total)
                         # 주요 업무 실적
                         elif "주요 실적" in main_activity.get_attribute("textContent"):
+                            print("주요 실적")
                             perf_lst = wait_presence_elements(extra, (By.CSS_SELECTOR, 'div.boxopen *'))
                             imsi_tit = []
                             imsi_cont = ""
