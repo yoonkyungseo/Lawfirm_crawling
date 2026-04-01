@@ -219,10 +219,15 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
                                                 imsi_cont += f',{plus_act.get_attribute("textContent").strip()}'
                                             else:
                                                 imsi_cont = plus_act.get_attribute("textContent").strip()
-                                    activity_total = []
-                                    for t, c in zip(imsi_tit, imsi_cont_lst):
-                                        activity_total.append(f'{t}]]{c}')
-                                    activity = '//'.join(activity_total)
+                                    if imsi_tit and imsi_cont:
+                                        imsi_cont_lst.append(imsi_cont)
+                                    if imsi_tit:
+                                        activity_total = []
+                                        for t, c in zip(imsi_tit, imsi_cont_lst):
+                                            activity_total.append(f'{t}]]{c}')
+                                        activity = '//'.join(activity_total)
+                                    else:
+                                        activity = imsi_cont
                         # 주요 업무 실적
                         elif "주요 실적" in main_activity.get_attribute("textContent"):
                             print("주요 실적")
@@ -235,18 +240,20 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
                                 print(perf.tag_name)
                                 if perf.tag_name == 'strong':
                                     txt_tit = perf.get_attribute("textContent").replace("[","").replace("]","").strip()
-                                    print('txt_tit', txt_tit)
                                     if txt_tit:
                                         imsi_tit.append(txt_tit)
-                                        print('추가!')
                                     if imsi_cont:
                                         imsi_cont_lst.append(imsi_cont)
                                         imsi_cont = ""
                                 elif perf.tag_name == "li":
                                     if imsi_cont:
                                         imsi_cont += f',{perf.get_attribute("textContent").strip()}'
+                                        print("li + 추가")
                                     else:
                                         imsi_cont = perf.get_attribute("textContent").strip()
+                                        print("li 첫 추가")
+                            if imsi_tit and imsi_cont:
+                                imsi_cont_lst.append(imsi_cont)
                             if imsi_tit:
                                 perf_total = []
                                 for t, c in zip(imsi_tit, imsi_cont_lst):
