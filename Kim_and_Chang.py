@@ -129,6 +129,7 @@ for num in tqdm.tqdm(range(2, len(elements)+1)):
 
                     # 이메일
                     email = wait_presence_element(driver, (By.XPATH, "//a[contains(@href, 'mailto:')]")).get_attribute("textContent")
+                    print('email',email)
 
                     # 상세 소개글
                     introduction = ""
@@ -138,6 +139,7 @@ for num in tqdm.tqdm(range(2, len(elements)+1)):
                             introduction += intro.get_attribute("textContent").replace('\n', ' ').strip()
                     except:
                         pass
+                    print('introduction',introduction)
 
                     # 관련 분야
                     fields_lst = wait_presence_elements(driver, (By.CSS_SELECTOR, 'div.left_tag li'))
@@ -145,6 +147,7 @@ for num in tqdm.tqdm(range(2, len(elements)+1)):
                     for field in fields_lst:
                         fields_total.append(field.get_attribute("textContent").replace('\n', ' ').strip())
                     related_fields = ','.join(fields_total)
+                    print('related_fields',related_fields)
 
                     # 경력
                     career_lst = wait_presence_elements(driver, (By.XPATH, '//*[@id="career"]/div[1]//*'))
@@ -152,6 +155,7 @@ for num in tqdm.tqdm(range(2, len(elements)+1)):
                     for careers in career_lst:
                         career_total.append(careers.get_attribute("textContent").replace('\n', ' ').strip())
                     career = ','.join(career_total)
+                    print('career',career)
 
                     # 학력
                     edu_lst = wait_presence_elements(driver, (By.XPATH, '//*[@id="career"]/ul[1]//*'))
@@ -159,6 +163,7 @@ for num in tqdm.tqdm(range(2, len(elements)+1)):
                     for edus in edu_lst:
                         edu_total.append(edus.get_attribute("textContent").replace('\n', ' ').strip())
                     education = ','.join(edu_total)
+                    print('education',education)
 
                     # 자격
                     try:
@@ -169,6 +174,7 @@ for num in tqdm.tqdm(range(2, len(elements)+1)):
                         eligibility = ','.join(eli_total)
                     except:
                         eligibility = ""
+                    print('eligibility',eligibility)
 
                     # 언어
                     try:
@@ -179,6 +185,7 @@ for num in tqdm.tqdm(range(2, len(elements)+1)):
                         language = ','.join(lan_total)
                     except:
                         language = ""
+                    print('language',language)
                     
                     # 수상, 외부 활동, 주요 업무 실적
                     awards, activity, performance = "", "", ""
