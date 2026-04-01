@@ -294,7 +294,7 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
                         'url':driver.current_url,
                         'new':new
                     }
-                    print(add_pf)
+                    print('awards', add_pf['awards'])
                     print('performance', add_pf['performance'])
                     print('activity',add_pf['activity'])
                     
