@@ -87,7 +87,8 @@ driver.execute_script("arguments[0].click();", all_button)
 company = "김앤장"
 # 김앤장 구성원 페이지 산업별(Industry) 구분 클릭
 elements = wait_presence_elements(driver, (By.XPATH, '//*[@id="keyWordTab2"]/li'))
-for num in tqdm.tqdm(range(1, len(elements)+1)):
+# for num in tqdm.tqdm(range(1, len(elements)+1)):
+for num in tqdm.tqdm(range(2, len(elements)+1)):
     practice = wait_presence_element(driver, (By.XPATH, f'//*[@id="keyWordTab2"]/li[{num}]/a')) # 구분 목록 요소
     driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", practice)
     # 현재 진행 중인 구분 목록 출력
@@ -107,7 +108,8 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
             pf_lst = wait_presence_elements(driver, (By.XPATH, '//*[@id="_pro"]/ul[2]/li'))
             current_pf_num = len(pf_lst)
 
-            for j in range(1, len(pf_lst)+1):
+            # for j in range(1, len(pf_lst)+1):
+            for j in range(3, len(pf_lst)+1):
                 pf = wait_presence_element(driver, (By.CSS_SELECTOR, f'#_pro > ul.lawyer_profile > li:nth-child({j})'))
                 driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", pf)
                 # 이름 # 직업
@@ -188,12 +190,10 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
                         main_activity = wait_presence_element(extra, (By.XPATH, './/h4/a'))
                         # 수상, 외부 활동
                         if "주요 활동" in main_activity.get_attribute("textContent"):
-                            print("주요 활동")
                             driver.execute_script("arguments[0].click();", main_activity)
                             main_activity_bullet = wait_presence_elements(extra, (By.XPATH, './/div/h5'))
                             for act in main_activity_bullet:
                                 if act.get_attribute("textContent") == "수상":
-                                    print("수상")
                                     try:
                                         awards_lst = wait_presence_elements(extra, (By.XPATH, './/div/ul[1]/li'))
                                         award_total = []
@@ -209,7 +209,6 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
                                                 award_total.append(award_txt)
                                         awards = ','.join(award_total)
                                 elif act.get_attribute("textContent") == "저서 및 외부활동":
-                                    print("외부 활동")
                                     activity_lst = wait_presence_elements(extra, (By.CSS_SELECTOR, ' ul.field_history *'))
                                     imsi_tit = []
                                     imsi_cont = ""
@@ -226,7 +225,7 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
                                             if imsi_cont:
                                                 imsi_cont += f',{plus_act.get_attribute("textContent").strip()}'
                                             else:
-                                                imsi_cont = plus_act.get_attribute("textContent").strip()
+                                                imsi_cont = plus_act.get_attribute("textContent").replace('\n[', '//').replace(']\n', ']]').replace('\n', '').replace('[','').strip()
                                     if imsi_tit and imsi_cont:
                                         imsi_cont_lst.append(imsi_cont)
                                     if imsi_tit:
