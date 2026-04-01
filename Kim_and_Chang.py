@@ -151,7 +151,7 @@ for num in tqdm.tqdm(range(2, len(elements)+1)):
                     print('related_fields',related_fields)
 
                     # 경력
-                    career_lst = wait_presence_elements(driver, (By.XPATH, '//*[@id="career"]/div[1]//*'))
+                    career_lst = wait_presence_elements(driver, (By.XPATH, '//*[@id="career"]/*[@class="bullet_list"][1]//*'))
                     career_total = []
                     for careers in career_lst:
                         career_total.append(careers.get_attribute("textContent").replace('\n', ' ').strip())
@@ -159,7 +159,7 @@ for num in tqdm.tqdm(range(2, len(elements)+1)):
                     print('career',career)
 
                     # 학력
-                    edu_lst = wait_presence_elements(driver, (By.XPATH, '//*[@id="career"]/ul[1]//*'))
+                    edu_lst = wait_presence_elements(driver, (By.XPATH, '//*[@id="career"]/*[@class="bullet_list"][2]//*'))
                     edu_total = []
                     for edus in edu_lst:
                         edu_total.append(edus.get_attribute("textContent").replace('\n', ' ').strip())
@@ -168,7 +168,9 @@ for num in tqdm.tqdm(range(2, len(elements)+1)):
 
                     # 자격
                     try:
-                        eli_lst = wait_presence_elements(driver, (By.XPATH, '//*[@id="career"]/ul[2]//*'))
+                        eli_lst = wait_presence_elements(driver, (By.XPATH, '//*[@id="career"]/*[@class="bullet_list"][3]//*'))
+                        if eli_lst[1].tag_name == "ul":
+                            eli_lst = wait_presence_elements(eli_lst[1], (By.XPATH, './/*'))
                         eli_total = []
                         for elis in eli_lst:
                             eli_total.append(elis.get_attribute("textContent").replace('\n', ' ').strip())
@@ -202,7 +204,6 @@ for num in tqdm.tqdm(range(2, len(elements)+1)):
                             main_activity_bullet = wait_presence_elements(extra, (By.XPATH, './/div/h5'))
                             for act in main_activity_bullet:
                                 if act.get_attribute("textContent") == "수상":
-                                    print("수상!!!!!!!!!!!!!!")
                                     try:
                                         awards_lst = wait_presence_elements(extra, (By.XPATH, './/div/ul[1]/li'))
                                         award_total = []
@@ -217,16 +218,12 @@ for num in tqdm.tqdm(range(2, len(elements)+1)):
                                             if award_txt:
                                                 award_total.append(award_txt)
                                         awards = ','.join(award_total)
-                                    print("수상:", awards)
                                 elif act.get_attribute("textContent") == "저서 및 외부활동":
-                                    print("김은정 외국 변호사 외부활동")
                                     activity_lst = wait_presence_elements(extra, (By.CSS_SELECTOR, ' ul.field_history *'))
-                                    print(len(activity_lst))
                                     imsi_tit = []
                                     imsi_cont = ""
                                     imsi_cont_lst = []
                                     for plus_act in activity_lst:
-                                        print(plus_act.tag_name)
                                         if plus_act.tag_name == "div":
                                             txt_tit = plus_act.get_attribute("textContent").replace("[","").replace("]","").strip()
                                             if txt_tit:
@@ -238,9 +235,7 @@ for num in tqdm.tqdm(range(2, len(elements)+1)):
                                             if imsi_cont:
                                                 imsi_cont += f',{plus_act.get_attribute("textContent").strip()}'
                                             else:
-                                                print("김은정 외국변호사 p태그 확인")
                                                 imsi_cont = plus_act.get_attribute("textContent").replace('\n[', '//').replace(']\n', ']]').replace('\n', '').replace('[','').strip()
-                                                print(imsi_cont)
                                     if imsi_tit and imsi_cont:
                                         imsi_cont_lst.append(imsi_cont)
                                     if imsi_tit:
