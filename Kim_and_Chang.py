@@ -238,7 +238,7 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
                             imsi_cont = ""
                             imsi_cont_lst = []
                             for perf in perf_lst:
-                                print(perf.tag_name, perf.get_attribute("textContent"))
+                                print(perf.tag_name)
                                 if perf.tag_name == 'strong':
                                     txt_tit = perf.get_attribute("textContent").replace("[","").replace("]","").strip()
                                     if txt_tit:
@@ -251,7 +251,9 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
                                         imsi_cont += f',{perf.get_attribute("textContent").strip()}'
                                     else:
                                         imsi_cont = perf.get_attribute("textContent").strip()
-
+                                elif perf.tag_name == 'p':
+                                    imsi_cont = perf.get_attribute("textContent").replace('\n[', '//').replace(']\n', ']]').replace('\n', '').replace('[','').strip()
+                                    print(imsi_cont)
                             if imsi_tit and imsi_cont:
                                 imsi_cont_lst.append(imsi_cont)
                             if imsi_tit:
