@@ -98,7 +98,7 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
 
     # 페이지 갯수 확인
     # current_page_idx = 1
-    current_page_idx = 5
+    current_page_idx = 4
 
     try_again = 0
     while True:
@@ -109,7 +109,7 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
             current_pf_num = len(pf_lst)
 
             # for j in range(1, len(pf_lst)+1):
-            for j in range(5, len(pf_lst)+1):
+            for j in range(5, 6):
                 pf = wait_presence_element(driver, (By.CSS_SELECTOR, f'#_pro > ul.lawyer_profile > li:nth-child({j})'))
                 driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", pf)
                 # 이름 # 직업
@@ -301,16 +301,18 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
                 target_page_btn = wait_clickable_element(driver, (By.XPATH, f'//div[@class="paging"]//a[text()="{next_page_idx}"]'))
                 driver.execute_script("arguments[0].click();", target_page_btn)
                 current_page_idx += 1
+                time.sleep(1)
             except:
                 try:
                     next_step_page_btn = wait_clickable_element(driver, (By.XPATH, '//div[@class="paging"]//a[@class="next hidden_text"]'))
                     driver.execute_script("arguments[0].click();", next_step_page_btn)
-                    time.sleep(3)
+                    time.sleep(2)
 
                     next_page_idx = current_page_idx + 1
                     target_page_btn = wait_clickable_element(driver, (By.XPATH, f'//div[@class="paging"]//a[text()="{next_page_idx}"]'))
                     driver.execute_script("arguments[0].click();", target_page_btn)
                     current_page_idx += 1
+                    time.sleep(1)
                 except:
                     print("마지막 페이지입니다.")
                     break
