@@ -244,10 +244,13 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
                                         imsi_cont += f',{perf.get_attribute("textContent").strip()}'
                                     else:
                                         imsi_cont = perf.get_attribute("textContent").strip()
-                            perf_total = []
-                            for t, c in zip(imsi_tit, imsi_cont_lst):
-                                perf_total.append(f'{t}]]{c}')
-                            performance = '//'.join(perf_total)
+                            if imsi_tit:
+                                perf_total = []
+                                for t, c in zip(imsi_tit, imsi_cont_lst):
+                                    perf_total.append(f'{t}]]{c}')
+                                performance = '//'.join(perf_total)
+                            else:
+                                performance = imsi_cont
 
                     if old_exist_data:
                         if (name, email) in old_exist_data:
