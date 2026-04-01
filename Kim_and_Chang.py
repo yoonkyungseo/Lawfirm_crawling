@@ -169,6 +169,7 @@ for num in tqdm.tqdm(range(2, len(elements)+1)):
                     # 자격
                     try:
                         eli_lst = wait_presence_elements(driver, (By.XPATH, '//*[@id="career"]/*[@class="bullet_list"][3]//*'))
+                        print(len(eli_lst))
                         if eli_lst[1].tag_name == "ul":
                             eli_lst = wait_presence_elements(eli_lst[1], (By.XPATH, './/*'))
                         eli_total = []
