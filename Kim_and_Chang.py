@@ -254,7 +254,7 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
                                                     activity += f'{act_txt}]]'
                                                 else:
                                                     activity += f'//{act_txt}]]'
-                                        elif not act_txt:
+                                        elif act_txt:
                                             if activity:
                                                 if activity[-2:] == ']]':
                                                     activity += act_txt
