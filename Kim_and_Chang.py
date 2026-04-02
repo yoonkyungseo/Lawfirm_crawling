@@ -90,8 +90,9 @@ elements = wait_presence_elements(driver, (By.XPATH, '//*[@id="keyWordTab2"]/li'
 for num in tqdm.tqdm(range(1, len(elements)+1)):
     practice = wait_presence_element(driver, (By.XPATH, f'//*[@id="keyWordTab2"]/li[{num}]/a')) # 구분 목록 요소
     driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", practice)
-    # 현재 진행 중인 구분 목록 출력
-    print("-----", practice.get_attribute("textContent").strip(), "-----")
+    # 현재 진행 중인 구분 목록 출력 (이 구분이 선택될때마다 1번 pf명이 갱신되도록 == 1page pf는 다 본다는 뜻)
+    prev_name = practice.get_attribute("textContent").strip()
+    print("-----", prev_name, "-----")
     pf_data = []
     driver.execute_script("arguments[0].click();", practice) # 해당 구분 목록 클릭
     time.sleep(5) # 구분 목록 클릭 후 로딩 시간 부여
@@ -116,7 +117,14 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
                 # 전화번호
                 call = wait_presence_element(pf, (By.XPATH, './/div/span[2]')).get_attribute("textContent").replace('T.','')
                 print(name, job, call)
-                    
+                
+                # 만약 페이지 갱신이 안된 것 같다면 한번 새로고침 하도록 설정
+                if j == 1:
+                    if name == prev_name:
+                        print("페이지 갱신에 실패하여 새로고침 후 재탐색합니다.")
+                        IndexError
+                    else:
+                        prev_name = name
 
                 # 해당 pf가 기존에 저장된 사람인지 확인
                 if check_duplicates(name, job, call):
@@ -156,12 +164,16 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
                     career = ','.join(career_total)
                     print('career',career)
 
-                    # 학력
-                    edu_lst = wait_presence_elements(driver, (By.XPATH, '//*[@id="career"]/*[@class="bullet_list"][2]//*'))
-                    edu_total = []
-                    for edus in edu_lst:
-                        edu_total.append(edus.get_attribute("textContent").replace('\n', ' ').strip())
-                    education = ','.join(edu_total)
+                    try:
+                        # 학력
+                        edu_lst = wait_presence_elements(driver, (By.XPATH, '//*[@id="career"]/*[@class="bullet_list"][2]//*'))
+                        edu_total = []
+                        for edus in edu_lst:
+                            edu_total.append(edus.get_attribute("textContent").replace('\n', ' ').strip())
+                        education = ','.join(edu_total)
+                    except:
+                        # 박성태 고문의 경우 없음
+                        education = ""
                     print('education',education)
 
                     # 자격
@@ -217,32 +229,39 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
                                                 award_total.append(award_txt)
                                         awards = ','.join(award_total)
                                 elif act.get_attribute("textContent") == "저서 및 외부활동":
-                                    activity_lst = wait_presence_elements(extra, (By.CSS_SELECTOR, ' ul.field_history *'))
+                                    activity_lst = wait_presence_elements(extra, (By.CSS_SELECTOR, ' ul.field_history > *'))
                                     imsi_tit = []
-                                    imsi_cont = ""
-                                    imsi_cont_lst = []
                                     for plus_act in activity_lst:
                                         if plus_act.tag_name == "div":
-                                            txt_tit = plus_act.get_attribute("textContent").replace("[","").replace("]","").strip()
+                                            txt_tit = plus_act.get_attribute("textContent").strip()
                                             if txt_tit:
                                                 imsi_tit.append(txt_tit)
-                                            if imsi_cont:
-                                                imsi_cont_lst.append(imsi_cont)
-                                                imsi_cont = ""
-                                        elif plus_act.tag_name in ["li", "p"]:
-                                            if imsi_cont:
-                                                imsi_cont += f',{plus_act.get_attribute("textContent").strip()}'
+                                    imsi_activity_txt= wait_presence_element(extra, (By.CSS_SELECTOR, ' ul.field_history')).get_attribute("textContent").replace('\n[', '//').replace(']\n', ']]').strip()
+                                    if (imsi_activity_txt[0] == '[') and (']]' in imsi_activity_txt):
+                                        imsi_activity_txt = imsi_activity_txt[1:]
+                                    imsi_activity_lst = imsi_activity_txt.split('\n')
+                                    activity = ""
+                                    for imsi_act in imsi_activity_lst:
+                                        act_txt = imsi_act.strip()
+                                        if act_txt in imsi_tit:
+                                            if act_txt[0] == '[' and act_txt[-1] == ']':
+                                                if not activity:
+                                                    activity += f'{act_txt[1:-1]}]]'
+                                                else:
+                                                    activity += f'//{act_txt[1:-1]}]]'
                                             else:
-                                                imsi_cont = plus_act.get_attribute("textContent").replace('\n[', '//').replace(']\n', ']]').replace('\n', '').replace('[','').strip()
-                                    if imsi_tit and imsi_cont:
-                                        imsi_cont_lst.append(imsi_cont)
-                                    if imsi_tit:
-                                        activity_total = []
-                                        for t, c in zip(imsi_tit, imsi_cont_lst):
-                                            activity_total.append(f'{t}]]{c}')
-                                        activity = '//'.join(activity_total)
-                                    else:
-                                        activity = imsi_cont
+                                                if not activity:
+                                                    activity += f'{act_txt}]]'
+                                                else:
+                                                    activity += f'//{act_txt}]]'
+                                        elif not act_txt:
+                                            if activity:
+                                                if activity[-2:] == ']]':
+                                                    activity += act_txt
+                                                else:
+                                                    activity += f',{act_txt}'
+                                            else:
+                                                activity += act_txt
                         # 주요 업무 실적
                         elif "주요 실적" in main_activity.get_attribute("textContent"):
                             perf_lst = wait_presence_elements(extra, (By.XPATH, './/div[@class="box_open"]//*'))
