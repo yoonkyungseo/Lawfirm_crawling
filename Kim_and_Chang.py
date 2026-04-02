@@ -160,7 +160,9 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
                     career_lst = wait_presence_elements(driver, (By.XPATH, '//*[@id="career"]/*[@class="bullet_list"][1]//*'))
                     career_total = []
                     for careers in career_lst:
-                        career_total.append(careers.get_attribute("textContent").replace('\n', ' ').strip())
+                        careers_txt = careers.get_attribute("textContent").replace('\n', ' ').strip()
+                        if careers_txt:
+                            career_total.append(careers_txt)
                     career = ','.join(career_total)
                     print('career',career)
 
