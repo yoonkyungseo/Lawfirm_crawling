@@ -63,3 +63,44 @@ jobs:
           git commit --allow-empty -m "Auto-update: Data for $(date +'%Y-%m-%d')"
           git pull origin master --rebase -X ours # 충돌 방지용
           git push origin master
+
+  merge_KimChang:
+    needs: lawfirm_crawling
+    runs-on: ubuntu-latest # 실행할 OS 환경
+    env:
+      TZ: Asia/Seoul
+      PYTHONUNBUFFERED: "1"
+    # 쓰기 권한 설정 (CSV 파일을 저장소에 다시 올리기 위해 필수)
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false # 일부가 실패해도 나머지는 돌아가도록 실행
+
+    steps:
+      # 저장소 내 코드 가상 서버로 복사
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 가상 서버에 파이썬 설치
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.14.3'
+
+      # 라이브러리 설치
+      - name: Install Pandas
+        run: |
+          python -m pip install --upgrade pip
+          pip install pandas
+        
+      - name: Run Deduplication
+        run: python merge_Kim_and_Chang.py
+
+      - name: Final Push
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add -f data/ 
+          git commit -m "Final cleanup: Remove duplicates"
+          git push origin master
+      
