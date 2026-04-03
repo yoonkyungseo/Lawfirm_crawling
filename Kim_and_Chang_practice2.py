@@ -123,7 +123,7 @@ for num in tqdm.tqdm(range(16, len(elements)+1)):
                     if name == prev_name:
                         print(f"'{name}'은 이전 페이지에 존재하는 사람입니다.")
                         print("페이지 갱신에 실패하여 새로고침 후 재탐색합니다.")
-                        IndexError
+                        raise IndexError
                     else:
                         prev_name = name
                         print(f"새 페이지 로딩에 성공하여 prev_name을 {name}으로 갱신합니다.")
