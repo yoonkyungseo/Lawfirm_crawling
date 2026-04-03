@@ -25,6 +25,7 @@ try:
         print(f"중복 제거 전: {initial_cnt} → 중복 제거 후: {len(final_df)}")
         latest_date = latest_folder.replace('-',"")[2:]
         final_df.to_csv(f"data/{latest_folder}/Kim_and_Chang_{latest_date}.csv", index=False, encoding='utf-8-sig')
+        print("김앤장 중복 제거 완료")
 
         # 되는거 확인 후에 만들어진 데이터 삭제하는 코드 넣어야 함 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
