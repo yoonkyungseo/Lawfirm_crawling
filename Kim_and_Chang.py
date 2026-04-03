@@ -121,10 +121,12 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
                 # 만약 페이지 갱신이 안된 것 같다면 한번 새로고침 하도록 설정
                 if j == 1:
                     if name == prev_name:
+                        print(f"'{name}'은 이전 페이지에 존재하는 사람입니다.")
                         print("페이지 갱신에 실패하여 새로고침 후 재탐색합니다.")
                         IndexError
                     else:
                         prev_name = name
+                        print(f"새 페이지 로딩에 성공하여 prev_name을 {name}으로 갱신합니다.")
 
                 # 해당 pf가 기존에 저장된 사람인지 확인
                 if check_duplicates(name, job, call):
@@ -135,8 +137,7 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
                     time.sleep(2)
 
                     # 이메일
-                    email = wait_presence_element(driver, (By.XPATH, "//a[contains(@href, 'mailto:')]")).get_attribute("textContent")
-                    print('email',email)
+                    email = wait_presence_element(driver, (By.XPATH, "//a[contains(@href, 'mailto:')]")).get_attribute("textContent").strip()
 
                     # 상세 소개글
                     introduction = ""
@@ -146,7 +147,6 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
                             introduction += intro.get_attribute("textContent").replace('\n', ' ').strip()
                     except:
                         pass
-                    print('introduction',introduction)
 
                     # 관련 분야
                     fields_lst = wait_presence_elements(driver, (By.CSS_SELECTOR, 'div.tag_area.pc > div.left_tag li'))
@@ -154,7 +154,6 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
                     for field in fields_lst:
                         fields_total.append(field.get_attribute("textContent").replace('\n', ' ').strip())
                     related_fields = ','.join(fields_total)
-                    print('related_fields',related_fields)
 
                     # 경력
                     career_lst = wait_presence_elements(driver, (By.XPATH, '//*[@id="career"]/*[@class="bullet_list"][1]//*'))
@@ -164,7 +163,6 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
                         if careers_txt:
                             career_total.append(careers_txt)
                     career = ','.join(career_total)
-                    print('career',career)
 
                     try:
                         # 학력
@@ -176,7 +174,6 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
                     except:
                         # 박성태 고문의 경우 없음
                         education = ""
-                    print('education',education)
 
                     # 자격
                     try:
@@ -189,7 +186,6 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
                         eligibility = ','.join(eli_total)
                     except:
                         eligibility = ""
-                    print('eligibility',eligibility)
 
                     # 언어
                     try:
@@ -200,7 +196,6 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
                         language = ','.join(lan_total)
                     except:
                         language = ""
-                    print('language',language)
                     
                     # 수상, 외부 활동, 주요 업무 실적
                     awards, activity, performance = "", "", ""
@@ -211,16 +206,16 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
                     for extra in extra_bullet:
                         main_activity = wait_presence_element(extra, (By.XPATH, './/h4/a'))
                         # 수상, 외부 활동
-                        if "주요 활동" in main_activity.get_attribute("textContent"):
+                        if "주요 활동" in main_activity.get_attribute("textContent").strip():
                             driver.execute_script("arguments[0].click();", main_activity)
                             main_activity_bullet = wait_presence_elements(extra, (By.XPATH, './/div/h5'))
                             for act in main_activity_bullet:
-                                if act.get_attribute("textContent") == "수상":
+                                if act.get_attribute("textContent").strip() == "수상":
                                     try:
                                         awards_lst = wait_presence_elements(extra, (By.XPATH, './/div/ul[1]/li'))
                                         award_total = []
                                         for award in awards_lst:
-                                            award_total.append(award.get_attribute("textContent"))
+                                            award_total.append(award.get_attribute("textContent").strip())
                                         awards = ','.join(award_total)
                                     except:
                                         awards_lst = wait_presence_elements(extra, (By.XPATH, './/div/p'))
@@ -230,7 +225,7 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
                                             if award_txt:
                                                 award_total.append(award_txt)
                                         awards = ','.join(award_total)
-                                elif act.get_attribute("textContent") == "저서 및 외부활동":
+                                elif act.get_attribute("textContent").strip() == "저서 및 외부활동":
                                     activity_lst = wait_presence_elements(extra, (By.CSS_SELECTOR, ' ul.field_history > *'))
                                     imsi_tit = []
                                     for plus_act in activity_lst:
@@ -265,7 +260,7 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
                                             else:
                                                 activity += act_txt
                         # 주요 업무 실적
-                        elif "주요 실적" in main_activity.get_attribute("textContent"):
+                        elif "주요 실적" in main_activity.get_attribute("textContent").strip():
                             perf_lst = wait_presence_elements(extra, (By.XPATH, './/div[@class="box_open"]//*'))
                             imsi_tit = []
                             imsi_cont = ""
@@ -321,11 +316,7 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
                         'activity':activity,
                         'url':driver.current_url,
                         'new':new
-                    }
-                    print('awards', add_pf['awards'])
-                    print('performance', add_pf['performance'])
-                    print('activity',add_pf['activity'])
-                    
+                    }               
                     pf_data.append(add_pf)
                     driver.back()
                     time.sleep(2)
@@ -355,7 +346,7 @@ for num in tqdm.tqdm(range(1, len(elements)+1)):
             if try_again <= 5:
                 driver.refresh()
                 try_again += 1
-                time.sleep(2)
+                time.sleep(5)
             else:
                 print("페이지 로딩 문제로 중단")
                 break
