@@ -33,7 +33,7 @@ try:
     folders = [f for f in os.listdir(base_path) if os.path.isdir(os.path.join(base_path, f))]
     folders.sort()
     latest_folder = folders[-1] # 가장 최근 폴더 선택
-    old_csv_files = glob.glob(os.path.join(f'data/{latest_folder}', "Kim_and_Chang*.csv"))
+    old_csv_files = glob.glob(os.path.join(f'data/{latest_folder}', f"Kim_and_Chang_{latest_folder.replace("-","")[2:]}.csv"))
     if old_csv_files:
         df_old = pd.read_csv(old_csv_files[0])
         old_exist_data = set(zip(df_old['name'].fillna(''), df_old['email'].fillna('')))

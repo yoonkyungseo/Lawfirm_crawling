@@ -27,7 +27,7 @@ try:
         final_df.to_csv(f"data/{latest_folder}/Kim_and_Chang_{latest_date}.csv", index=False, encoding='utf-8-sig')
         print("김앤장 중복 제거 완료")
 
-        # 되는거 확인 후에 만들어진 데이터 삭제하는 코드 넣어야 함 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        # 우선 만들어진 각각의 파일은 삭제 안함
 
     else:
         print("저장된 김앤장 인사정보 파일이 없습니다.")
