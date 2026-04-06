@@ -83,15 +83,15 @@ main_window = driver.current_window_handle # 현재 창 ID를 변수로 저장
 driver.maximize_window()
 time.sleep(3)
 
-all_button = wait_presence_element(driver, (By.XPATH, '//*[@id="form1"]/div[2]/ul/li[1]/a/span'))
+all_button = wait_presence_element(driver, (By.XPATH, '//*[@id="form1"]/div[2]/ul/li[2]/a/span'))
 driver.execute_script("arguments[0].click();", all_button)
 
 company = "김앤장"
 flag = True
-# 김앤장 구성원 페이지 분야별(practice) 구분 클릭
-elements = wait_presence_elements(driver, (By.XPATH, '//*[@id="keyWordTab1"]/li'))
-for num in tqdm.tqdm(range(1, 7)):
-    practice = wait_presence_element(driver, (By.XPATH, f'//*[@id="keyWordTab1"]/li[{num}]/a')) # 구분 목록 요소
+# 김앤장 구성원 페이지 산업별(Industry) 구분 클릭
+elements = wait_presence_elements(driver, (By.XPATH, '//*[@id="keyWordTab2"]/li'))
+for num in tqdm.tqdm(range(9, len(elements)+1)):
+    practice = wait_presence_element(driver, (By.XPATH, f'//*[@id="keyWordTab2"]/li[{num}]/a')) # 구분 목록 요소
     driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", practice)
     # 현재 진행 중인 구분 목록 출력 (이 구분이 선택될때마다 1번 pf명이 갱신되도록 == 1page pf는 다 본다는 뜻)
     prev_name = practice.get_attribute("textContent").strip()
@@ -401,6 +401,6 @@ today_folder = datetime.now().strftime("%Y-%m-%d")
 os.makedirs(f"data/{today_folder}", exist_ok=True)
 
 today = datetime.now().strftime("%y%m%d")
-df.to_csv(f"data/{today_folder}/Kim_and_Chang_{today}_practice1.csv", index=False, encoding='utf-8-sig')
+df.to_csv(f"data/{today_folder}/Kim_and_Chang_{today}_industry2.csv", index=False, encoding='utf-8-sig')
 
 driver.quit()
