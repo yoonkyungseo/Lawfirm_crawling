@@ -21,8 +21,12 @@ jobs:
       fail-fast: false # 일부가 실패해도 나머지는 돌아가도록 실행
       matrix:
         # 병렬 실행 파일
-        # python-file: ["Kim_and_Chang_industry.py","Kim_and_Chang_practice1.py","Kim_and_Chang_practice2.py","Kim_and_Chang_region.py", "BKL.py", "Lee_Ko.py", "Shin_Kim.py", "Hwawoo.py"]
-        python-file: ["Kim_and_Chang_industry1.py", "Kim_and_Chang_industry2.py","Kim_and_Chang_practice1.py","Kim_and_Chang_practice2.py","Kim_and_Chang_practice3.py","Kim_and_Chang_practice4.py","Kim_and_Chang_region.py"]
+        python-file: [
+          "Kim_and_Chang_industry1.py","Kim_and_Chang_industry2.py",
+          "Kim_and_Chang_practice1.py","Kim_and_Chang_practice2.py","Kim_and_Chang_practice3.py","Kim_and_Chang_practice4.py",
+          "Kim_and_Chang_region.py",
+          "BKL.py", "Lee_Ko.py", "Shin_Kim.py", "Hwawoo.py"
+          ]
 
     
     steps:
