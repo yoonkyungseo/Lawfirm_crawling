@@ -3,7 +3,8 @@ name: Monthly Law Firm Crawling
 on:
   schedule:
     # 매월 1일 00:00 (UTC 기준, 한국 시간 오전 9시)에 실행
-    - cron: '0 0 1 * *'
+    # 분 시 일 월 요일
+    - cron: '0 1 6 * *'
   workflow_dispatch: # 수동으로 실행하고 싶을 때 사용
   # 저장소 상단 Actions 탭 > 좌측 목록 중 해당 Workflow 클릭 > 우측에 나타나는 Rum workflow 회색 버튼 클릭
 
