@@ -95,7 +95,7 @@ for i in tqdm.tqdm(range(1, len(pf_lst)+1)):
     call = '-'.join(pf.find_element(By.CSS_SELECTOR, 'span.tel').text.split())
 
     if check_duplicates(name, job, call):
-        print(i+"번째 PF", name, job, call)
+        print(i,"번째 PF", name, job, call)
         pf.click()
         time.sleep(3)
 
@@ -202,7 +202,7 @@ for i in tqdm.tqdm(range(1, len(pf_lst)+1)):
         driver.back()
         time.sleep(3)
     else:
-        print(i+'번째 PF', name, "→ 이미 존재하는 PF입니다.")
+        print(i,'번째 PF', name, "→ 이미 존재하는 PF입니다.")
 
 # 카테고리 하나당 한번씩 df 갱신
 df = pd.concat([df, pd.DataFrame(pf_data)], ignore_index=True)
