@@ -8,6 +8,8 @@ import pandas as pd
 import tqdm
 from selenium import webdriver
 from selenium.webdriver.common. by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from datetime import datetime
 import glob
 
@@ -74,6 +76,7 @@ company = "태평양"
 def bkl_crawling(id, button_id):
     global company, df
     page = 1
+    try_again = 0
     while True:
         pf_data = []
         scroll = driver.find_element(By.XPATH, f'//*[@id="{id}"]/ul[{page}]/li[1]/a[1]/div[1]')
@@ -221,7 +224,8 @@ def bkl_crawling(id, button_id):
         df = pd.concat([df, pd.DataFrame(pf_data)], ignore_index=True)
 
         try:
-            button = driver.find_element(By.XPATH, f'//*[@id="{id}"]/div[{button_id}]/button')
+            # button = driver.find_element(By.XPATH, f'//*[@id="{id}"]/div[{button_id}]/button')
+            button = WebDriverWait(driver, 15).until(EC.element_to_be_clickable((By.XPATH, f'//*[@id="{id}"]/div[{button_id}]/button')))
             driver.execute_script("arguments[0].scrollIntoView({block: 'nearest'});", button)
             button.click()
             time.sleep(2)
@@ -230,9 +234,19 @@ def bkl_crawling(id, button_id):
             print(page, "페이지 완료")
             page += 1
         except:
-            print(f"현재 {page} 페이지까지 완료")
-            print("더보기 버튼을 찾을 수 없습니다.")
-            break
+            if try_again <= 3:
+                button = WebDriverWait(driver, 15).until(EC.element_to_be_clickable((By.XPATH, f'//*[@id="{id}"]/div[{button_id}]/button')))
+                driver.execute_script("arguments[0].scrollIntoView({block: 'nearest'});", button)
+                button.click()
+                time.sleep(2)
+                driver.refresh()
+                time.sleep(4)
+                print(page, "페이지 완료")
+                page += 1
+            else:
+                print(f"현재 {page} 페이지까지 완료")
+                print("더보기 버튼을 찾을 수 없습니다.")
+                break
 
 bkl_crawling("isMainY", 2)
 time.sleep(2)
