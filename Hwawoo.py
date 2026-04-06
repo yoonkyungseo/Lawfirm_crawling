@@ -85,16 +85,13 @@ company = "화우"
 
 pf_lst = driver.find_elements(By.XPATH, '//*[@id="contentsList"]/div')
 pf_data = []
-# for i in tqdm.tqdm(range(1, len(pf_lst)+1)):
-for i in tqdm.tqdm(range(325, 326)):
-    print(f"{i}번째 PF 입니다.")
+for i in tqdm.tqdm(range(1, len(pf_lst)+1)):
     pf = driver.find_element(By.XPATH, f'//*[@id="contentsList"]/div[{i}]')
     driver.execute_script("arguments[0].scrollIntoView({block: 'nearest'});", pf) # 크롤링 pf로 화면 스크롤
     time.sleep(1)
     name = pf.find_element(By.CSS_SELECTOR, 'strong.name').text
     job = pf.find_element(By.CSS_SELECTOR, 'span.grade').text
     call = '-'.join(pf.find_element(By.CSS_SELECTOR, 'span.tel').text.split())
-    print(name, job, call, "자 이제 중복 확인합니다.")
 
     if check_duplicates(name, job, call):
         print(i,"번째 PF", name, job, call)
