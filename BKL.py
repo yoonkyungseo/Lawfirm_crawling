@@ -227,13 +227,16 @@ def bkl_crawling(id, button_id):
             time.sleep(2)
             driver.refresh()
             time.sleep(4)
+            print(page, "페이지 완료")
             page += 1
         except:
+            print(f"현재 {page} 페이지까지 완료")
             print("더보기 버튼을 찾을 수 없습니다.")
             break
 
 bkl_crawling("isMainY", 2)
 time.sleep(2)
+print('-'*30)
 bkl_crawling("isMainN", 3)
 
 # 퇴사자 확인
