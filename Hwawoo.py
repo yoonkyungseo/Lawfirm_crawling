@@ -86,6 +86,7 @@ company = "화우"
 pf_lst = driver.find_elements(By.XPATH, '//*[@id="contentsList"]/div')
 pf_data = []
 for i in tqdm.tqdm(range(1, len(pf_lst)+1)):
+    print(f'총 {len(pf_lst)}명의 pf가 있습니다.')
     pf = driver.find_element(By.XPATH, f'//*[@id="contentsList"]/div[{i}]')
     driver.execute_script("arguments[0].scrollIntoView({block: 'nearest'});", pf) # 크롤링 pf로 화면 스크롤
     time.sleep(1)
@@ -94,7 +95,7 @@ for i in tqdm.tqdm(range(1, len(pf_lst)+1)):
     call = '-'.join(pf.find_element(By.CSS_SELECTOR, 'span.tel').text.split())
 
     if check_duplicates(name, job, call):
-        print(name, job, call)
+        print(i+"번째 PF", name, job, call)
         pf.click()
         time.sleep(3)
 
@@ -200,6 +201,8 @@ for i in tqdm.tqdm(range(1, len(pf_lst)+1)):
 
         driver.back()
         time.sleep(3)
+    else:
+        print(i+'번째 PF', name, "→ 이미 존재하는 PF입니다.")
 
 # 카테고리 하나당 한번씩 df 갱신
 df = pd.concat([df, pd.DataFrame(pf_data)], ignore_index=True)
