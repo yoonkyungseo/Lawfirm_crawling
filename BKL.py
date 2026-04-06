@@ -229,6 +229,7 @@ def bkl_crawling(id, button_id):
             time.sleep(4)
             page += 1
         except:
+            print("더보기 버튼을 찾을 수 없습니다.")
             break
 
 bkl_crawling("isMainY", 2)
