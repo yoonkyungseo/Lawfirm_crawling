@@ -232,6 +232,7 @@ def bkl_crawling(id, button_id):
             break
 
 bkl_crawling("isMainY", 2)
+time.sleep(2)
 bkl_crawling("isMainN", 3)
 
 # 퇴사자 확인
