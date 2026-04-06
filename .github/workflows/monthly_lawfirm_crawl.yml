@@ -8,64 +8,64 @@ on:
   # 저장소 상단 Actions 탭 > 좌측 목록 중 해당 Workflow 클릭 > 우측에 나타나는 Rum workflow 회색 버튼 클릭
 
 jobs:
-  # lawfirm_crawling:
-  #   runs-on: ubuntu-latest # 실행할 OS 환경
-  #   env:
-  #     TZ: Asia/Seoul
-  #     PYTHONUNBUFFERED: "1"
-  #   # 쓰기 권한 설정 (CSV 파일을 저장소에 다시 올리기 위해 필수)
-  #   permissions:
-  #     contents: write
-  #   strategy:
-  #     fail-fast: false # 일부가 실패해도 나머지는 돌아가도록 실행
-  #     matrix:
-  #       # 병렬 실행 파일
-  #       # python-file: ["Kim_and_Chang.py", "BKL.py", "Lee_Ko.py", "Shin_Kim.py", "Hwawoo.py"]
-  #       python-file: ["Kim_and_Chang_industry.py","Kim_and_Chang_practice1.py","Kim_and_Chang_practice2.py","Kim_and_Chang_region.py", "BKL.py", "Lee_Ko.py", "Shin_Kim.py", "Hwawoo.py"]
+  lawfirm_crawling:
+    runs-on: ubuntu-latest # 실행할 OS 환경
+    env:
+      TZ: Asia/Seoul
+      PYTHONUNBUFFERED: "1"
+    # 쓰기 권한 설정 (CSV 파일을 저장소에 다시 올리기 위해 필수)
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false # 일부가 실패해도 나머지는 돌아가도록 실행
+      matrix:
+        # 병렬 실행 파일
+        # python-file: ["Kim_and_Chang.py", "BKL.py", "Lee_Ko.py", "Shin_Kim.py", "Hwawoo.py"]
+        python-file: ["Kim_and_Chang_industry.py","Kim_and_Chang_practice1.py","Kim_and_Chang_practice2.py","Kim_and_Chang_region.py", "BKL.py", "Lee_Ko.py", "Shin_Kim.py", "Hwawoo.py"]
     
-  #   steps:
-  #     # 저장소 내 코드 가상 서버로 복사
-  #     - name: Checkout code
-  #       uses: actions/checkout@v4
+    steps:
+      # 저장소 내 코드 가상 서버로 복사
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-  #     # 가상 서버에 파이썬 설치
-  #     - name: Set up Python
-  #       uses: actions/setup-python@v5
-  #       with:
-  #         python-version: '3.14.3'
+      # 가상 서버에 파이썬 설치
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.14.3'
 
-  #     # 라이브러리 설치
-  #     - name: Install dependencies
-  #       run: |
-  #         python -m pip install --upgrade pip
-  #         pip install -r requirements.txt
+      # 라이브러리 설치
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
       
-  #     # 실행 중인 크롬과 드라이버가 있다면 강제로 종료 (없어도 에러 나지 않게 || true 붙임)
-  #     - name: Cleanup messy processes
-  #       run: |
-  #         pkill -9 chrome || true
-  #         pkill -9 chromedriver || true
+      # 실행 중인 크롬과 드라이버가 있다면 강제로 종료 (없어도 에러 나지 않게 || true 붙임)
+      - name: Cleanup messy processes
+        run: |
+          pkill -9 chrome || true
+          pkill -9 chromedriver || true
 
-  #     # python 파일 실행
-  #     - name: Run crawling script
-  #       continue-on-error: false # 여기서 오류가 나면 Commit and Push 단계 실행하지 않도록 설정
-  #       run: python ${{ matrix.python-file }}
+      # python 파일 실행
+      - name: Run crawling script
+        continue-on-error: false # 여기서 오류가 나면 Commit and Push 단계 실행하지 않도록 설정
+        run: python ${{ matrix.python-file }}
 
-  #     # 결과 저장 및 푸시
-  #     # data 폴더와 그 안의 모든 파일 추가
-  #     # 변경사항이 없어도 커밋 생성 (에러 방지용 --allow-empty)
-  #     - name: Commit and Push CSV
-  #       run: |
-  #         git config --global user.name "github-actions[bot]"
-  #         git config --global user.email "github-actions[bot]@users.noreply.github.com"
-  #         git pull origin master --rebase -X ours # 최신 상태로 업데이트
-  #         git add -f data/ 
-  #         git commit --allow-empty -m "Auto-update: Data for $(date +'%Y-%m-%d')"
-  #         git pull origin master --rebase -X ours # 충돌 방지용
-  #         git push origin master
+      # 결과 저장 및 푸시
+      # data 폴더와 그 안의 모든 파일 추가
+      # 변경사항이 없어도 커밋 생성 (에러 방지용 --allow-empty)
+      - name: Commit and Push CSV
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git pull origin master --rebase -X ours # 최신 상태로 업데이트
+          git add -f data/ 
+          git commit --allow-empty -m "Auto-update: Data for $(date +'%Y-%m-%d')"
+          git pull origin master --rebase -X ours # 충돌 방지용
+          git push origin master
 
   merge_KimChang:
-    # needs: lawfirm_crawling
+    needs: lawfirm_crawling
     runs-on: ubuntu-latest # 실행할 OS 환경
     env:
       TZ: Asia/Seoul
