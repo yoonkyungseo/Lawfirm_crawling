@@ -25,7 +25,7 @@ jobs:
           "Kim_and_Chang_industry1.py","Kim_and_Chang_industry2.py",
           "Kim_and_Chang_practice1.py","Kim_and_Chang_practice2.py","Kim_and_Chang_practice3.py","Kim_and_Chang_practice4.py","Kim_and_Chang_practice5.py","Kim_and_Chang_practice6.py","Kim_and_Chang_practice7.py",
           "Kim_and_Chang_region.py",
-          # "BKL.py", "Lee_Ko.py", "Shin_Kim.py", "Hwawoo.py"
+          "BKL.py", "Lee_Ko.py", "Shin_Kim.py", "Hwawoo.py"
           ]
     
     steps:
