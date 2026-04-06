@@ -3,6 +3,7 @@ import gc
 import time
 import warnings
 warnings.filterwarnings('ignore')
+import traceback
 
 import pandas as pd
 import tqdm
@@ -123,7 +124,7 @@ for num in tqdm.tqdm(range(1, 16)):
                     if name == prev_name:
                         print(f"'{name}'은 이전 페이지에 존재하는 사람입니다.")
                         print("페이지 갱신에 실패하여 새로고침 후 재탐색합니다.")
-                        raise IndexError
+                        raise ModuleNotFoundError
                     else:
                         prev_name = name
                         print(f"새 페이지 로딩에 성공하여 prev_name을 {name}으로 갱신합니다.")
@@ -342,14 +343,21 @@ for num in tqdm.tqdm(range(1, 16)):
                 except:
                     print("마지막 페이지입니다.")
                     break
-        except:
+        except ModuleNotFoundError:
             if try_again <= 5:
-                driver.refresh()
-                try_again += 1
+                target_page_btn = wait_clickable_element(driver, (By.XPATH, f'//div[@class="paging"]//a[text()="{current_page_idx}"]'))
+                driver.execute_script("arguments[0].click();", target_page_btn)
                 time.sleep(5)
+                print("페이지를 다시 클릭했습니다.")
             else:
-                print("페이지 로딩 문제로 중단")
+                print("페이지 로딩 중 오류가 발생했습니다.")
                 break
+        except Exception as e:
+            print(f"예상치 못한 오류 발생: {type(e).__name__}")
+            print("-" * 30)
+            traceback.print_exc() # <--- 이 한 줄이 "어디서" 났는지 다 보여줍니다.
+            print("-" * 30)
+            break
 
     # 구분목록 하나당 한번씩 df 갱신
     df = pd.concat([df, pd.DataFrame(pf_data)], ignore_index=True)
