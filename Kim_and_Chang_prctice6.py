@@ -90,7 +90,7 @@ company = "김앤장"
 flag = True
 # 김앤장 구성원 페이지 분야별(practice) 구분 클릭
 elements = wait_presence_elements(driver, (By.XPATH, '//*[@id="keyWordTab1"]/li'))
-for num in tqdm.tqdm(range(5, 9)):
+for num in tqdm.tqdm(range(21, 25)):
     practice = wait_presence_element(driver, (By.XPATH, f'//*[@id="keyWordTab1"]/li[{num}]/a')) # 구분 목록 요소
     driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", practice)
     # 현재 진행 중인 구분 목록 출력 (이 구분이 선택될때마다 1번 pf명이 갱신되도록 == 1page pf는 다 본다는 뜻)
@@ -401,6 +401,6 @@ today_folder = datetime.now().strftime("%Y-%m-%d")
 os.makedirs(f"data/{today_folder}", exist_ok=True)
 
 today = datetime.now().strftime("%y%m%d")
-df.to_csv(f"data/{today_folder}/Kim_and_Chang_{today}_practice2.csv", index=False, encoding='utf-8-sig')
+df.to_csv(f"data/{today_folder}/Kim_and_Chang_{today}_practice6.csv", index=False, encoding='utf-8-sig')
 
 driver.quit()
