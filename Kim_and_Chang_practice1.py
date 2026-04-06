@@ -11,6 +11,7 @@ from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common. by import By
+from selenium.common.exceptions import StaleElementReferenceException
 from datetime import datetime
 import glob
 
@@ -86,6 +87,7 @@ all_button = wait_presence_element(driver, (By.XPATH, '//*[@id="form1"]/div[2]/u
 driver.execute_script("arguments[0].click();", all_button)
 
 company = "김앤장"
+flag = True
 # 김앤장 구성원 페이지 분야별(practice) 구분 클릭
 elements = wait_presence_elements(driver, (By.XPATH, '//*[@id="keyWordTab1"]/li'))
 for num in tqdm.tqdm(range(1, 16)):
@@ -135,6 +137,7 @@ for num in tqdm.tqdm(range(1, 16)):
                     pf_link = wait_presence_element(pf, (By.CSS_SELECTOR, "img"))
                     driver.execute_script("arguments[0].setAttribute('target', '_self');", wait_presence_element(pf, (By.CSS_SELECTOR, "p.img a")))
                     driver.execute_script("arguments[0].click();", pf_link)
+                    flag = False
                     time.sleep(2)
 
                     # 이메일
@@ -320,6 +323,7 @@ for num in tqdm.tqdm(range(1, 16)):
                     }               
                     pf_data.append(add_pf)
                     driver.back()
+                    flag = True
                     time.sleep(2)
 
             # 다음 페이지로 넘기기
@@ -328,18 +332,18 @@ for num in tqdm.tqdm(range(1, 16)):
                 target_page_btn = wait_clickable_element(driver, (By.XPATH, f'//div[@class="paging"]//a[text()="{next_page_idx}"]'))
                 driver.execute_script("arguments[0].click();", target_page_btn)
                 current_page_idx += 1
-                time.sleep(2)
+                time.sleep(4)
             except:
                 try:
                     next_step_page_btn = wait_clickable_element(driver, (By.XPATH, '//div[@class="paging"]//a[@class="next hidden_text"]'))
                     driver.execute_script("arguments[0].click();", next_step_page_btn)
-                    time.sleep(2)
+                    time.sleep(4)
 
                     next_page_idx = current_page_idx + 1
                     target_page_btn = wait_clickable_element(driver, (By.XPATH, f'//div[@class="paging"]//a[text()="{next_page_idx}"]'))
                     driver.execute_script("arguments[0].click();", target_page_btn)
                     current_page_idx += 1
-                    time.sleep(2)
+                    time.sleep(4)
                 except:
                     print("마지막 페이지입니다.")
                     break
@@ -352,6 +356,24 @@ for num in tqdm.tqdm(range(1, 16)):
             else:
                 print("페이지 로딩 중 오류가 발생했습니다.")
                 break
+        except StaleElementReferenceException:
+            print("StaleElementReferenceException 오류 발생")
+            print("-" * 30)
+            traceback.print_exc()
+            print("-" * 30)
+            if flag:
+                if try_again <= 5:
+                    target_page_btn = wait_clickable_element(driver, (By.XPATH, f'//div[@class="paging"]//a[text()="{current_page_idx}"]'))
+                    driver.execute_script("arguments[0].click();", target_page_btn)
+                    time.sleep(5)
+                    print("페이지를 다시 클릭했습니다.")
+                else:
+                    print("페이지 로딩 중 오류가 발생했습니다.")
+                    break
+            else:
+                driver.back()
+                time.sleep(2)
+                print("pf 클릭 후 발생한 오류로 해당 페이지를 재탐색합니다.")
         except Exception as e:
             print(f"예상치 못한 오류 발생: {type(e).__name__}")
             print("-" * 30)
