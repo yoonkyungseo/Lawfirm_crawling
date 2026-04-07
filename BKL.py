@@ -240,10 +240,12 @@ def bkl_crawling(id, button_id):
             print(page, "페이지 완료")
             page += 1
         except ReadTimeoutError:
+            print("url을 다시 호출합니다.")
             driver.get(current_url)
             time.sleep(4)
         except:
             try:
+                print("버튼 클릭을 재시도 합니다.")
                 button = WebDriverWait(driver, 15).until(EC.element_to_be_clickable((By.XPATH, f'//*[@id="{id}"]/div[{button_id}]/button')))
                 driver.execute_script("arguments[0].scrollIntoView({block: 'nearest'});", button)
                 button.click()
@@ -267,6 +269,7 @@ def bkl_crawling(id, button_id):
                 break
             except Exception as e:
                 print(f"페이지를 다시 불러오는 중 오류 발생: {e}")
+    print("크롤링이 종료되어 브라우저를 닫습니다.")
     driver.quit()
 
 bkl_crawling("isMainY", 2)
