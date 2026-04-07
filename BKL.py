@@ -20,15 +20,6 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 
-gc.collect()
-
-options = Options()
-options.add_argument("--headless")           # 브라우저 창을 띄우지 않음 (필수)
-options.add_argument("--no-sandbox")          # 보안 기능 해제 (리눅스 서버 필수)
-options.add_argument("--disable-dev-shm-usage") # 공유 메모리 부족 방지
-options.add_argument("--disable-gpu")         # GPU 가속 해제
-options.add_argument("--window-size=1920,1080") # 가상 모니터 크기 설정 (스크롤/클릭 오류 방지)
-
 base_path = 'data'
 try:
     folders = [f for f in os.listdir(base_path) if os.path.isdir(os.path.join(base_path, f))]
@@ -61,24 +52,35 @@ def check_duplicates(name, job, call):
     else:
         exist_data.add(new)
         return True
-    
-service = Service(ChromeDriverManager().install())
-driver = webdriver.Chrome(service=service, options=options)
+
+def create_driver():
+    gc.collect()
+    options = Options()
+    options.add_argument("--headless")           # 브라우저 창을 띄우지 않음 (필수)
+    options.add_argument("--no-sandbox")          # 보안 기능 해제 (리눅스 서버 필수)
+    options.add_argument("--disable-dev-shm-usage") # 공유 메모리 부족 방지
+    options.add_argument("--disable-gpu")         # GPU 가속 해제
+    options.add_argument("--window-size=1920,1080") # 가상 모니터 크기 설정 (스크롤/클릭 오류 방지)
+        
+    service = Service(ChromeDriverManager().install())
+    driver = webdriver.Chrome(service=service, options=options)
+    return driver
+
 # 태평양 크롤링 코드
-
-driver.get("https://www.bkl.co.kr/law/member/allList.do?isMain=&pageIndex=1&searchCondition=&url=all&job=&lang=ko&memberNo=&searchYn=Y&logFunction=goSearch&searchKeyword=")
-driver.maximize_window()
-time.sleep(1)
-
-company = "태평양"
 
 # 주요 구성원 id = isMainY, button_id = 2
 # 관련 구성원 id = isMainN, button_id = 3
 # button_id는 "더보기 버튼" 클릭 시 XPATH 내 달라지는 div 리스트 넘버
 def bkl_crawling(id, button_id):
-    global company, df, driver, service, options
+    global df
+    company = "태평양"
     page = 1
-    try_again = 0
+
+    driver = create_driver()
+    driver.get("https://www.bkl.co.kr/law/member/allList.do?isMain=&pageIndex=1&searchCondition=&url=all&job=&lang=ko&memberNo=&searchYn=Y&logFunction=goSearch&searchKeyword=")
+    driver.maximize_window()
+    time.sleep(1)
+
     while True:
         pf_data = []
         scroll = driver.find_element(By.XPATH, f'//*[@id="{id}"]/ul[{page}]/li[1]/a[1]/div[1]')
@@ -255,7 +257,7 @@ def bkl_crawling(id, button_id):
                 print("새로고침 오류로 브라우저를 완전히 닫고 새로 시작합니다.")
                 driver.quit()
                 time.sleep(2)
-                driver = webdriver.Chrome(service=service, options=options)
+                driver = create_driver()
                 driver.get(current_url)
                 button = WebDriverWait(driver, 15).until(EC.element_to_be_clickable((By.XPATH, f'//*[@id="{id}"]/div[{button_id}]/button'))) # 더보기 버튼 나타날때까지 url이 로딩되도록 대기
                 print("재접속 완료")
@@ -265,10 +267,11 @@ def bkl_crawling(id, button_id):
                 break
             except Exception as e:
                 print(f"페이지를 다시 불러오는 중 오류 발생: {e}")
+    driver.quit()
 
-# bkl_crawling("isMainY", 2)
-# time.sleep(2)
-# print('-'*30)
+bkl_crawling("isMainY", 2)
+time.sleep(2)
+print('-'*30)
 bkl_crawling("isMainN", 3)
 
 # 퇴사자 확인
