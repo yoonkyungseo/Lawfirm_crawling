@@ -11,6 +11,7 @@ from selenium.webdriver.common. by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
+from urllib3.exceptions import ReadTimeoutError
 from datetime import datetime
 import glob
 
@@ -223,29 +224,42 @@ def bkl_crawling(id, button_id):
                 time.sleep(4)
         # 더보기 버튼 클릭 전마다 df 갱신
         df = pd.concat([df, pd.DataFrame(pf_data)], ignore_index=True)
+        current_url = driver.current_url
 
         try:
             # button = driver.find_element(By.XPATH, f'//*[@id="{id}"]/div[{button_id}]/button')
             button = WebDriverWait(driver, 15).until(EC.element_to_be_clickable((By.XPATH, f'//*[@id="{id}"]/div[{button_id}]/button')))
             driver.execute_script("arguments[0].scrollIntoView({block: 'nearest'});", button)
             button.click()
+            time.sleep(2)
+            current_url = driver.current_url
+            driver.refresh()
             time.sleep(4)
             print(page, "페이지 완료")
             page += 1
+        except ReadTimeoutError:
+            driver.get(current_url)
+            time.sleep(4)
         except:
             try:
                 button = WebDriverWait(driver, 15).until(EC.element_to_be_clickable((By.XPATH, f'//*[@id="{id}"]/div[{button_id}]/button')))
                 driver.execute_script("arguments[0].scrollIntoView({block: 'nearest'});", button)
                 button.click()
                 time.sleep(2)
+                current_url = driver.current_url
                 driver.refresh()
                 time.sleep(4)
                 print(page, "페이지 완료")
                 page += 1
+            except ReadTimeoutError:
+                driver.get(current_url)
+                time.sleep(4)
             except TimeoutException:
                 print(f"현재 {page} 페이지까지 완료")
                 print("더보기 버튼을 찾을 수 없습니다.")
                 break
+            except Exception as e:
+                print(f"페이지를 다시 불러오는 중 오류 발생: {e}")
 
 bkl_crawling("isMainY", 2)
 time.sleep(2)
