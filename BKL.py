@@ -229,8 +229,6 @@ def bkl_crawling(id, button_id):
             button = WebDriverWait(driver, 15).until(EC.element_to_be_clickable((By.XPATH, f'//*[@id="{id}"]/div[{button_id}]/button')))
             driver.execute_script("arguments[0].scrollIntoView({block: 'nearest'});", button)
             button.click()
-            time.sleep(2)
-            driver.refresh()
             time.sleep(4)
             print(page, "페이지 완료")
             page += 1
