@@ -76,7 +76,7 @@ company = "태평양"
 # 관련 구성원 id = isMainN, button_id = 3
 # button_id는 "더보기 버튼" 클릭 시 XPATH 내 달라지는 div 리스트 넘버
 def bkl_crawling(id, button_id):
-    global company, df
+    global company, df, driver, service, options
     page = 1
     try_again = 0
     while True:
@@ -252,8 +252,13 @@ def bkl_crawling(id, button_id):
                 print(page, "페이지 완료")
                 page += 1
             except ReadTimeoutError:
+                print("새로고침 오류로 브라우저를 완전히 닫고 새로 시작합니다.")
+                driver.quit()
+                time.sleep(2)
+                driver = webdriver.Chrome(service=service, options=options)
                 driver.get(current_url)
-                time.sleep(4)
+                button = WebDriverWait(driver, 15).until(EC.element_to_be_clickable((By.XPATH, f'//*[@id="{id}"]/div[{button_id}]/button'))) # 더보기 버튼 나타날때까지 url이 로딩되도록 대기
+                print("재접속 완료")
             except TimeoutException:
                 print(f"현재 {page} 페이지까지 완료")
                 print("더보기 버튼을 찾을 수 없습니다.")
@@ -261,9 +266,9 @@ def bkl_crawling(id, button_id):
             except Exception as e:
                 print(f"페이지를 다시 불러오는 중 오류 발생: {e}")
 
-bkl_crawling("isMainY", 2)
-time.sleep(2)
-print('-'*30)
+# bkl_crawling("isMainY", 2)
+# time.sleep(2)
+# print('-'*30)
 bkl_crawling("isMainN", 3)
 
 # 퇴사자 확인
