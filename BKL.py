@@ -282,10 +282,10 @@ def bkl_crawling(id, button_id):
     print("크롤링이 종료되어 브라우저를 닫습니다.")
     driver.quit()
 
-bkl_crawling("isMainY", 2)
+bkl_crawling("isMainN", 3)
 time.sleep(2)
 print('-'*30)
-bkl_crawling("isMainN", 3)
+bkl_crawling("isMainY", 2)
 
 # 퇴사자 확인
 if not df_old.empty:
