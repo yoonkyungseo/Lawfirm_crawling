@@ -10,6 +10,7 @@ from selenium import webdriver
 from selenium.webdriver.common. by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import TimeoutException
 from datetime import datetime
 import glob
 
@@ -234,7 +235,7 @@ def bkl_crawling(id, button_id):
             print(page, "페이지 완료")
             page += 1
         except:
-            if try_again <= 3:
+            try:
                 button = WebDriverWait(driver, 15).until(EC.element_to_be_clickable((By.XPATH, f'//*[@id="{id}"]/div[{button_id}]/button')))
                 driver.execute_script("arguments[0].scrollIntoView({block: 'nearest'});", button)
                 button.click()
@@ -243,7 +244,7 @@ def bkl_crawling(id, button_id):
                 time.sleep(4)
                 print(page, "페이지 완료")
                 page += 1
-            else:
+            except TimeoutException:
                 print(f"현재 {page} 페이지까지 완료")
                 print("더보기 버튼을 찾을 수 없습니다.")
                 break
