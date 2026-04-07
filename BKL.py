@@ -76,7 +76,17 @@ def bkl_crawling(id, button_id):
     company = "태평양"
     page = 1
 
-    driver = create_driver()
+    gc.collect()
+    options = Options()
+    options.add_argument("--headless")           # 브라우저 창을 띄우지 않음 (필수)
+    options.add_argument("--no-sandbox")          # 보안 기능 해제 (리눅스 서버 필수)
+    options.add_argument("--disable-dev-shm-usage") # 공유 메모리 부족 방지
+    options.add_argument("--disable-gpu")         # GPU 가속 해제
+    options.add_argument("--window-size=1920,1080") # 가상 모니터 크기 설정 (스크롤/클릭 오류 방지)
+        
+    service = Service(ChromeDriverManager().install())
+    driver = webdriver.Chrome(service=service, options=options)
+    
     driver.get("https://www.bkl.co.kr/law/member/allList.do?isMain=&pageIndex=1&searchCondition=&url=all&job=&lang=ko&memberNo=&searchYn=Y&logFunction=goSearch&searchKeyword=")
     driver.maximize_window()
     time.sleep(1)
