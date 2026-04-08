@@ -388,19 +388,6 @@ for num in tqdm.tqdm(range(9, 13)):
     # 구분목록 하나당 한번씩 df 갱신
     df = pd.concat([df, pd.DataFrame(pf_data)], ignore_index=True)
 
-# 퇴사자 확인
-if not df_old.empty:
-    df_old['temp_id'] = df_old['url'].astype(str)
-    df['temp_id'] = df['url'].astype(str)
-    # 퇴사자 정보 추출
-    retired_info = df_old[~df_old['temp_id'].isin(df['temp_id'])].copy()
-    df.drop(columns=['temp_id'], inplace=True)
-
-    if not retired_info.empty:
-        retired_info['new'] = "Out"
-        retired_info.drop(columns=['temp_id'], inplace=True)
-        df = pd.concat([df, retired_info], ignore_index=True)
-
 today_folder = datetime.now().strftime("%Y-%m-%d")
 os.makedirs(f"data/{today_folder}", exist_ok=True)
 

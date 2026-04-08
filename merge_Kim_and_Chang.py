@@ -16,20 +16,44 @@ try:
         combined_df = pd.concat(df_lst, ignore_index=True)
         initial_cnt = len(combined_df)
 
-        # (이름, 이메일, 전화번호) 중복제거
+        # url 중복제거
         final_df = combined_df.drop_duplicates(
-            subset=['name', 'email', 'call'], 
+            subset=['url'], 
             keep='first' # 첫 번째 데이터만 남김
-        )
+        ).copy()
 
-        print(f"중복 제거 전: {initial_cnt} → 중복 제거 후: {len(final_df)}")
-        latest_date = latest_folder.replace('-',"")[2:]
-        final_df.to_csv(f"data/{latest_folder}/Kim_and_Chang_{latest_date}.csv", index=False, encoding='utf-8-sig')
-        print("김앤장 중복 제거 완료")
-
-        # 우선 만들어진 각각의 파일은 삭제 안함
-
+        print("김앤장 concat & 중복 제거 완료")
     else:
         print("저장된 김앤장 인사정보 파일이 없습니다.")
+
+    try:
+        find_quitter_folder = folders[-2]
+        before_csv_files = glob.glob(os.path.join(f'data/{find_quitter_folder}', f"Kim_and_Chang_{find_quitter_folder.replace("-","")[2:]}.csv"))
+        if before_csv_files:
+            df_old = pd.read_csv(before_csv_files[0])
+            if not df_old.empty:
+                df_old['temp_id'] = df_old['url'].astype(str)
+                final_df['temp_id'] = final_df['url'].astype(str)
+                # 퇴사자 정보 추출
+                retired_info = df_old[~df_old['temp_id'].isin(final_df['temp_id'])].copy()
+                final_df.drop(columns=['temp_id'], inplace=True)
+
+                if not retired_info.empty:
+                    retired_info['new'] = "Out"
+                    retired_info.drop(columns=['temp_id'], inplace=True)
+                    save_df = pd.concat([final_df, retired_info], ignore_index=True)
+                else:
+                    save_df = final_df
+            else:
+                save_df = final_df
+        else:
+            save_df = final_df
+    except IndexError:
+        save_df = final_df
+    
+    print(f"중복 제거 전: {final_df} → 중복 제거 후: {len(save_df)}")
+    latest_date = latest_folder.replace('-',"")[2:]
+    save_df.to_csv(f"data/{latest_folder}/Kim_and_Chang_{latest_date}.csv", index=False, encoding='utf-8-sig')
+    print("김앤장 인사정보 파일 저장 완료!")
 except FileNotFoundError:
     print("파일을 찾을 수 없습니다.")
