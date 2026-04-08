@@ -28,7 +28,7 @@ try:
     old_csv_files = glob.glob(os.path.join(f'data/{latest_folder}', "BKL*.csv"))
     if old_csv_files:
         df_old = pd.read_csv(old_csv_files[0])
-        old_exist_data = set(zip(df_old['name'].fillna(''), df_old['email'].fillna('')))
+        old_exist_data = set(zip(df_old['url'].astype(str)))
     else:
         df_old = pd.DataFrame()
         old_exist_data = set()
@@ -204,8 +204,9 @@ def bkl_crawling(id, button_id):
                                 performance_total.append(perform_content_text)
                         performance = '//'.join(performance_total)
 
+                save_url = driver.current_url
                 if old_exist_data:
-                    if (name, email) in old_exist_data:
+                    if save_url in old_exist_data:
                         new = "-"
                     else:
                         new = "Y"
@@ -228,7 +229,7 @@ def bkl_crawling(id, button_id):
                             'performance':performance,
                             'language':"", # 태평양은 사용언어 정보가 없음
                             'activity':activity,
-                            'url':driver.current_url,
+                            'url':save_url,
                             'new':new
                         }
                 pf_data.append(add_pf)

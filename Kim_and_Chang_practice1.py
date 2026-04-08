@@ -38,7 +38,7 @@ try:
     old_csv_files = glob.glob(os.path.join(f'data/{latest_folder}', f"Kim_and_Chang_{latest_folder.replace("-","")[2:]}.csv"))
     if old_csv_files:
         df_old = pd.read_csv(old_csv_files[0])
-        old_exist_data = set(zip(df_old['name'].fillna(''), df_old['email'].fillna('')))
+        old_exist_data = set(zip(df_old['url'].astype(str)))
     else:
         df_old = pd.DataFrame()
         old_exist_data = set()
@@ -294,8 +294,9 @@ for num in tqdm.tqdm(range(1, 5)):
                             else:
                                 performance = imsi_cont
 
+                    save_url = driver.current_url
                     if old_exist_data:
-                        if (name, email) in old_exist_data:
+                        if save_url in old_exist_data:
                             new = "-"
                         else:
                             new = "Y"
@@ -318,7 +319,7 @@ for num in tqdm.tqdm(range(1, 5)):
                         'performance':performance,
                         'language':language,
                         'activity':activity,
-                        'url':driver.current_url,
+                        'url':save_url,
                         'new':new
                     }               
                     pf_data.append(add_pf)

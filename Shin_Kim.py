@@ -35,7 +35,7 @@ try:
     old_csv_files = glob.glob(os.path.join(f'data/{latest_folder}', "Shin_Kim*.csv"))
     if old_csv_files:
         df_old = pd.read_csv(old_csv_files[0])
-        old_exist_data = set(zip(df_old['name'].fillna(''), df_old['email'].fillna('')))
+        old_exist_data = set(zip(df_old['url'].astype(str)))
     else:
         df_old = pd.DataFrame()
         old_exist_data = set()
@@ -222,8 +222,9 @@ for category in tqdm.tqdm(range(2, len(categories)+1)):
                     elif detail_title == "언어":
                         language = detail.find_element(By.CSS_SELECTOR, ' p.para').text
                 
+                save_url = driver.current_url
                 if old_exist_data:
-                    if (name, email) in old_exist_data:
+                    if save_url in old_exist_data:
                         new = "-"
                     else:
                         new = "Y"
@@ -246,7 +247,7 @@ for category in tqdm.tqdm(range(2, len(categories)+1)):
                             'performance':performance,
                             'language':language,
                             'activity':activity,
-                            'url':driver.current_url,
+                            'url':save_url,
                             'new':new
                         }
                 pf_data.append(add_pf)
