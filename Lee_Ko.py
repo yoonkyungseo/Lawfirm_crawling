@@ -32,12 +32,15 @@ try:
     latest_folder = folders[-1] # 가장 최근 폴더 선택
     old_csv_files = glob.glob(os.path.join(f'data/{latest_folder}', "Lee_Ko*.csv"))
     if old_csv_files:
+        print("참고할 이전 파일을 찾았습니다.")
         df_old = pd.read_csv(old_csv_files[0])
         old_exist_data = set(zip(df_old['url'].astype(str)))
     else:
+        print("참고할 이전 파일이 존재하지 않습니다.")
         df_old = pd.DataFrame()
         old_exist_data = set()
 except FileNotFoundError:
+    print("파일 탐색 과정에서 오류가 발생했습니다. 참고할 이전 파일 없이 크롤링을 진행합니다.")
     df_old = pd.DataFrame()
     old_exist_data = set()
 
