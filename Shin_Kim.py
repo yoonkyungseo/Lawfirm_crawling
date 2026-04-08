@@ -273,8 +273,8 @@ for category in tqdm.tqdm(range(2, len(categories)+1)):
 
 # 퇴사자 확인
 if not df_old.empty:
-    df_old['temp_id'] = df_old['name'].astype(str) + df_old['email'].astype(str)
-    df['temp_id'] = df['name'].astype(str) + df['email'].astype(str)
+    df_old['temp_id'] = df_old['url'].astype(str)
+    df['temp_id'] = df['url'].astype(str)
     # 퇴사자 정보 추출
     retired_info = df_old[~df_old['temp_id'].isin(df['temp_id'])].copy()
     df.drop(columns=['temp_id'], inplace=True)
