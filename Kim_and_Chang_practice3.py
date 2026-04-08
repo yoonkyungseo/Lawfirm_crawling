@@ -12,6 +12,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common. by import By
 from selenium.common.exceptions import StaleElementReferenceException
+from selenium.common.exceptions import TimeoutException
 from datetime import datetime
 import glob
 
@@ -35,7 +36,7 @@ try:
     folders = [f for f in os.listdir(base_path) if os.path.isdir(os.path.join(base_path, f))]
     folders.sort()
     latest_folder = folders[-1] # 가장 최근 폴더 선택
-    old_csv_files = glob.glob(os.path.join(f'data/{latest_folder}', f"Kim_and_Chang_{latest_folder.replace("-","")[2:]}.csv"))
+    old_csv_files = glob.glob(os.path.join(f'data/{latest_folder}', f'Kim_and_Chang_{latest_folder.replace("-","")[2:]}.csv'))
     if old_csv_files:
         print("참고할 이전 파일을 찾았습니다.")
         df_old = pd.read_csv(old_csv_files[0])
@@ -360,8 +361,8 @@ for num in tqdm.tqdm(range(9, 13)):
             else:
                 print("페이지 로딩 중 오류가 발생했습니다.")
                 break
-        except StaleElementReferenceException:
-            print("StaleElementReferenceException 오류 발생")
+        except (StaleElementReferenceException, TimeoutException):
+            print("StaleElementReferenceException / TimeoutException 오류 발생")
             print("-" * 30)
             traceback.print_exc()
             print("-" * 30)
