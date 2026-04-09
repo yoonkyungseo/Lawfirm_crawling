@@ -32,6 +32,9 @@ try:
         if before_csv_files:
             df_old = pd.read_csv(before_csv_files[0])
             if not df_old.empty:
+                print(f"저번 달 총 인원 수 : {len(df_old)}, 저번 달 퇴사자: {len(df_old.loc[df_old['new']=="Out"])}")
+                df_old = df_old.loc[df_old['new'] != "Out"]
+                print(len(df_old), "명과 비교하여 퇴사자가 있는지 확인하겠습니다.")
                 df_old['temp_id'] = df_old['url'].astype(str)
                 final_df['temp_id'] = final_df['url'].astype(str)
                 # 퇴사자 정보 추출
