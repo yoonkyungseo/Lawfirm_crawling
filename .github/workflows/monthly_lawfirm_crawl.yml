@@ -4,7 +4,7 @@ on:
   schedule:
     # 매월 1일 00:00 (UTC 기준, 한국 시간 오전 9시)에 실행
     # 분 시 일 월 요일
-    - cron: '6 0 8 * *'
+    - cron: '0 0 1 * *'
   workflow_dispatch: # 수동으로 실행하고 싶을 때 사용
   # 저장소 상단 Actions 탭 > 좌측 목록 중 해당 Workflow 클릭 > 우측에 나타나는 Rum workflow 회색 버튼 클릭
 
@@ -22,12 +22,10 @@ jobs:
       matrix:
         # 병렬 실행 파일
         python-file: [
-          # "Kim_and_Chang_industry1.py","Kim_and_Chang_industry2.py",
-          # "Kim_and_Chang_practice1.py","Kim_and_Chang_practice2.py","Kim_and_Chang_practice3.py","Kim_and_Chang_practice4.py","Kim_and_Chang_practice5.py","Kim_and_Chang_practice6.py",
-          # "Kim_and_Chang_region.py",
-          # "BKL.py", "Lee_Ko.py", 
-          "Shin_Kim.py", 
-          # "Hwawoo.py"
+          "Kim_and_Chang_industry1.py","Kim_and_Chang_industry2.py",
+          "Kim_and_Chang_practice1.py","Kim_and_Chang_practice2.py","Kim_and_Chang_practice3.py","Kim_and_Chang_practice4.py","Kim_and_Chang_practice5.py","Kim_and_Chang_practice6.py",
+          "Kim_and_Chang_region.py",
+          "BKL.py", "Lee_Ko.py", "Shin_Kim.py", "Hwawoo.py"
           ]
     
     steps:
