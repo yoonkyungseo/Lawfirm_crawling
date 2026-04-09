@@ -40,7 +40,10 @@ try:
     if old_csv_files:
         print("참고할 이전 파일을 찾았습니다.")
         df_old = pd.read_csv(old_csv_files[0])
-        old_exist_data = set(zip(df_old['url'].astype(str)))
+        print(f"저번 달 총 인원 수 : {len(df_old)}, 저번 달 퇴사자: {len(df_old.loc[df_old['new']=="Out"])}")
+        df_old = df_old.loc[df_old['new'] != "Out"]
+        print(len(df_old), "명과 비교하여 퇴사자가 있는지 확인하겠습니다.")
+        old_exist_data = set(df_old['url'].astype(str))
     else:
         print("참고할 이전 파일이 존재하지 않습니다.")
         df_old = pd.DataFrame()
