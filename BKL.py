@@ -6,6 +6,7 @@ warnings.filterwarnings('ignore')
 
 import pandas as pd
 import tqdm
+import traceback
 from selenium import webdriver
 from selenium.webdriver.common. by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -289,10 +290,38 @@ def bkl_crawling(id, button_id):
     print("크롤링이 종료되어 브라우저를 닫습니다.")
     driver.quit()
 
-bkl_crawling("isMainN", 3)
-time.sleep(2)
-print('-'*30)
-bkl_crawling("isMainY", 2)
+again_cnt = 0
+while again_cnt <= 5:
+    try:
+        bkl_crawling("isMainN", 3)
+        time.sleep(2)
+        break
+    except Exception as e:
+        again_cnt += 1
+        if again_cnt > 5:
+            print(f"예상치 못한 오류 발생: {type(e).__name__}")
+            print("-" * 30)
+            traceback.print_exc() # <--- 이 한 줄이 "어디서" 났는지 다 보여줍니다.
+            print("-" * 30)
+        else:
+            print(f"오류 발생({again_cnt}회차): {e}. 다시 시도합니다...")
+            time.sleep(5) # 잠시 대기 후 재시도
+again_cnt = 0
+while again_cnt <= 5:
+    try:
+        bkl_crawling("isMainY", 2)
+        time.sleep(2)
+        break
+    except Exception as e:
+        again_cnt += 1
+        if again_cnt > 5:
+            print(f"예상치 못한 오류 발생: {type(e).__name__}")
+            print("-" * 30)
+            traceback.print_exc() # <--- 이 한 줄이 "어디서" 났는지 다 보여줍니다.
+            print("-" * 30)
+        else:
+            print(f"오류 발생({again_cnt}회차): {e}. 다시 시도합니다...")
+            time.sleep(5) # 잠시 대기 후 재시도
 
 # 퇴사자 확인
 if not df_old.empty:
