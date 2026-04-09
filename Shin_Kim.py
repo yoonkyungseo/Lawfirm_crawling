@@ -6,6 +6,7 @@ warnings.filterwarnings('ignore')
 
 import pandas as pd
 import tqdm
+import traceback
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -114,151 +115,163 @@ for category in tqdm.tqdm(range(2, len(categories)+1)):
                 driver.execute_script("arguments[0].click();", pf_name)
                 time.sleep(3)
 
-
-                overviews = driver.find_elements(By.CSS_SELECTOR, 'div#overview div.subsection')
-                for overview in overviews:
-                    title = overview.find_element(By.CSS_SELECTOR, 'h5.subsection-name').get_attribute("textContent").strip()
-                    # 상세 소개글
-                    if title == "개요":
-                        introduction = overview.find_element(By.CSS_SELECTOR, ' p.para').text.replace('\n', ' ')
-                    elif title == "관련 업무분야":
-                        # 관련 분야
-                        fields_lst = overview.find_elements(By.CSS_SELECTOR, ' ul.related-work li')
-                        fields_total = []
-                        for field in fields_lst:
-                            driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", field)
-                            fields_total.append(field.get_attribute("textContent").replace('\n', ' ').strip())
-                        related_fields = ','.join(fields_total)
-                        time.sleep(2)
-
-                # 경력
-                wait = WebDriverWait(driver, 10)
-                career_box = wait.until(EC.presence_of_element_located((By.ID, "professionalCareer")))
-                driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", career_box)
-                title = career_box.find_element(By.CSS_SELECTOR, 'h5.subsection-name').text
-                # 경력 더보기 버튼 존재 시 클릭
-                while True:
+                try_cnt = 0
+                while try_cnt < 6:
                     try:
-                        career_button = career_box.find_element(By.CSS_SELECTOR, 'button span.open')
-                        driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", career_button)
-                        time.sleep(0.5)
-                        driver.execute_script("arguments[0].click();", career_button)
-                        time.sleep(1)
-                    except:
-                        break
-                career_lst = career_box.find_elements(By.CSS_SELECTOR, 'div.data-list-area li.data-item')
-                career_total = []
-                for careers in career_lst:
-                    driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", careers)
-                    try:
-                        period = careers.find_element(By.CSS_SELECTOR, 'span.data-head').text
-                    except:
-                        period = ""
-                    content = careers.find_element(By.CSS_SELECTOR, 'span.data-body').text
-                    if not period:
-                        career_total.append(content)
-                    else:
-                        career_total.append(f'{content} ({period})')
-                career = ','.join(career_total)
-                time.sleep(1)
+                        overviews = driver.find_elements(By.CSS_SELECTOR, 'div#overview div.subsection')
+                        for overview in overviews:
+                            title = overview.find_element(By.CSS_SELECTOR, 'h5.subsection-name').get_attribute("textContent").strip()
+                            # 상세 소개글
+                            if title == "개요":
+                                introduction = overview.find_element(By.CSS_SELECTOR, ' p.para').text.replace('\n', ' ')
+                            elif title == "관련 업무분야":
+                                # 관련 분야
+                                fields_lst = overview.find_elements(By.CSS_SELECTOR, ' ul.related-work li')
+                                fields_total = []
+                                for field in fields_lst:
+                                    driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", field)
+                                    fields_total.append(field.get_attribute("textContent").replace('\n', ' ').strip())
+                                related_fields = ','.join(fields_total)
+                                time.sleep(2)
 
-                # 학력, 자격, 수상
-                detail_table = driver.find_elements(By.CSS_SELECTOR, 'div#keyExperience div.subsection')
-                eligibility, awards, assessment, activity, performance = "", "", "", "", ""
-                for detail in detail_table:
-                    driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", detail)
-                    time.sleep(0.5)
-                    detail_title = detail.find_element(By.CSS_SELECTOR, 'h5.subsection-name').text
-                    # 외부 평가
-                    assessment_flag = False
-                    if detail_title == "외부 평가" or detail_title == "외부 활동":
-                        assessment_flag = True
-
-                    if detail_title in ["학력", "자격", "수상 내역", "외부 평가", "외부 활동"]:
+                        # 경력
+                        wait = WebDriverWait(driver, 10)
+                        career_box = wait.until(EC.presence_of_element_located((By.ID, "professionalCareer")))
+                        driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", career_box)
+                        title = career_box.find_element(By.CSS_SELECTOR, 'h5.subsection-name').text
+                        # 경력 더보기 버튼 존재 시 클릭
                         while True:
                             try:
-                                button = detail.find_element(By.CSS_SELECTOR, 'button span.open')
-                                driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", button)
-                                driver.execute_script("arguments[0].click();", button)
-                                time.sleep(2)
+                                career_button = career_box.find_element(By.CSS_SELECTOR, 'button span.open')
+                                driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", career_button)
+                                time.sleep(0.5)
+                                driver.execute_script("arguments[0].click();", career_button)
+                                time.sleep(1)
                             except:
                                 break
-                        detail_contents = detail.find_elements(By.CSS_SELECTOR, 'div.data-list-area li.data-item')
-                        box_total = []
-                        for detail_content in detail_contents:
-                            driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", detail_content)
+                        career_lst = career_box.find_elements(By.CSS_SELECTOR, 'div.data-list-area li.data-item')
+                        career_total = []
+                        for careers in career_lst:
+                            driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", careers)
                             try:
-                                period = detail_content.find_element(By.CSS_SELECTOR, 'span.data-head').text
+                                period = careers.find_element(By.CSS_SELECTOR, 'span.data-head').text
                             except:
                                 period = ""
-                            content = detail_content.find_element(By.CSS_SELECTOR, 'span.data-body').text
-                            if assessment_flag or not period:
-                                box_total.append(content)
+                            content = careers.find_element(By.CSS_SELECTOR, 'span.data-body').text
+                            if not period:
+                                career_total.append(content)
                             else:
-                                box_total.append(f'{content} ({period})')
+                                career_total.append(f'{content} ({period})')
+                        career = ','.join(career_total)
+                        time.sleep(1)
 
-                        if detail_title == "학력":
-                            education = ','.join(box_total)
-                        elif detail_title == "자격":
-                            eligibility = ','.join(box_total)
-                        elif detail_title == "수상 내역":
-                            awards = ','.join(box_total)
-                        elif detail_title == "외부 평가":
-                            assessment = ','.join(box_total)
-                        else:
-                            activity = ','.join(box_total)
-                    elif detail_title == "주요 업무 실적":
-                        cont_element = detail.find_element(By.CSS_SELECTOR, 'div.data-list-area > div.inner')
-                        children = cont_element.find_elements(By.XPATH, "./*")
-                        detail_results = ""
-                        for child in children:
-                            if child.tag_name == "h6":
-                                if detail_results:
-                                    detail_results += f'//{child.get_attribute("textContent")}]]'
-                                else:
-                                    detail_results += f"{child.get_attribute("textContent")}]]"
-                            elif child.tag_name == "ul":
-                                for ch in child.find_elements(By.CSS_SELECTOR, 'li'):
-                                    ch_text = ch.get_attribute("textContent")
-                                    if detail_results:
-                                        detail_results += f',{ch_text}'
+                        # 학력, 자격, 수상
+                        detail_table = driver.find_elements(By.CSS_SELECTOR, 'div#keyExperience div.subsection')
+                        eligibility, awards, assessment, activity, performance = "", "", "", "", ""
+                        for detail in detail_table:
+                            driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", detail)
+                            time.sleep(0.5)
+                            detail_title = detail.find_element(By.CSS_SELECTOR, 'h5.subsection-name').text
+                            # 외부 평가
+                            assessment_flag = False
+                            if detail_title == "외부 평가" or detail_title == "외부 활동":
+                                assessment_flag = True
+
+                            if detail_title in ["학력", "자격", "수상 내역", "외부 평가", "외부 활동"]:
+                                while True:
+                                    try:
+                                        button = detail.find_element(By.CSS_SELECTOR, 'button span.open')
+                                        driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", button)
+                                        driver.execute_script("arguments[0].click();", button)
+                                        time.sleep(2)
+                                    except:
+                                        break
+                                detail_contents = detail.find_elements(By.CSS_SELECTOR, 'div.data-list-area li.data-item')
+                                box_total = []
+                                for detail_content in detail_contents:
+                                    driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", detail_content)
+                                    try:
+                                        period = detail_content.find_element(By.CSS_SELECTOR, 'span.data-head').text
+                                    except:
+                                        period = ""
+                                    content = detail_content.find_element(By.CSS_SELECTOR, 'span.data-body').text
+                                    if assessment_flag or not period:
+                                        box_total.append(content)
                                     else:
-                                        detail_results += ch_text
-                        performance = detail_results
-                    elif detail_title == "언어":
-                        language = detail.find_element(By.CSS_SELECTOR, ' p.para').text
-                
-                save_url = driver.current_url
-                if old_exist_data:
-                    if save_url in old_exist_data:
-                        new = "-"
-                    else:
-                        new = "Y"
-                else:
-                    new = '-'
+                                        box_total.append(f'{content} ({period})')
 
-                add_pf = {
-                            'company':company,
-                            'name':name,
-                            'job':job,
-                            'call':call,
-                            'email':email,
-                            'introduction':introduction,
-                            'related_fields':related_fields,
-                            'career':career,
-                            'education':education,
-                            'eligibility':eligibility,
-                            'awards':awards,
-                            'assessment':assessment,
-                            'performance':performance,
-                            'language':language,
-                            'activity':activity,
-                            'url':save_url,
-                            'new':new
-                        }
-                pf_data.append(add_pf)
-                driver.back()
-                time.sleep(3)
+                                if detail_title == "학력":
+                                    education = ','.join(box_total)
+                                elif detail_title == "자격":
+                                    eligibility = ','.join(box_total)
+                                elif detail_title == "수상 내역":
+                                    awards = ','.join(box_total)
+                                elif detail_title == "외부 평가":
+                                    assessment = ','.join(box_total)
+                                else:
+                                    activity = ','.join(box_total)
+                            elif detail_title == "주요 업무 실적":
+                                cont_element = detail.find_element(By.CSS_SELECTOR, 'div.data-list-area > div.inner')
+                                children = cont_element.find_elements(By.XPATH, "./*")
+                                detail_results = ""
+                                for child in children:
+                                    if child.tag_name == "h6":
+                                        if detail_results:
+                                            detail_results += f'//{child.get_attribute("textContent")}]]'
+                                        else:
+                                            detail_results += f"{child.get_attribute("textContent")}]]"
+                                    elif child.tag_name == "ul":
+                                        for ch in child.find_elements(By.CSS_SELECTOR, 'li'):
+                                            ch_text = ch.get_attribute("textContent")
+                                            if detail_results:
+                                                detail_results += f',{ch_text}'
+                                            else:
+                                                detail_results += ch_text
+                                performance = detail_results
+                            elif detail_title == "언어":
+                                language = detail.find_element(By.CSS_SELECTOR, ' p.para').text
+                        
+                        save_url = driver.current_url
+                        if old_exist_data:
+                            if save_url in old_exist_data:
+                                new = "-"
+                            else:
+                                new = "Y"
+                        else:
+                            new = '-'
+
+                        add_pf = {
+                                    'company':company,
+                                    'name':name,
+                                    'job':job,
+                                    'call':call,
+                                    'email':email,
+                                    'introduction':introduction,
+                                    'related_fields':related_fields,
+                                    'career':career,
+                                    'education':education,
+                                    'eligibility':eligibility,
+                                    'awards':awards,
+                                    'assessment':assessment,
+                                    'performance':performance,
+                                    'language':language,
+                                    'activity':activity,
+                                    'url':save_url,
+                                    'new':new
+                                }
+                        pf_data.append(add_pf)
+                        driver.back()
+                        time.sleep(3)
+                        break
+                    except Exception as e:
+                        print(f"오류 발생: {type(e).__name__}")
+                        print("-" * 30)
+                        traceback.print_exc() # <--- 이 한 줄이 "어디서" 났는지 다 보여줍니다.
+                        print("-" * 30)
+                        print("새로고침 후 재시도 합니다.")
+                        driver.refresh()
+                        time.sleep(4)
+                        try_cnt += 1
         
         # 페이지가 넘어갈 수 있으면 다음 페이지로 이동, 더이상 넘어갈 페이지가 없으면 while문 break
         try:
