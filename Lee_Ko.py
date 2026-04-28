@@ -111,7 +111,7 @@ for category in tqdm.tqdm(range(2, len(categories)+1)):
             print(name, job, call)
 
             if check_duplicates(name, job, call):
-                pf.click()
+                driver.execute_script("arguments[0].click();", pf)
                 time.sleep(3)
                 # 이메일
                 email = driver.find_element(By.XPATH, '//*[@id="printDiv"]/div/div/div[1]/div[1]/div[2]/p[1]/a').text
