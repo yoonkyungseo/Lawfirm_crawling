@@ -29,7 +29,7 @@ base_path = 'data'
 try:
     folders = [f for f in os.listdir(base_path) if os.path.isdir(os.path.join(base_path, f))]
     folders.sort()
-    latest_folder = folders[-1] # 가장 최근 폴더 선택
+    latest_folder = folders[-2] # 가장 최근 폴더 선택
     old_csv_files = glob.glob(os.path.join(f'data/{latest_folder}', "Lee_Ko*.csv"))
     if old_csv_files:
         print("참고할 이전 파일을 찾았습니다.")
