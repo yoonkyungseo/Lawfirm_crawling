@@ -10,6 +10,7 @@ from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common. by import By
+from selenium.common import TimeoutException
 from datetime import datetime
 import glob
 
@@ -163,31 +164,34 @@ for category in tqdm.tqdm(range(2, len(categories)+1)):
                         language = wait_presence_element(detail, (By.CSS_SELECTOR, ' td')).text
 
                 # 주요업무실적, 외부활동
-                detail_table = wait_presence_elements(driver, (By.CSS_SELECTOR, '.leeko-member-detail__list'))
                 performace, activity = "", ""
-                for detail in detail_table:
-                    detail_title = wait_presence_element(detail, (By.XPATH, './/div[1]')).text
+                try:
+                    detail_table = wait_presence_elements(driver, (By.CSS_SELECTOR, '.leeko-member-detail__list'))
+                    for detail in detail_table:
+                        detail_title = wait_presence_element(detail, (By.XPATH, './/div[1]')).text
 
-                    if detail_title in ["주요처리사례", "저서/활동/기타"]:
-                        dl_element = wait_presence_element(detail, (By.CSS_SELECTOR, 'dl.leeko-more-contents'))
-                        children = wait_presence_elements(dl_element, (By.XPATH, "./*"))
-                        detail_results = ""
-                        for child in children:
-                            child_text = child.get_attribute("textContent")
-                            if child.tag_name == "dt":
-                                if detail_results:
-                                    detail_results += f'//{child_text.replace("[","").replace("]","")}]]'
-                                else:
-                                    detail_results += f'{child_text.replace("[","").replace("]","")}]]'
-                            elif child.tag_name == "dd":
-                                if detail_results:
-                                    detail_results += f",{child_text}"
-                                else:
-                                    detail_results += child_text
-                        if detail_title == "주요처리사례":
-                            performance = detail_results
-                        else:
-                            activity = detail_results
+                        if detail_title in ["주요처리사례", "저서/활동/기타"]:
+                            dl_element = wait_presence_element(detail, (By.CSS_SELECTOR, 'dl.leeko-more-contents'))
+                            children = wait_presence_elements(dl_element, (By.XPATH, "./*"))
+                            detail_results = ""
+                            for child in children:
+                                child_text = child.get_attribute("textContent")
+                                if child.tag_name == "dt":
+                                    if detail_results:
+                                        detail_results += f'//{child_text.replace("[","").replace("]","")}]]'
+                                    else:
+                                        detail_results += f'{child_text.replace("[","").replace("]","")}]]'
+                                elif child.tag_name == "dd":
+                                    if detail_results:
+                                        detail_results += f",{child_text}"
+                                    else:
+                                        detail_results += child_text
+                            if detail_title == "주요처리사례":
+                                performance = detail_results
+                            else:
+                                activity = detail_results
+                except TimeoutException:
+                    pass
 
                 save_url = driver.current_url
                 if old_exist_data:
