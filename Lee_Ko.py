@@ -104,7 +104,7 @@ for category in tqdm.tqdm(range(2, len(categories)+1)):
     # 모든 더보기 버튼 클릭해서 화면에 pf 정보가 다 뜨도록 설정
     while True:
         try:
-            button = wait_presence_element(driver, (By.XPATH, '/html/body/div[1]/div/div/div[6]/a/strong'))
+            button = wait_clickable_element(driver, (By.XPATH, '/html/body/div[1]/div/div/div[6]/a/strong'))
             driver.execute_script("arguments[0].scrollIntoView({block: 'nearest'});", button)
             time.sleep(1)
             driver.execute_script("arguments[0].click();", button)
