@@ -113,10 +113,13 @@ for category in tqdm.tqdm(range(2, len(categories)+1)):
 
     category_member_lst = wait_presence_element(driver, (By.XPATH, '/html/body/div[1]/div/div/div[5]/div')) # 구성원 리스트
     pf_lines = wait_presence_elements(category_member_lst, (By.CSS_SELECTOR, "div.leeko-member__list")) # 구성원 리스트에서 한 줄씩 뽑기
+    pf_lines_num = len(pf_lines)
 
-    for pf_line in pf_lines:
-        pf_lst = wait_presence_elements(pf_line, (By.XPATH, './/a'))
-        for pf in pf_lst:
+    for pf_lines_i in range(1, pf_lines_num+1):
+        pf_lst = wait_presence_elements(driver, (By.XPATH, f'//div[@class="leeko-member__list"][{pf_lines_i}]//a')) # 한 줄에서 pf 하나씩 뽑기
+        pf_lst_num = len(pf_lst)
+        for pf_lst_i in range(1, pf_lst_num+1):
+            pf = wait_presence_element(driver, (By.XPATH, f'//div[@class="leeko-member__list"][{pf_lines_i}]//a[{pf_lst_i}]'))
             driver.execute_script("arguments[0].scrollIntoView({block: 'nearest'});", pf) # 크롤링 pf로 화면 스크롤
             name = wait_presence_element(pf, (By.XPATH, './/div[2]/strong/span')).text
             job = wait_presence_element(pf, (By.XPATH, './/div[2]/p')).text
