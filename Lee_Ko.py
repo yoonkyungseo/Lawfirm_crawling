@@ -7,6 +7,8 @@ warnings.filterwarnings('ignore')
 import pandas as pd
 import tqdm
 from selenium import webdriver
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common. by import By
 from datetime import datetime
 import glob
@@ -67,6 +69,15 @@ def check_duplicates(name, job, call):
 service = Service(ChromeDriverManager().install())
 driver = webdriver.Chrome(service=service, options=options)
 
+def wait_presence_element(driver, locator, timeout=15):
+    return WebDriverWait(driver, timeout).until(EC.presence_of_element_located(locator))
+def wait_presence_elements(driver, locator, timeout=15):
+    return WebDriverWait(driver, timeout).until(EC.presence_of_all_elements_located(locator))
+def wait_visibility_element(driver, locator, timeout=15):
+    return WebDriverWait(driver, timeout).until(EC.visibility_of_element_located(locator))
+def wait_clickable_element(driver, locator, timeout=15):
+    return WebDriverWait(driver, timeout).until(EC.element_to_be_clickable(locator))
+
 # 광장 크롤링 코드
 
 driver.get("https://www.leeko.com/leenko/member/memberList.do?lang=KR")
@@ -75,68 +86,69 @@ time.sleep(1)
 
 company = "광장"
 
-categories = driver.find_elements(By.XPATH, '//*[@id="mCSB_2_container"]/li')
+categories = wait_presence_elements(driver, (By.XPATH, '//*[@id="mCSB_2_container"]/li'))
 for category in tqdm.tqdm(range(2, len(categories)+1)):
     pf_data = []
     # 카테고리 선택
-    category_box = driver.find_element(By.XPATH, "//div[@class='leeko-member-search__select']//div[@class='nice-select chosen-select']")
+    category_box = wait_presence_element(driver, (By.XPATH, "//div[@class='leeko-member-search__select']//div[@class='nice-select chosen-select']"))
     driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", category_box) # 카테고리 박스로 스크롤
-    category_box.click() # 카테고리 박스 클릭
-    cate = driver.find_element(By.XPATH, f'//*[@id="mCSB_2_container"]/li[{category}]')
+    driver.execute_script("arguments[0].click();", category_box) # 카테고리 박스 클릭
+    cate = wait_clickable_element(driver, (By.XPATH, f'//*[@id="mCSB_2_container"]/li[{category}]'))
     print("-----", cate.text, "-----")
-    cate.click() # 카테고리 선택
-    driver.find_element(By.XPATH, "//div[@class='leeko-member-search__form']/button").click() # 검색 버튼 클릭
+    driver.execute_script("arguments[0].click();", cate) # 카테고리 선택
+    search_btn = wait_clickable_element(driver, (By.XPATH, "//div[@class='leeko-member-search__form']/button"))
+    driver.execute_script("arguments[0].click();", search_btn) # 검색 버튼 클릭
     time.sleep(3)
 
     # 모든 더보기 버튼 클릭해서 화면에 pf 정보가 다 뜨도록 설정
     while True:
         try:
-            button = driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[6]/a/strong')
+            button = wait_presence_element(driver, (By.XPATH, '/html/body/div[1]/div/div/div[6]/a/strong'))
             driver.execute_script("arguments[0].scrollIntoView({block: 'nearest'});", button)
             time.sleep(1)
-            button.click()
+            driver.execute_script("arguments[0].click();", button)
         except:
             break
 
-    category_member_lst = driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[5]/div') # 구성원 리스트
-    pf_lines = category_member_lst.find_elements(By.CSS_SELECTOR, "div.leeko-member__list") # 구성원 리스트에서 한 줄씩 뽑기
+    category_member_lst = wait_presence_element(driver, (By.XPATH, '/html/body/div[1]/div/div/div[5]/div')) # 구성원 리스트
+    pf_lines = wait_presence_elements(category_member_lst, (By.CSS_SELECTOR, "div.leeko-member__list")) # 구성원 리스트에서 한 줄씩 뽑기
 
     for pf_line in pf_lines:
-        pf_lst = pf_line.find_elements(By.XPATH, './/a')
+        pf_lst = wait_presence_elements(pf_line, (By.XPATH, './/a'))
         for pf in pf_lst:
             driver.execute_script("arguments[0].scrollIntoView({block: 'nearest'});", pf) # 크롤링 pf로 화면 스크롤
-            name = pf.find_element(By.XPATH, './/div[2]/strong/span').text
-            job = pf.find_element(By.XPATH, './/div[2]/p').text
-            call = pf.find_element(By.XPATH, './/div[3]/p[1]').text.split('\n')[1]
+            name = wait_presence_element(pf, (By.XPATH, './/div[2]/strong/span')).text
+            job = wait_presence_element(pf, (By.XPATH, './/div[2]/p')).text
+            call = wait_presence_element(pf, (By.XPATH, './/div[3]/p[1]')).text.split('\n')[1]
             print(name, job, call)
 
             if check_duplicates(name, job, call):
                 driver.execute_script("arguments[0].click();", pf)
                 time.sleep(3)
                 # 이메일
-                email = driver.find_element(By.XPATH, '//*[@id="printDiv"]/div/div/div[1]/div[1]/div[2]/p[1]/a').text
+                email = wait_presence_element(driver, (By.XPATH, '//*[@id="printDiv"]/div/div/div[1]/div[1]/div[2]/p[1]/a')).text
                 # 상세 소개글
-                introduction = driver.find_element(By.CSS_SELECTOR, '.leeko-member-detail__text').text.replace('\n', ' ').strip()
+                introduction = wait_presence_element(driver, (By.CSS_SELECTOR, '.leeko-member-detail__text')).text.replace('\n', ' ').strip()
 
                 # 관련 분야
-                fields_lst = driver.find_elements(By.CSS_SELECTOR, '.leeko-tag.leeko-tag--dark a')
+                fields_lst = wait_presence_elements(driver, (By.CSS_SELECTOR, '.leeko-tag.leeko-tag--dark a'))
                 fields_total = []
                 for field in fields_lst:
                     fields_total.append(field.text)
                 related_fields = ','.join(fields_total)
 
                 # 경력, 학력, 자격, 수상, 언어
-                detail_table = driver.find_elements(By.CSS_SELECTOR, '.leeko-member-detail__table')
+                detail_table = wait_presence_elements(driver, (By.CSS_SELECTOR, '.leeko-member-detail__table'))
                 eligibility, awards = "", ""
                 for detail in detail_table:
-                    detail_title = detail.find_element(By.XPATH, './/div[1]').text
+                    detail_title = wait_presence_element(detail, (By.XPATH, './/div[1]')).text
 
                     if detail_title in ["경력", "학력", "자격/회원", "수상실적"]:
-                        detail_contents = detail.find_elements(By.XPATH, './/div[2]//tr')
+                        detail_contents = wait_presence_elements(detail, (By.XPATH, './/div[2]//tr'))
                         box_total = []
                         for detail_content in detail_contents:
-                            period = detail_content.find_element(By.XPATH, './/th').get_attribute("textContent")
-                            content = detail_content.find_element(By.XPATH, './/td').get_attribute("textContent")
+                            period = wait_presence_element(detail_content, (By.XPATH, './/th')).get_attribute("textContent")
+                            content = wait_presence_element(detail_content, (By.XPATH, './/td')).get_attribute("textContent")
                             box_total.append(f'{content} ({period})')
 
                         if detail_title == "경력":
@@ -148,17 +160,17 @@ for category in tqdm.tqdm(range(2, len(categories)+1)):
                         else:
                             awards = ','.join(box_total)
                     elif detail_title == "언어":
-                        language = detail.find_element(By.CSS_SELECTOR, ' td').text
+                        language = wait_presence_element(detail, (By.CSS_SELECTOR, ' td')).text
 
                 # 주요업무실적, 외부활동
-                detail_table = driver.find_elements(By.CSS_SELECTOR, '.leeko-member-detail__list')
+                detail_table = wait_presence_elements(driver, (By.CSS_SELECTOR, '.leeko-member-detail__list'))
                 performace, activity = "", ""
                 for detail in detail_table:
-                    detail_title = detail.find_element(By.XPATH, './/div[1]').text
+                    detail_title = wait_presence_element(detail, (By.XPATH, './/div[1]')).text
 
                     if detail_title in ["주요처리사례", "저서/활동/기타"]:
-                        dl_element = detail.find_element(By.CSS_SELECTOR, 'dl.leeko-more-contents')
-                        children = dl_element.find_elements(By.XPATH, "./*")
+                        dl_element = wait_presence_element(detail, (By.CSS_SELECTOR, 'dl.leeko-more-contents'))
+                        children = wait_presence_elements(dl_element, (By.XPATH, "./*"))
                         detail_results = ""
                         for child in children:
                             child_text = child.get_attribute("textContent")
