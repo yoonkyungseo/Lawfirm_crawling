@@ -111,8 +111,7 @@ for category in tqdm.tqdm(range(2, len(categories)+1)):
         except:
             break
 
-    category_member_lst = wait_presence_element(driver, (By.XPATH, '/html/body/div[1]/div/div/div[5]/div')) # 구성원 리스트
-    pf_lines = wait_presence_elements(category_member_lst, (By.CSS_SELECTOR, "div.leeko-member__list")) # 구성원 리스트에서 한 줄씩 뽑기
+    pf_lines = wait_presence_elements(driver, (By.XPATH, "//div[@class='mem-List']//div[@class='leeko-member__list']")) # 구성원 리스트에서 한 줄씩 뽑기
     pf_lines_num = len(pf_lines)
 
     for pf_lines_i in range(1, pf_lines_num+1):
