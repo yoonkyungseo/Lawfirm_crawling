@@ -101,7 +101,7 @@ for category in tqdm.tqdm(range(2, len(categories)+1)):
     driver.execute_script("arguments[0].click();", category_box) # 카테고리 박스 클릭
     cate = wait_presence_element(driver, (By.XPATH, f'//*[@id="mCSB_2_container"]/li[{category}]'))
     driver.execute_script("arguments[0].scrollTop = arguments[1].offsetTop;", category_box, cate)
-    print("-----", cate.text, "-----")
+    print("-----", cate.get_attribute("textContent").strip(), "-----")
     driver.execute_script("arguments[0].click();", cate) # 카테고리 선택
     search_btn = wait_clickable_element(driver, (By.XPATH, "//div[@class='leeko-member-search__form']/button"))
     driver.execute_script("arguments[0].click();", search_btn) # 검색 버튼 클릭
