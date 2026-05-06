@@ -66,9 +66,6 @@ def check_duplicates(name, job, call):
     else:
         exist_data.add(new)
         return True
-    
-service = Service(ChromeDriverManager().install())
-driver = webdriver.Chrome(service=service, options=options)
 
 def wait_presence_element(driver, locator, timeout=15):
     return WebDriverWait(driver, timeout).until(EC.presence_of_element_located(locator))
@@ -80,6 +77,8 @@ def wait_clickable_element(driver, locator, timeout=15):
     return WebDriverWait(driver, timeout).until(EC.element_to_be_clickable(locator))
 
 # 광장 크롤링 코드
+service = Service(ChromeDriverManager().install())
+driver = webdriver.Chrome(service=service, options=options)
 driver.get("https://www.leeko.com/leenko/member/memberList.do?lang=KR")
 driver.maximize_window()
 time.sleep(1)
@@ -89,6 +88,8 @@ company = "광장"
 categories = wait_presence_elements(driver, (By.XPATH, '//*[@id="mCSB_2_container"]/li'))
 for category in tqdm.tqdm(range(2, len(categories)+1)):
     
+    service = Service(ChromeDriverManager().install())
+    driver = webdriver.Chrome(service=service, options=options)
     driver.get("https://www.leeko.com/leenko/member/memberList.do?lang=KR")
     driver.maximize_window()
     time.sleep(1)
