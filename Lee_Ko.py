@@ -80,7 +80,9 @@ def wait_clickable_element(driver, locator, timeout=15):
     return WebDriverWait(driver, timeout).until(EC.element_to_be_clickable(locator))
 
 # 광장 크롤링 코드
-
+driver.get("https://www.leeko.com/leenko/member/memberList.do?lang=KR")
+driver.maximize_window()
+time.sleep(1)
 
 company = "광장"
 
