@@ -166,7 +166,7 @@ for category in tqdm.tqdm(range(2, len(categories)+1)):
                         language = wait_presence_element(detail, (By.CSS_SELECTOR, ' td')).text
 
                 # 주요업무실적, 외부활동
-                performace, activity = "", ""
+                performance, activity = "", ""
                 try:
                     detail_table = wait_presence_elements(driver, (By.CSS_SELECTOR, '.leeko-member-detail__list'))
                     for detail in detail_table:
