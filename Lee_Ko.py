@@ -81,20 +81,23 @@ def wait_clickable_element(driver, locator, timeout=15):
 
 # 광장 크롤링 코드
 
-driver.get("https://www.leeko.com/leenko/member/memberList.do?lang=KR")
-driver.maximize_window()
-time.sleep(1)
 
 company = "광장"
 
 categories = wait_presence_elements(driver, (By.XPATH, '//*[@id="mCSB_2_container"]/li'))
 for category in tqdm.tqdm(range(2, len(categories)+1)):
+    
+    driver.get("https://www.leeko.com/leenko/member/memberList.do?lang=KR")
+    driver.maximize_window()
+    time.sleep(1)
+
     pf_data = []
     # 카테고리 선택
     category_box = wait_presence_element(driver, (By.XPATH, "//div[@class='leeko-member-search__select']//div[@class='nice-select chosen-select']"))
     driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", category_box) # 카테고리 박스로 스크롤
     driver.execute_script("arguments[0].click();", category_box) # 카테고리 박스 클릭
-    cate = wait_clickable_element(driver, (By.XPATH, f'//*[@id="mCSB_2_container"]/li[{category}]'))
+    cate = wait_presence_element(driver, (By.XPATH, f'//*[@id="mCSB_2_container"]/li[{category}]'))
+    driver.execute_script("arguments[0].scrollTop = arguments[1].offsetTop;", category_box, cate)
     print("-----", cate.text, "-----")
     driver.execute_script("arguments[0].click();", cate) # 카테고리 선택
     search_btn = wait_clickable_element(driver, (By.XPATH, "//div[@class='leeko-member-search__form']/button"))
@@ -229,6 +232,7 @@ for category in tqdm.tqdm(range(2, len(categories)+1)):
                 
     # 카테고리 하나당 한번씩 df 갱신
     df = pd.concat([df, pd.DataFrame(pf_data)], ignore_index=True)
+    driver.quit()
 
 # 퇴사자 확인
 if not df_old.empty:
@@ -248,5 +252,3 @@ os.makedirs(f"data/{today_folder}", exist_ok=True)
 
 today = datetime.now().strftime("%y%m%d")
 df.to_csv(f"data/{today_folder}/Lee_Ko_{today}.csv", index=False, encoding='utf-8-sig')
-
-driver.quit()
