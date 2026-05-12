@@ -130,8 +130,11 @@ for i in tqdm.tqdm(range(1, len(pf_lst)+1)):
                 for detail_content in detail_contents:
                     content = detail_content.text
                     if detail_title in ["경력", "학력"]:
-                        period, cont = content.split('\n')
-                        box_total.append(f'{cont} ({period})')
+                        try:
+                            period, cont = content.split('\n')
+                            box_total.append(f'{cont} ({period})')
+                        except ValueError:
+                            box_total.append(content)
                     else:
                         box_total.append(content)
                 # 자격의 경우, 리스트 형식일 때도 있고 아닐 때도 있어서
