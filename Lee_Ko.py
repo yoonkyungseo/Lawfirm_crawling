@@ -27,6 +27,9 @@ options.add_argument("--no-sandbox")          # 보안 기능 해제 (리눅스 
 options.add_argument("--disable-dev-shm-usage") # 공유 메모리 부족 방지
 options.add_argument("--disable-gpu")         # GPU 가속 해제
 options.add_argument("--window-size=1920,1080") # 가상 모니터 크기 설정 (스크롤/클릭 오류 방지)
+# 추가: 실제 유저처럼 보이게 설정
+options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+options.page_load_strategy = 'eager' # 로딩 속도 개선
 
 base_path = 'data'
 try:
@@ -88,11 +91,16 @@ company = "광장"
 categories = wait_presence_elements(driver, (By.XPATH, '//*[@id="mCSB_2_container"]/li'))
 for category in tqdm.tqdm(range(2, len(categories)+1)):
     
-    service = Service(ChromeDriverManager().install())
-    driver = webdriver.Chrome(service=service, options=options)
-    driver.get("https://www.leeko.com/leenko/member/memberList.do?lang=KR")
-    driver.maximize_window()
-    time.sleep(1)
+    for try_cnt in range(3): # 카테고리 하나당 최대 3번 시도
+        try:
+            service = Service(ChromeDriverManager().install())
+            driver = webdriver.Chrome(service=service, options=options)
+            driver.get("https://www.leeko.com/leenko/member/memberList.do?lang=KR")
+            driver.maximize_window()
+            time.sleep(1)
+        except Exception as e:
+            print(f"카테고리 {category} 시도 {try_cnt+1}회 실패: {e}")
+            time.sleep(60) # 재시도 전 대기 시간
 
     pf_data = []
     # 카테고리 선택
