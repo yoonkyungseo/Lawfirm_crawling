@@ -35,7 +35,7 @@ base_path = 'data'
 try:
     folders = [f for f in os.listdir(base_path) if os.path.isdir(os.path.join(base_path, f))]
     folders.sort()
-    latest_folder = folders[-1] # 가장 최근 폴더 선택
+    latest_folder = folders[-2] # 가장 최근 폴더 선택
     old_csv_files = glob.glob(os.path.join(f'data/{latest_folder}', "Lee_Ko*.csv"))
     if old_csv_files:
         print("참고할 이전 파일을 찾았습니다.")
@@ -133,7 +133,7 @@ for category in tqdm.tqdm(range(2, len(categories)+1)):
         pf_lst_num = len(pf_lst)
         for pf_lst_i in range(1, pf_lst_num+1):
             pf = wait_presence_element(driver, (By.XPATH, f"//div[@class='leeko-member']/div[@class='mem-List']/div[@class='leeko-member__list'][{pf_lines_i}]//a[{pf_lst_i}]"))
-            driver.execute_script("arguments[0].scrollIntoView({block: 'nearest'});", pf) # 크롤링 pf로 화면 스크롤
+            driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", pf) # 크롤링 pf로 화면 스크롤
             name = wait_presence_element(pf, (By.XPATH, './/div[2]/strong/span')).text
             job = wait_presence_element(pf, (By.XPATH, './/div[2]/p')).text
             call = wait_presence_element(pf, (By.XPATH, './/div[3]/p[1]')).text.split('\n')[1]

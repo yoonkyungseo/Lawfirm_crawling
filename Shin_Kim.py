@@ -32,7 +32,7 @@ base_path = 'data'
 try:
     folders = [f for f in os.listdir(base_path) if os.path.isdir(os.path.join(base_path, f))]
     folders.sort()
-    latest_folder = folders[-1] # 가장 최근 폴더 선택
+    latest_folder = folders[-2] # 가장 최근 폴더 선택
     old_csv_files = glob.glob(os.path.join(f'data/{latest_folder}', "Shin_Kim*.csv"))
     if old_csv_files:
         print("참고할 이전 파일을 찾았습니다.")
@@ -84,6 +84,7 @@ for category in tqdm.tqdm(range(2, len(categories)+1)):
     # 뒤에서 page 넘길 때 사용하는 page_number
     page_num = 1
     # 카테고리 선택
+    time.sleep(1)
     category_box = driver.find_element(By.XPATH, f'//*[@id="bizCode"]')
     driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", category_box) # 카테고리 박스로 스크롤
     driver.execute_script("arguments[0].click();", category_box) # 카테고리 박스 클릭
