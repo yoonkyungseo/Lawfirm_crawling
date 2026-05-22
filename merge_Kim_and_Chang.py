@@ -6,7 +6,7 @@ base_path = 'data'
 try:
     folders = [f for f in os.listdir(base_path) if os.path.isdir(os.path.join(base_path, f))]
     folders.sort()
-    latest_folder = folders[-1] # 가장 최근 폴더 선택
+    latest_folder = folders[-3] # 가장 최근 폴더 선택
     kim_chang_csv_files = glob.glob(os.path.join(f'data/{latest_folder}', "Kim_and_Chang*.csv"))
     if kim_chang_csv_files:
         df_lst = []
