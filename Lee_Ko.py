@@ -89,8 +89,11 @@ time.sleep(1)
 company = "광장"
 
 categories = wait_presence_elements(driver, (By.XPATH, '//*[@id="mCSB_2_container"]/li'))
-print(len(categories))
-for category in tqdm.tqdm(range(2, len(categories)+1)):
+# 카테고리 갯수를 세기 위해 열었던 드라이버 닫기
+driver.quit()
+
+category = 2
+while category <= len(categories):
     
     while True: # 카테고리 하나당 최대 3번 시도
         try:
@@ -242,6 +245,8 @@ for category in tqdm.tqdm(range(2, len(categories)+1)):
             # 카테고리 하나당 한번씩 df 갱신
             df = pd.concat([df, pd.DataFrame(pf_data)], ignore_index=True)
             driver.quit()
+
+            category += 1
             break
 
         except Exception as e:
