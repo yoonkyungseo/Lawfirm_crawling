@@ -89,6 +89,7 @@ time.sleep(1)
 company = "광장"
 
 categories = wait_presence_elements(driver, (By.XPATH, '//*[@id="mCSB_2_container"]/li'))
+print(len(categories))
 for category in tqdm.tqdm(range(2, len(categories)+1)):
     
     while True: # 카테고리 하나당 최대 3번 시도
