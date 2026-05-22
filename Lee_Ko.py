@@ -35,7 +35,7 @@ base_path = 'data'
 try:
     folders = [f for f in os.listdir(base_path) if os.path.isdir(os.path.join(base_path, f))]
     folders.sort()
-    latest_folder = folders[-2] # 가장 최근 폴더 선택
+    latest_folder = folders[-3] # 가장 최근 폴더 선택
     old_csv_files = glob.glob(os.path.join(f'data/{latest_folder}', "Lee_Ko*.csv"))
     if old_csv_files:
         print("참고할 이전 파일을 찾았습니다.")
@@ -91,159 +91,161 @@ company = "광장"
 categories = wait_presence_elements(driver, (By.XPATH, '//*[@id="mCSB_2_container"]/li'))
 for category in tqdm.tqdm(range(2, len(categories)+1)):
     
-    for try_cnt in range(3): # 카테고리 하나당 최대 3번 시도
+    while True: # 카테고리 하나당 최대 3번 시도
         try:
             service = Service(ChromeDriverManager().install())
             driver = webdriver.Chrome(service=service, options=options)
             driver.get("https://www.leeko.com/leenko/member/memberList.do?lang=KR")
             driver.maximize_window()
             time.sleep(1)
-        except Exception as e:
-            print(f"카테고리 {category} 시도 {try_cnt+1}회 실패: {e}")
-            time.sleep(60) # 재시도 전 대기 시간
 
-    pf_data = []
-    # 카테고리 선택
-    category_box = wait_presence_element(driver, (By.XPATH, "//div[@class='leeko-member-search__select']//div[@class='nice-select chosen-select']"))
-    driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", category_box) # 카테고리 박스로 스크롤
-    driver.execute_script("arguments[0].click();", category_box) # 카테고리 박스 클릭
-    cate = wait_presence_element(driver, (By.XPATH, f'//*[@id="mCSB_2_container"]/li[{category}]'))
-    driver.execute_script("arguments[0].scrollTop = arguments[1].offsetTop;", category_box, cate)
-    print("-----", cate.get_attribute("textContent").strip(), "-----")
-    driver.execute_script("arguments[0].click();", cate) # 카테고리 선택
-    search_btn = wait_clickable_element(driver, (By.XPATH, "//div[@class='leeko-member-search__form']/button"))
-    driver.execute_script("arguments[0].click();", search_btn) # 검색 버튼 클릭
-    time.sleep(3)
+            pf_data = []
+            # 카테고리 선택
+            category_box = wait_presence_element(driver, (By.XPATH, "//div[@class='leeko-member-search__select']//div[@class='nice-select chosen-select']"))
+            driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", category_box) # 카테고리 박스로 스크롤
+            driver.execute_script("arguments[0].click();", category_box) # 카테고리 박스 클릭
+            cate = wait_presence_element(driver, (By.XPATH, f'//*[@id="mCSB_2_container"]/li[{category}]'))
+            driver.execute_script("arguments[0].scrollTop = arguments[1].offsetTop;", category_box, cate)
+            print("-----", cate.get_attribute("textContent").strip(), "-----")
+            driver.execute_script("arguments[0].click();", cate) # 카테고리 선택
+            search_btn = wait_clickable_element(driver, (By.XPATH, "//div[@class='leeko-member-search__form']/button"))
+            driver.execute_script("arguments[0].click();", search_btn) # 검색 버튼 클릭
+            time.sleep(3)
 
-    # 모든 더보기 버튼 클릭해서 화면에 pf 정보가 다 뜨도록 설정
-    while True:
-        try:
-            button = wait_clickable_element(driver, (By.XPATH, '/html/body/div[1]/div/div/div[6]/a/strong'))
-            driver.execute_script("arguments[0].scrollIntoView({block: 'nearest'});", button)
-            time.sleep(1)
-            driver.execute_script("arguments[0].click();", button)
-        except:
+            # 모든 더보기 버튼 클릭해서 화면에 pf 정보가 다 뜨도록 설정
+            while True:
+                try:
+                    button = wait_clickable_element(driver, (By.XPATH, '/html/body/div[1]/div/div/div[6]/a/strong'))
+                    driver.execute_script("arguments[0].scrollIntoView({block: 'nearest'});", button)
+                    time.sleep(1)
+                    driver.execute_script("arguments[0].click();", button)
+                except:
+                    break
+
+            pf_lines = wait_presence_elements(driver, (By.XPATH, "//div[@class='leeko-member']/div[@class='mem-List']/div[@class='leeko-member__list']")) # 구성원 리스트에서 한 줄씩 뽑기
+            pf_lines_num = len(pf_lines)
+
+            for pf_lines_i in range(1, pf_lines_num+1):
+                pf_lst = wait_presence_elements(driver, (By.XPATH, f"//div[@class='leeko-member']/div[@class='mem-List']/div[@class='leeko-member__list'][{pf_lines_i}]//a")) # 한 줄에서 pf 하나씩 뽑기
+                pf_lst_num = len(pf_lst)
+                for pf_lst_i in range(1, pf_lst_num+1):
+                    pf = wait_presence_element(driver, (By.XPATH, f"//div[@class='leeko-member']/div[@class='mem-List']/div[@class='leeko-member__list'][{pf_lines_i}]//a[{pf_lst_i}]"))
+                    driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", pf) # 크롤링 pf로 화면 스크롤
+                    name = wait_presence_element(pf, (By.XPATH, './/div[2]/strong/span')).text
+                    job = wait_presence_element(pf, (By.XPATH, './/div[2]/p')).text
+                    call = wait_presence_element(pf, (By.XPATH, './/div[3]/p[1]')).text.split('\n')[1]
+                    print(name, job, call)
+
+                    if check_duplicates(name, job, call):
+                        driver.execute_script("arguments[0].click();", pf)
+                        time.sleep(3)
+                        # 이메일
+                        email = wait_visibility_element(driver, (By.XPATH, '//*[@id="printDiv"]/div/div/div[1]/div[1]/div[2]/p[1]/a')).text
+                        # 상세 소개글
+                        introduction = wait_presence_element(driver, (By.CSS_SELECTOR, '.leeko-member-detail__text')).text.replace('\n', ' ').strip()
+
+                        # 관련 분야
+                        fields_lst = wait_presence_elements(driver, (By.CSS_SELECTOR, '.leeko-tag.leeko-tag--dark a'))
+                        fields_total = []
+                        for field in fields_lst:
+                            fields_total.append(field.text)
+                        related_fields = ','.join(fields_total)
+
+                        # 경력, 학력, 자격, 수상, 언어
+                        detail_table = wait_presence_elements(driver, (By.CSS_SELECTOR, '.leeko-member-detail__table'))
+                        eligibility, awards = "", ""
+                        for detail in detail_table:
+                            detail_title = wait_presence_element(detail, (By.XPATH, './/div[1]')).text
+
+                            if detail_title in ["경력", "학력", "자격/회원", "수상실적"]:
+                                detail_contents = wait_presence_elements(detail, (By.XPATH, './/div[2]//tr'))
+                                box_total = []
+                                for detail_content in detail_contents:
+                                    period = wait_presence_element(detail_content, (By.XPATH, './/th')).get_attribute("textContent")
+                                    content = wait_presence_element(detail_content, (By.XPATH, './/td')).get_attribute("textContent")
+                                    box_total.append(f'{content} ({period})')
+
+                                if detail_title == "경력":
+                                    career = ','.join(box_total)
+                                elif detail_title == "학력":
+                                    education = ','.join(box_total)
+                                elif detail_title == "자격/회원":
+                                    eligibility = ','.join(box_total)
+                                else:
+                                    awards = ','.join(box_total)
+                            elif detail_title == "언어":
+                                language = wait_presence_element(detail, (By.CSS_SELECTOR, ' td')).text
+
+                        # 주요업무실적, 외부활동
+                        performance, activity = "", ""
+                        try:
+                            detail_table = wait_presence_elements(driver, (By.CSS_SELECTOR, '.leeko-member-detail__list'))
+                            for detail in detail_table:
+                                detail_title = wait_presence_element(detail, (By.XPATH, './/div[1]')).text
+
+                                if detail_title in ["주요처리사례", "저서/활동/기타"]:
+                                    dl_element = wait_presence_element(detail, (By.CSS_SELECTOR, 'dl.leeko-more-contents'))
+                                    children = wait_presence_elements(dl_element, (By.XPATH, "./*"))
+                                    detail_results = ""
+                                    for child in children:
+                                        child_text = child.get_attribute("textContent")
+                                        if child.tag_name == "dt":
+                                            if detail_results:
+                                                detail_results += f'//{child_text.replace("[","").replace("]","")}]]'
+                                            else:
+                                                detail_results += f'{child_text.replace("[","").replace("]","")}]]'
+                                        elif child.tag_name == "dd":
+                                            if detail_results:
+                                                detail_results += f",{child_text}"
+                                            else:
+                                                detail_results += child_text
+                                    if detail_title == "주요처리사례":
+                                        performance = detail_results
+                                    else:
+                                        activity = detail_results
+                        except TimeoutException:
+                            pass
+
+                        save_url = driver.current_url
+                        if old_exist_data:
+                            if save_url in old_exist_data:
+                                new = "-"
+                            else:
+                                new = "Y"
+                        else:
+                            new = '-'
+
+                        add_pf = {
+                                    'company':company,
+                                    'name':name,
+                                    'job':job,
+                                    'call':call,
+                                    'email':email,
+                                    'introduction':introduction,
+                                    'related_fields':related_fields,
+                                    'career':career,
+                                    'education':education,
+                                    'eligibility':eligibility,
+                                    'awards':awards,
+                                    'assessment':"",
+                                    'performance':performance,
+                                    'language':language,
+                                    'activity':activity,
+                                    'url':save_url,
+                                    'new':new
+                                }
+                        pf_data.append(add_pf)
+                        driver.back()
+                        time.sleep(3)
+                        
+            # 카테고리 하나당 한번씩 df 갱신
+            df = pd.concat([df, pd.DataFrame(pf_data)], ignore_index=True)
+            driver.quit()
             break
 
-    pf_lines = wait_presence_elements(driver, (By.XPATH, "//div[@class='leeko-member']/div[@class='mem-List']/div[@class='leeko-member__list']")) # 구성원 리스트에서 한 줄씩 뽑기
-    pf_lines_num = len(pf_lines)
-
-    for pf_lines_i in range(1, pf_lines_num+1):
-        pf_lst = wait_presence_elements(driver, (By.XPATH, f"//div[@class='leeko-member']/div[@class='mem-List']/div[@class='leeko-member__list'][{pf_lines_i}]//a")) # 한 줄에서 pf 하나씩 뽑기
-        pf_lst_num = len(pf_lst)
-        for pf_lst_i in range(1, pf_lst_num+1):
-            pf = wait_presence_element(driver, (By.XPATH, f"//div[@class='leeko-member']/div[@class='mem-List']/div[@class='leeko-member__list'][{pf_lines_i}]//a[{pf_lst_i}]"))
-            driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", pf) # 크롤링 pf로 화면 스크롤
-            name = wait_presence_element(pf, (By.XPATH, './/div[2]/strong/span')).text
-            job = wait_presence_element(pf, (By.XPATH, './/div[2]/p')).text
-            call = wait_presence_element(pf, (By.XPATH, './/div[3]/p[1]')).text.split('\n')[1]
-            print(name, job, call)
-
-            if check_duplicates(name, job, call):
-                driver.execute_script("arguments[0].click();", pf)
-                time.sleep(3)
-                # 이메일
-                email = wait_presence_element(driver, (By.XPATH, '//*[@id="printDiv"]/div/div/div[1]/div[1]/div[2]/p[1]/a')).text
-                # 상세 소개글
-                introduction = wait_presence_element(driver, (By.CSS_SELECTOR, '.leeko-member-detail__text')).text.replace('\n', ' ').strip()
-
-                # 관련 분야
-                fields_lst = wait_presence_elements(driver, (By.CSS_SELECTOR, '.leeko-tag.leeko-tag--dark a'))
-                fields_total = []
-                for field in fields_lst:
-                    fields_total.append(field.text)
-                related_fields = ','.join(fields_total)
-
-                # 경력, 학력, 자격, 수상, 언어
-                detail_table = wait_presence_elements(driver, (By.CSS_SELECTOR, '.leeko-member-detail__table'))
-                eligibility, awards = "", ""
-                for detail in detail_table:
-                    detail_title = wait_presence_element(detail, (By.XPATH, './/div[1]')).text
-
-                    if detail_title in ["경력", "학력", "자격/회원", "수상실적"]:
-                        detail_contents = wait_presence_elements(detail, (By.XPATH, './/div[2]//tr'))
-                        box_total = []
-                        for detail_content in detail_contents:
-                            period = wait_presence_element(detail_content, (By.XPATH, './/th')).get_attribute("textContent")
-                            content = wait_presence_element(detail_content, (By.XPATH, './/td')).get_attribute("textContent")
-                            box_total.append(f'{content} ({period})')
-
-                        if detail_title == "경력":
-                            career = ','.join(box_total)
-                        elif detail_title == "학력":
-                            education = ','.join(box_total)
-                        elif detail_title == "자격/회원":
-                            eligibility = ','.join(box_total)
-                        else:
-                            awards = ','.join(box_total)
-                    elif detail_title == "언어":
-                        language = wait_presence_element(detail, (By.CSS_SELECTOR, ' td')).text
-
-                # 주요업무실적, 외부활동
-                performance, activity = "", ""
-                try:
-                    detail_table = wait_presence_elements(driver, (By.CSS_SELECTOR, '.leeko-member-detail__list'))
-                    for detail in detail_table:
-                        detail_title = wait_presence_element(detail, (By.XPATH, './/div[1]')).text
-
-                        if detail_title in ["주요처리사례", "저서/활동/기타"]:
-                            dl_element = wait_presence_element(detail, (By.CSS_SELECTOR, 'dl.leeko-more-contents'))
-                            children = wait_presence_elements(dl_element, (By.XPATH, "./*"))
-                            detail_results = ""
-                            for child in children:
-                                child_text = child.get_attribute("textContent")
-                                if child.tag_name == "dt":
-                                    if detail_results:
-                                        detail_results += f'//{child_text.replace("[","").replace("]","")}]]'
-                                    else:
-                                        detail_results += f'{child_text.replace("[","").replace("]","")}]]'
-                                elif child.tag_name == "dd":
-                                    if detail_results:
-                                        detail_results += f",{child_text}"
-                                    else:
-                                        detail_results += child_text
-                            if detail_title == "주요처리사례":
-                                performance = detail_results
-                            else:
-                                activity = detail_results
-                except TimeoutException:
-                    pass
-
-                save_url = driver.current_url
-                if old_exist_data:
-                    if save_url in old_exist_data:
-                        new = "-"
-                    else:
-                        new = "Y"
-                else:
-                    new = '-'
-
-                add_pf = {
-                            'company':company,
-                            'name':name,
-                            'job':job,
-                            'call':call,
-                            'email':email,
-                            'introduction':introduction,
-                            'related_fields':related_fields,
-                            'career':career,
-                            'education':education,
-                            'eligibility':eligibility,
-                            'awards':awards,
-                            'assessment':"",
-                            'performance':performance,
-                            'language':language,
-                            'activity':activity,
-                            'url':save_url,
-                            'new':new
-                        }
-                pf_data.append(add_pf)
-                driver.back()
-                time.sleep(3)
-                
-    # 카테고리 하나당 한번씩 df 갱신
-    df = pd.concat([df, pd.DataFrame(pf_data)], ignore_index=True)
-    driver.quit()
+        except Exception as e:
+            print(f"카테고리 {category} 시도 실패: {e}")
+            time.sleep(60) # 재시도 전 대기 시간
 
 # 퇴사자 확인
 if not df_old.empty:
