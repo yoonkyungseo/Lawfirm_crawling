@@ -22,9 +22,8 @@ jobs:
       matrix:
         # 병렬 실행 파일
         python-file: [
-          "Kim_and_Chang_industry1.py","Kim_and_Chang_industry2.py",
-          "Kim_and_Chang_practice1.py","Kim_and_Chang_practice2.py","Kim_and_Chang_practice3.py","Kim_and_Chang_practice4.py","Kim_and_Chang_practice5.py","Kim_and_Chang_practice6.py",
-          "Kim_and_Chang_region.py",
+          "Kim_and_Chang_all1.py","Kim_and_Chang_all2.py","Kim_and_Chang_all3.py","Kim_and_Chang_all4.py","Kim_and_Chang_all5.py",
+          "Kim_and_Chang_all6.py","Kim_and_Chang_all7.py","Kim_and_Chang_all8.py","Kim_and_Chang_all9.py","Kim_and_Chang_all10.py",
           "BKL.py", "Lee_Ko.py", "Shin_Kim.py", "Hwawoo.py"
           ]
     
