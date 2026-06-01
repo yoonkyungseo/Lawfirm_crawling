@@ -97,7 +97,7 @@ company = "김앤장"
 flag = True
 # 김앤장 구성원 페이지 산업별(Industry) 구분 클릭
 elements = wait_presence_elements(driver, (By.XPATH, '//*[@id="keyWordTab4"]/li'))
-for num in tqdm.tqdm(range(72, 81)):
+for num in tqdm.tqdm(range(76, 86)):
     practice = wait_presence_element(driver, (By.XPATH, f'//*[@id="keyWordTab4"]/li[{num}]/a')) # 구분 목록 요소
     driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", practice)
     # 현재 진행 중인 구분 목록 출력 (이 구분이 선택될때마다 1번 pf명이 갱신되도록 == 1page pf는 다 본다는 뜻)
@@ -335,6 +335,7 @@ for num in tqdm.tqdm(range(72, 81)):
                     time.sleep(2)
 
             # 다음 페이지로 넘기기
+            try_again = 0
             try:
                 next_page_idx = current_page_idx + 1
                 target_page_btn = wait_clickable_element(driver, (By.XPATH, f'//div[@class="paging"]//a[text()="{next_page_idx}"]'))
@@ -359,6 +360,8 @@ for num in tqdm.tqdm(range(72, 81)):
             if try_again <= 5:
                 target_page_btn = wait_clickable_element(driver, (By.XPATH, f'//div[@class="paging"]//a[text()="{current_page_idx}"]'))
                 driver.execute_script("arguments[0].click();", target_page_btn)
+                prev_name = ""
+                try_again += 1
                 time.sleep(5)
                 print("페이지를 다시 클릭했습니다.")
             else:
@@ -373,6 +376,8 @@ for num in tqdm.tqdm(range(72, 81)):
                 if try_again <= 5:
                     target_page_btn = wait_clickable_element(driver, (By.XPATH, f'//div[@class="paging"]//a[text()="{current_page_idx}"]'))
                     driver.execute_script("arguments[0].click();", target_page_btn)
+                    prev_name = ""
+                    try_again += 1
                     time.sleep(5)
                     print("페이지를 다시 클릭했습니다.")
                 else:
@@ -396,6 +401,6 @@ today_folder = datetime.now().strftime("%Y-%m-%d")
 os.makedirs(f"data/{today_folder}", exist_ok=True)
 
 today = datetime.now().strftime("%y%m%d")
-df.to_csv(f"data/{today_folder}/Kim_and_Chang_{today}_all9.csv", index=False, encoding='utf-8-sig')
+df.to_csv(f"data/{today_folder}/Kim_and_Chang_{today}_all1.csv", index=False, encoding='utf-8-sig')
 
 driver.quit()

@@ -335,6 +335,7 @@ for num in tqdm.tqdm(range(18, 27)):
                     time.sleep(2)
 
             # 다음 페이지로 넘기기
+            try_again = 0
             try:
                 next_page_idx = current_page_idx + 1
                 target_page_btn = wait_clickable_element(driver, (By.XPATH, f'//div[@class="paging"]//a[text()="{next_page_idx}"]'))
@@ -359,6 +360,8 @@ for num in tqdm.tqdm(range(18, 27)):
             if try_again <= 5:
                 target_page_btn = wait_clickable_element(driver, (By.XPATH, f'//div[@class="paging"]//a[text()="{current_page_idx}"]'))
                 driver.execute_script("arguments[0].click();", target_page_btn)
+                prev_name = ""
+                try_again += 1
                 time.sleep(5)
                 print("페이지를 다시 클릭했습니다.")
             else:
@@ -373,6 +376,8 @@ for num in tqdm.tqdm(range(18, 27)):
                 if try_again <= 5:
                     target_page_btn = wait_clickable_element(driver, (By.XPATH, f'//div[@class="paging"]//a[text()="{current_page_idx}"]'))
                     driver.execute_script("arguments[0].click();", target_page_btn)
+                    prev_name = ""
+                    try_again += 1
                     time.sleep(5)
                     print("페이지를 다시 클릭했습니다.")
                 else:
@@ -396,6 +401,6 @@ today_folder = datetime.now().strftime("%Y-%m-%d")
 os.makedirs(f"data/{today_folder}", exist_ok=True)
 
 today = datetime.now().strftime("%y%m%d")
-df.to_csv(f"data/{today_folder}/Kim_and_Chang_{today}_all3.csv", index=False, encoding='utf-8-sig')
+df.to_csv(f"data/{today_folder}/Kim_and_Chang_{today}_all1.csv", index=False, encoding='utf-8-sig')
 
 driver.quit()
