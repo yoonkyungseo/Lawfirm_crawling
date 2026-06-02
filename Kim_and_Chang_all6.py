@@ -401,6 +401,6 @@ today_folder = datetime.now().strftime("%Y-%m-%d")
 os.makedirs(f"data/{today_folder}", exist_ok=True)
 
 today = datetime.now().strftime("%y%m%d")
-df.to_csv(f"data/{today_folder}/Kim_and_Chang_{today}_all1.csv", index=False, encoding='utf-8-sig')
+df.to_csv(f"data/{today_folder}/Kim_and_Chang_{today}_all6.csv", index=False, encoding='utf-8-sig')
 
 driver.quit()
