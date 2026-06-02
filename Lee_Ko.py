@@ -157,7 +157,7 @@ while category <= len(categories):
 
                         # 경력, 학력, 자격, 수상, 언어
                         detail_table = wait_presence_elements(driver, (By.CSS_SELECTOR, '.leeko-member-detail__table'))
-                        eligibility, awards = "", ""
+                        career, education, eligibility, awards, language = "", "", "", "", ""
                         for detail in detail_table:
                             detail_title = wait_presence_element(detail, (By.XPATH, './/div[1]')).text
 
