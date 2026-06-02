@@ -94,7 +94,7 @@ def bkl_crawling(id, button_id):
     service = Service(ChromeDriverManager().install())
     driver = webdriver.Chrome(service=service, options=options)
     
-    driver.get("https://www.bkl.co.kr/law/member/allList.do?isMain=&pageIndex=1&searchCondition=&url=all&job=&lang=ko&memberNo=&searchYn=Y&logFunction=goSearch&searchKeyword=")
+    driver.get("https://www.bkl.co.kr/law/member?searchYn=Y")
     driver.maximize_window()
     time.sleep(1)
 
