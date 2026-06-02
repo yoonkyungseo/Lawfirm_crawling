@@ -101,12 +101,16 @@ def bkl_crawling(id, button_id):
     while True:
         pf_data = []
         scroll = driver.find_element(By.XPATH, f'//*[@id="{id}"]/ul[{page}]/li[1]/a[1]/div[1]')
+        print(page, "페이지 스크롤 중...")
         driver.execute_script("arguments[0].scrollIntoView(true);", scroll)
+        print(page, "페이지 스크롤 완료")
         time.sleep(1)
 
         pf_lst = driver.find_elements(By.XPATH, f'//*[@id="{id}"]/ul[{page}]/li')
+        print(page, "페이지 내 프로필 수: ", len(pf_lst))
         for i in range(1,len(pf_lst)+1):
             pf = driver.find_element(By.XPATH, f'//*[@id="{id}"]/ul[{page}]/li[{i}]/a[1]')
+            print(page, "페이지", i, "번째 프로필 클릭 중...")
             # 이름, 직업, 전화번호
             name = pf.find_element(By.XPATH, './/div[2]').text
             job = pf.find_element(By.XPATH, './/div[3]').text
@@ -301,14 +305,14 @@ while again_cnt <= 5:
         break
     except Exception as e:
         again_cnt += 1
-        # if again_cnt > 5:
-        #     print(f"예상치 못한 오류 발생: {type(e).__name__}")
-        #     print("-" * 30)
-        #     traceback.print_exc() # <--- 이 한 줄이 "어디서" 났는지 다 보여줍니다.
-        #     print("-" * 30)
-        # else:
-        #     print(f"오류 발생({again_cnt}회차): {e}. 다시 시도합니다...")
-        #     time.sleep(5) # 잠시 대기 후 재시도
+        if again_cnt > 5:
+            print(f"예상치 못한 오류 발생: {type(e).__name__}")
+            print("-" * 30)
+            traceback.print_exc() # <--- 이 한 줄이 "어디서" 났는지 다 보여줍니다.
+            print("-" * 30)
+        else:
+            print(f"오류 발생({again_cnt}회차): {e}. 다시 시도합니다...")
+            time.sleep(5) # 잠시 대기 후 재시도
 again_cnt = 0
 while again_cnt <= 5:
     try:
