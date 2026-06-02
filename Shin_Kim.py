@@ -123,6 +123,7 @@ for category in tqdm.tqdm(range(2, len(categories)+1)):
                         for overview in overviews:
                             title = overview.find_element(By.CSS_SELECTOR, 'h5.subsection-name').get_attribute("textContent").strip()
                             # 상세 소개글
+                            introduction = ""
                             if title == "개요":
                                 introduction = overview.find_element(By.CSS_SELECTOR, ' p.para').text.replace('\n', ' ')
                             elif title == "관련 업무분야":
@@ -168,7 +169,7 @@ for category in tqdm.tqdm(range(2, len(categories)+1)):
 
                         # 학력, 자격, 수상
                         detail_table = driver.find_elements(By.CSS_SELECTOR, 'div#keyExperience div.subsection')
-                        eligibility, awards, assessment, activity, performance = "", "", "", "", ""
+                        eligibility, awards, assessment, activity, performance, language = "", "", "", "", "", ""
                         for detail in detail_table:
                             driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", detail)
                             time.sleep(0.5)
