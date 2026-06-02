@@ -99,6 +99,7 @@ def bkl_crawling(id, button_id):
     time.sleep(1)
 
     while True:
+        print(page, "페이지 크롤링 시작")
         pf_data = []
         scroll = driver.find_element(By.XPATH, f'//*[@id="{id}"]/ul[{page}]/li[1]/a[1]/div[1]')
         print(page, "페이지 스크롤 중...")
