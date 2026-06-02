@@ -301,14 +301,14 @@ while again_cnt <= 5:
         break
     except Exception as e:
         again_cnt += 1
-        if again_cnt > 5:
-            print(f"예상치 못한 오류 발생: {type(e).__name__}")
-            print("-" * 30)
-            traceback.print_exc() # <--- 이 한 줄이 "어디서" 났는지 다 보여줍니다.
-            print("-" * 30)
-        else:
-            print(f"오류 발생({again_cnt}회차): {e}. 다시 시도합니다...")
-            time.sleep(5) # 잠시 대기 후 재시도
+        # if again_cnt > 5:
+        #     print(f"예상치 못한 오류 발생: {type(e).__name__}")
+        #     print("-" * 30)
+        #     traceback.print_exc() # <--- 이 한 줄이 "어디서" 났는지 다 보여줍니다.
+        #     print("-" * 30)
+        # else:
+        #     print(f"오류 발생({again_cnt}회차): {e}. 다시 시도합니다...")
+        #     time.sleep(5) # 잠시 대기 후 재시도
 again_cnt = 0
 while again_cnt <= 5:
     try:
