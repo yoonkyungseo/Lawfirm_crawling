@@ -21,6 +21,11 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 
+def wait_presence_element(driver, locator, timeout=15):
+    return WebDriverWait(driver, timeout).until(EC.presence_of_element_located(locator))
+def wait_presence_elements(driver, locator, timeout=15):
+    return WebDriverWait(driver, timeout).until(EC.presence_of_all_elements_located(locator))
+
 base_path = 'data'
 try:
     folders = [f for f in os.listdir(base_path) if os.path.isdir(os.path.join(base_path, f))]
@@ -101,16 +106,16 @@ def bkl_crawling(id, button_id):
     while True:
         print(page, "페이지 크롤링 시작")
         pf_data = []
-        scroll = driver.find_element(By.XPATH, f'//*[@id="{id}"]/ul[{page}]/li[1]/a[1]/div[1]')
+        scroll = wait_presence_element(driver, (By.XPATH, f'//*[@id="{id}"]/ul[{page}]/li[1]/a[1]/div[1]'))
         print(page, "페이지 스크롤 중...")
         driver.execute_script("arguments[0].scrollIntoView(true);", scroll)
         print(page, "페이지 스크롤 완료")
         time.sleep(1)
 
-        pf_lst = driver.find_elements(By.XPATH, f'//*[@id="{id}"]/ul[{page}]/li')
+        pf_lst = wait_presence_elements(driver, (By.XPATH, f'//*[@id="{id}"]/ul[{page}]/li'))
         print(page, "페이지 내 프로필 수: ", len(pf_lst))
         for i in range(1,len(pf_lst)+1):
-            pf = driver.find_element(By.XPATH, f'//*[@id="{id}"]/ul[{page}]/li[{i}]/a[1]')
+            pf = wait_presence_element(driver, (By.XPATH, f'//*[@id="{id}"]/ul[{page}]/li[{i}]/a[1]'))
             print(page, "페이지", i, "번째 프로필 클릭 중...")
             # 이름, 직업, 전화번호
             name = pf.find_element(By.XPATH, './/div[2]').text
