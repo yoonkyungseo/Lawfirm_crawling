@@ -117,7 +117,7 @@ def bkl_crawling(id, button_id):
             
             # 해당 pf가 기존에 저장된 사람인지 확인
             if check_duplicates(name, job, call):
-                pf.click()
+                driver.execute_script("arguments[0].click();", pf)
                 time.sleep(3)
                 # 이메일
                 email = driver.find_element(By.XPATH, '//*[@id="content"]/div[1]/div[1]/div[3]/ul[2]/li[3]/span[2]').text
@@ -165,9 +165,12 @@ def bkl_crawling(id, button_id):
                         else:
                             eligibility = ','.join(box_total)
                     elif "주요활동" in title:
-                        main_action_button = title_.find_element(By.XPATH, './/button')
-                        driver.execute_script("arguments[0].click();", main_action_button)
-                        time.sleep(0.3)
+                        try:
+                            main_action_button = title_.find_element(By.XPATH, './/button')
+                            driver.execute_script("arguments[0].click();", main_action_button)
+                            time.sleep(0.3)
+                        except:
+                            pass
                         # 수상, 외부 활동
                         try:
                             contents_total = []
@@ -250,7 +253,7 @@ def bkl_crawling(id, button_id):
             # button = driver.find_element(By.XPATH, f'//*[@id="{id}"]/div[{button_id}]/button')
             button = WebDriverWait(driver, 15).until(EC.element_to_be_clickable((By.XPATH, f'//*[@id="{id}"]/div[{button_id}]/button')))
             driver.execute_script("arguments[0].scrollIntoView({block: 'nearest'});", button)
-            button.click()
+            driver.execute_script("arguments[0].click();", button)
             time.sleep(2)
             current_url = driver.current_url
             driver.refresh()
@@ -266,7 +269,7 @@ def bkl_crawling(id, button_id):
                 print("버튼 클릭을 재시도 합니다.")
                 button = WebDriverWait(driver, 15).until(EC.element_to_be_clickable((By.XPATH, f'//*[@id="{id}"]/div[{button_id}]/button')))
                 driver.execute_script("arguments[0].scrollIntoView({block: 'nearest'});", button)
-                button.click()
+                driver.execute_script("arguments[0].click();", button)
                 time.sleep(2)
                 current_url = driver.current_url
                 driver.refresh()
