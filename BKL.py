@@ -102,21 +102,16 @@ def bkl_crawling(id, button_id):
     driver.get("https://www.bkl.co.kr/law/member?searchYn=Y")
     driver.maximize_window()
     time.sleep(1)
-
+    
     while True:
-        print(page, "페이지 크롤링 시작")
         pf_data = []
         scroll = wait_presence_element(driver, (By.XPATH, f'//*[@id="{id}"]/ul[{page}]/li[1]/a[1]/div[1]'))
-        print(page, "페이지 스크롤 중...")
         driver.execute_script("arguments[0].scrollIntoView(true);", scroll)
-        print(page, "페이지 스크롤 완료")
         time.sleep(1)
 
         pf_lst = wait_presence_elements(driver, (By.XPATH, f'//*[@id="{id}"]/ul[{page}]/li'))
-        print(page, "페이지 내 프로필 수: ", len(pf_lst))
         for i in range(1,len(pf_lst)+1):
             pf = wait_presence_element(driver, (By.XPATH, f'//*[@id="{id}"]/ul[{page}]/li[{i}]/a[1]'))
-            print(page, "페이지", i, "번째 프로필 클릭 중...")
             # 이름, 직업, 전화번호
             name = pf.find_element(By.XPATH, './/div[2]').text
             job = pf.find_element(By.XPATH, './/div[3]').text
@@ -266,7 +261,6 @@ def bkl_crawling(id, button_id):
             driver.execute_script("arguments[0].click();", button)
             time.sleep(2)
             current_url = driver.current_url
-            driver.refresh()
             time.sleep(4)
             print(page, "페이지 완료")
             page += 1
@@ -282,7 +276,6 @@ def bkl_crawling(id, button_id):
                 driver.execute_script("arguments[0].click();", button)
                 time.sleep(2)
                 current_url = driver.current_url
-                driver.refresh()
                 time.sleep(4)
                 print(page, "페이지 완료")
                 page += 1
