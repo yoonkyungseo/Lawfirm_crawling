@@ -132,7 +132,7 @@ def bkl_crawling(id, button_id):
                 intro_total = []
                 for intro in pf_introduction:
                     intro_total.append(intro.text)
-                introduction = ','.join(intro_total)
+                introduction = '###'.join(intro_total)
 
                 # 관련 분야
                 fields_lst = driver.find_elements(By.CSS_SELECTOR, ' div.prof-business-container ul.prof-business-list > li')
@@ -140,7 +140,7 @@ def bkl_crawling(id, button_id):
                 for field in fields_lst:
                     field_text = field.find_element(By.XPATH, './/a').get_attribute("textContent")
                     fields_total.append(field_text)
-                related_fields = ','.join(fields_total)
+                related_fields = '###'.join(fields_total)
                 
                 sections = driver.find_elements(By.CSS_SELECTOR, '.prof-section.ui-scroll-spy-section.ui-box')
                 for section in sections:
@@ -164,11 +164,11 @@ def bkl_crawling(id, button_id):
                                     box_total.append(f'{hidden_content} ({hidden_period})')
                             except:
                                 pass
-                            career = ','.join(box_total)
+                            career = '###'.join(box_total)
                         elif title == "학력":
-                            education = ','.join(box_total)
+                            education = '###'.join(box_total)
                         else:
-                            eligibility = ','.join(box_total)
+                            eligibility = '###'.join(box_total)
                     elif "주요활동" in title:
                         try:
                             main_action_button = title_.find_element(By.XPATH, './/button')
@@ -186,14 +186,15 @@ def bkl_crawling(id, button_id):
                                 contents_imsi = []
                                 for cont in len_contents[1:]:
                                     contents_imsi.append(cont.text)
-                                contents_text = ','.join(contents_imsi)
                                 # 수상
                                 if contents_title == "수상":
+                                    contents_text = '###'.join(contents_imsi)
                                     awards = contents_text
                                 # 외부활동
                                 else:
-                                    contents_total.append(f"{contents_title}]]{contents_text}")
-                            activity = '//'.join(contents_total)
+                                    contents_text = '@@@'.join(contents_imsi)
+                                    contents_total.append(f"{contents_title}@#@{contents_text}")
+                            activity = '###'.join(contents_total)
                         except:
                             pass
                     
@@ -211,13 +212,13 @@ def bkl_crawling(id, button_id):
                             perform_content_imsi = []
                             for perf_con in perform_contents:
                                 perform_content_imsi.append(perf_con.get_attribute("textContent"))
-                            perform_content_text = ','.join(perform_content_imsi)
+                            perform_content_text = '@@@'.join(perform_content_imsi)
 
                             if perform_title:
-                                performance_total.append(f'{perform_title}]]{perform_content_text}')
+                                performance_total.append(f'{perform_title}@#@{perform_content_text}')
                             else:
                                 performance_total.append(perform_content_text)
-                        performance = '//'.join(performance_total)
+                        performance = '###'.join(performance_total)
 
                 save_url = driver.current_url
                 if old_exist_data:

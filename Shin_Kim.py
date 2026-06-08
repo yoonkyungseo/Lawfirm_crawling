@@ -32,7 +32,7 @@ base_path = 'data'
 try:
     folders = [f for f in os.listdir(base_path) if os.path.isdir(os.path.join(base_path, f))]
     folders.sort()
-    latest_folder = folders[-2] # 가장 최근 폴더 선택
+    latest_folder = folders[-1] # 가장 최근 폴더 선택
     old_csv_files = glob.glob(os.path.join(f'data/{latest_folder}', "Shin_Kim*.csv"))
     if old_csv_files:
         print("참고할 이전 파일을 찾았습니다.")
@@ -133,7 +133,7 @@ for category in tqdm.tqdm(range(2, len(categories)+1)):
                                 for field in fields_lst:
                                     driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", field)
                                     fields_total.append(field.get_attribute("textContent").replace('\n', ' ').strip())
-                                related_fields = ','.join(fields_total)
+                                related_fields = '###'.join(fields_total)
                                 time.sleep(2)
 
                         # 경력
@@ -164,7 +164,7 @@ for category in tqdm.tqdm(range(2, len(categories)+1)):
                                 career_total.append(content)
                             else:
                                 career_total.append(f'{content} ({period})')
-                        career = ','.join(career_total)
+                        career = '###'.join(career_total)
                         time.sleep(1)
 
                         # 학력, 자격, 수상
@@ -203,15 +203,15 @@ for category in tqdm.tqdm(range(2, len(categories)+1)):
                                         box_total.append(f'{content} ({period})')
 
                                 if detail_title == "학력":
-                                    education = ','.join(box_total)
+                                    education = '###'.join(box_total)
                                 elif detail_title == "자격":
-                                    eligibility = ','.join(box_total)
+                                    eligibility = '###'.join(box_total)
                                 elif detail_title == "수상 내역":
-                                    awards = ','.join(box_total)
+                                    awards = '###'.join(box_total)
                                 elif detail_title == "외부 평가":
-                                    assessment = ','.join(box_total)
+                                    assessment = '###'.join(box_total)
                                 else:
-                                    activity = ','.join(box_total)
+                                    activity = '###'.join(box_total)
                             elif detail_title == "주요 업무 실적":
                                 cont_element = detail.find_element(By.CSS_SELECTOR, 'div.data-list-area > div.inner')
                                 children = cont_element.find_elements(By.XPATH, "./*")
@@ -219,14 +219,14 @@ for category in tqdm.tqdm(range(2, len(categories)+1)):
                                 for child in children:
                                     if child.tag_name == "h6":
                                         if detail_results:
-                                            detail_results += f'//{child.get_attribute("textContent")}]]'
+                                            detail_results += f'###{child.get_attribute("textContent")}@#@'
                                         else:
-                                            detail_results += f"{child.get_attribute("textContent")}]]"
+                                            detail_results += f"{child.get_attribute("textContent")}@#@"
                                     elif child.tag_name == "ul":
                                         for ch in child.find_elements(By.CSS_SELECTOR, 'li'):
                                             ch_text = ch.get_attribute("textContent")
                                             if detail_results:
-                                                detail_results += f',{ch_text}'
+                                                detail_results += f'@@@{ch_text}'
                                             else:
                                                 detail_results += ch_text
                                 performance = detail_results

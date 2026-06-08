@@ -153,7 +153,7 @@ while category <= len(categories):
                         fields_total = []
                         for field in fields_lst:
                             fields_total.append(field.text)
-                        related_fields = ','.join(fields_total)
+                        related_fields = '###'.join(fields_total)
 
                         # 경력, 학력, 자격, 수상, 언어
                         detail_table = wait_presence_elements(driver, (By.CSS_SELECTOR, '.leeko-member-detail__table'))
@@ -170,13 +170,13 @@ while category <= len(categories):
                                     box_total.append(f'{content} ({period})')
 
                                 if detail_title == "경력":
-                                    career = ','.join(box_total)
+                                    career = '###'.join(box_total)
                                 elif detail_title == "학력":
-                                    education = ','.join(box_total)
+                                    education = '###'.join(box_total)
                                 elif detail_title == "자격/회원":
-                                    eligibility = ','.join(box_total)
+                                    eligibility = '###'.join(box_total)
                                 else:
-                                    awards = ','.join(box_total)
+                                    awards = '###'.join(box_total)
                             elif detail_title == "언어":
                                 language = wait_presence_element(detail, (By.CSS_SELECTOR, ' td')).text
 
@@ -195,12 +195,12 @@ while category <= len(categories):
                                         child_text = child.get_attribute("textContent")
                                         if child.tag_name == "dt":
                                             if detail_results:
-                                                detail_results += f'//{child_text.replace("[","").replace("]","")}]]'
+                                                detail_results += f'###{child_text.replace("[","").replace("]","")}@#@'
                                             else:
-                                                detail_results += f'{child_text.replace("[","").replace("]","")}]]'
+                                                detail_results += f'{child_text.replace("[","").replace("]","")}@#@'
                                         elif child.tag_name == "dd":
                                             if detail_results:
-                                                detail_results += f",{child_text}"
+                                                detail_results += f"@@@{child_text}"
                                             else:
                                                 detail_results += child_text
                                     if detail_title == "주요처리사례":

@@ -164,7 +164,7 @@ for num in tqdm.tqdm(range(67, 76)):
                     fields_total = []
                     for field in fields_lst:
                         fields_total.append(field.get_attribute("textContent").replace('\n', ' ').strip())
-                    related_fields = ','.join(fields_total)
+                    related_fields = '###'.join(fields_total)
 
                     # 경력
                     career_lst = wait_presence_elements(driver, (By.XPATH, '//*[@id="career"]/*[@class="bullet_list"][1]//*'))
@@ -173,7 +173,7 @@ for num in tqdm.tqdm(range(67, 76)):
                         careers_txt = careers.get_attribute("textContent").replace('\n', ' ').strip()
                         if careers_txt:
                             career_total.append(careers_txt)
-                    career = ','.join(career_total)
+                    career = '###'.join(career_total)
 
                     try:
                         # 학력
@@ -181,7 +181,7 @@ for num in tqdm.tqdm(range(67, 76)):
                         edu_total = []
                         for edus in edu_lst:
                             edu_total.append(edus.get_attribute("textContent").replace('\n', ' ').strip())
-                        education = ','.join(edu_total)
+                        education = '###'.join(edu_total)
                     except:
                         # 박성태 고문의 경우 없음
                         education = ""
@@ -194,7 +194,7 @@ for num in tqdm.tqdm(range(67, 76)):
                         eli_total = []
                         for elis in eli_lst:
                             eli_total.append(elis.get_attribute("textContent").replace('\n', ' ').strip())
-                        eligibility = ','.join(eli_total)
+                        eligibility = '###'.join(eli_total)
                     except:
                         eligibility = ""
 
@@ -204,7 +204,7 @@ for num in tqdm.tqdm(range(67, 76)):
                         lan_total = []
                         for lan in lan_lst:
                             lan_total.append(lan.get_attribute("textContent").replace('\n', ' ').strip())
-                        language = ','.join(lan_total)
+                        language = '###'.join(lan_total)
                     except:
                         language = ""
                     
@@ -227,7 +227,7 @@ for num in tqdm.tqdm(range(67, 76)):
                                         award_total = []
                                         for award in awards_lst:
                                             award_total.append(award.get_attribute("textContent").strip())
-                                        awards = ','.join(award_total)
+                                        awards = '###'.join(award_total)
                                     except:
                                         awards_lst = wait_presence_elements(extra, (By.XPATH, './/div/p'))
                                         award_total = []
@@ -235,7 +235,7 @@ for num in tqdm.tqdm(range(67, 76)):
                                             award_txt = award.get_attribute("textContent").strip()
                                             if award_txt:
                                                 award_total.append(award_txt)
-                                        awards = ','.join(award_total)
+                                        awards = '###'.join(award_total)
                                 elif act.get_attribute("textContent").strip() == "저서 및 외부활동":
                                     activity_lst = wait_presence_elements(extra, (By.CSS_SELECTOR, ' ul.field_history > *'))
                                     imsi_tit = []
@@ -244,8 +244,8 @@ for num in tqdm.tqdm(range(67, 76)):
                                             txt_tit = plus_act.get_attribute("textContent").strip()
                                             if txt_tit:
                                                 imsi_tit.append(txt_tit)
-                                    imsi_activity_txt= wait_presence_element(extra, (By.CSS_SELECTOR, ' ul.field_history')).get_attribute("textContent").replace('\n[', '//').replace(']\n', ']]').strip()
-                                    if (imsi_activity_txt[0] == '[') and (']]' in imsi_activity_txt):
+                                    imsi_activity_txt= wait_presence_element(extra, (By.CSS_SELECTOR, ' ul.field_history')).get_attribute("textContent").replace('\n[', '###').replace(']\n', '@#@').strip()
+                                    if (imsi_activity_txt[0] == '[') and ('@#@' in imsi_activity_txt):
                                         imsi_activity_txt = imsi_activity_txt[1:]
                                     imsi_activity_lst = imsi_activity_txt.split('\n')
                                     activity = ""
@@ -254,20 +254,20 @@ for num in tqdm.tqdm(range(67, 76)):
                                         if act_txt in imsi_tit:
                                             if act_txt[0] == '[' and act_txt[-1] == ']':
                                                 if not activity:
-                                                    activity += f'{act_txt[1:-1]}]]'
+                                                    activity += f'{act_txt[1:-1]}@#@'
                                                 else:
-                                                    activity += f'//{act_txt[1:-1]}]]'
+                                                    activity += f'###{act_txt[1:-1]}@#@'
                                             else:
                                                 if not activity:
-                                                    activity += f'{act_txt}]]'
+                                                    activity += f'{act_txt}@#@'
                                                 else:
-                                                    activity += f'//{act_txt}]]'
+                                                    activity += f'###{act_txt}@#@'
                                         elif act_txt:
                                             if activity:
-                                                if activity[-2:] == ']]':
+                                                if activity[-3:] == '@#@':
                                                     activity += act_txt
                                                 else:
-                                                    activity += f',{act_txt}'
+                                                    activity += f'@@@{act_txt}'
                                             else:
                                                 activity += act_txt
                         # 주요 업무 실적
@@ -290,14 +290,14 @@ for num in tqdm.tqdm(range(67, 76)):
                                     else:
                                         imsi_cont = perf.get_attribute("textContent").strip()
                                 elif (perf.tag_name == 'p') and perf.get_attribute("textContent").strip() != "":
-                                    imsi_cont = perf.get_attribute("textContent").replace('\n[', '//').replace(']\n', ']]').replace('\n', '').replace('[','').strip()
+                                    imsi_cont = perf.get_attribute("textContent").replace('\n[', '###').replace(']\n', '@#@').replace('\n', '').replace('[','').strip()
                             if imsi_tit and imsi_cont:
                                 imsi_cont_lst.append(imsi_cont)
                             if imsi_tit:
                                 perf_total = []
                                 for t, c in zip(imsi_tit, imsi_cont_lst):
-                                    perf_total.append(f'{t}]]{c}')
-                                performance = '//'.join(perf_total)
+                                    perf_total.append(f'{t}@#@{c}')
+                                performance = '###'.join(perf_total)
                             else:
                                 performance = imsi_cont
 

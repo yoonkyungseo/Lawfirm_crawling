@@ -144,15 +144,15 @@ for i in tqdm.tqdm(range(1, len(pf_lst)+1)):
                     box_total.append(content)
 
                 if detail_title == "업무분야":
-                    related_fields = ','.join(box_total)
+                    related_fields = '###'.join(box_total)
                 elif detail_title == "경력":
-                    career = ','.join(box_total)
+                    career = '###'.join(box_total)
                 elif detail_title == "학력":
-                    education = ','.join(box_total)
+                    education = '###'.join(box_total)
                 elif detail_title == "자격":
-                    eligibility = ','.join(box_total)
+                    eligibility = '###'.join(box_total)
                 else:
-                    awards = ','.join(box_total)
+                    awards = '###'.join(box_total)
             elif detail_title in ["주요업무사례", "기고"]:
                 added_total = []
                 perf = detail.find_element(By.CSS_SELECTOR, 'div.box-fold-wrap.short > div')
@@ -164,13 +164,13 @@ for i in tqdm.tqdm(range(1, len(pf_lst)+1)):
                 if added_title:
                     for tits, conts in zip(added_title, added_content):
                         conts_elements = conts.find_elements(By.CSS_SELECTOR, 'li')
-                        cts = ','.join([el.get_attribute("textContent") for el in conts_elements])
-                        added_total.append(f'{tits.get_attribute("textContent")[1:-1]}]]{cts}')
-                    added_result = '//'.join(added_total)
+                        cts = '@@@'.join([el.get_attribute("textContent") for el in conts_elements])
+                        added_total.append(f'{tits.get_attribute("textContent")[1:-1]}@#@{cts}')
+                    added_result = '###'.join(added_total)
                 else:
                     for conts in added_content:
                         conts_elements = conts.find_elements(By.CSS_SELECTOR, 'li')
-                        added_result = ','.join([el.get_attribute("textContent") for el in conts_elements])
+                        added_result = '###'.join([el.get_attribute("textContent") for el in conts_elements])
                 if detail_title == "주요업무사례":
                     performance = added_result
                 else:
