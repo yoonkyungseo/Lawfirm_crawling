@@ -74,7 +74,7 @@ driver = webdriver.Chrome(service=service, options=options)
 
 driver.get("https://www.shinkim.com/kor/member")
 driver.maximize_window()
-time.sleep(1)
+time.sleep(10)
 
 company = "세종"
 
