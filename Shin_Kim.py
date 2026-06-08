@@ -71,7 +71,7 @@ service = Service(ChromeDriverManager().install())
 driver = webdriver.Chrome(service=service, options=options)
 
 # 세종 크롤링 코드
-
+print("세종 구성원 페이지 접속 중")
 driver.get("https://www.shinkim.com/kor/member")
 driver.maximize_window()
 time.sleep(10)
@@ -80,6 +80,7 @@ company = "세종"
 
 categories = driver.find_elements(By.XPATH, '//*[@id="bizCode"]/option')
 for category in tqdm.tqdm(range(2, len(categories)+1)):
+    print(f"{category-1}번째 카테고리를 크롤링합니다.")
     pf_data = []
     # 뒤에서 page 넘길 때 사용하는 page_number
     page_num = 1
