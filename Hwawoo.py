@@ -109,7 +109,7 @@ for i in tqdm.tqdm(range(1, len(pf_lst)+1)):
         
         # 관련분야, 경력, 학력, 자격, 수상, 주요업무실적
         detail_table = driver.find_elements(By.CSS_SELECTOR, ' div.tab-wrap.box-detail-contents.tab-ctrl > article[class^="dtail"]')
-        introduction, eligibility, awards, performance, activity = "", "", "", "", ""
+        introduction, related_fields, career, education, eligibility, awards, performance, language, activity = "", "", "", "", "", "", "", "", ""
         for detail in detail_table:
             detail_title = detail.find_element(By.CSS_SELECTOR, 'h3').get_attribute("textContent").strip()
             

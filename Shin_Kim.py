@@ -170,7 +170,7 @@ for category in tqdm.tqdm(range(2, len(categories)+1)):
 
                         # 학력, 자격, 수상
                         detail_table = driver.find_elements(By.CSS_SELECTOR, 'div#keyExperience div.subsection')
-                        eligibility, awards, assessment, activity, performance, language = "", "", "", "", "", ""
+                        education, eligibility, awards, assessment, activity, performance, language = "", "", "", "", "", "", ""
                         for detail in detail_table:
                             driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", detail)
                             time.sleep(0.5)
