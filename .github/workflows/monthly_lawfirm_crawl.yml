@@ -77,7 +77,7 @@ jobs:
 
   merge_KimChang:
     needs: lawfirm_crawling
-    runs-on: ubuntu-latest # 실행할 OS 환경
+    runs-on: ubuntu-24.04 # 실행할 OS 환경
     env:
       TZ: Asia/Seoul
       PYTHONUNBUFFERED: "1"
